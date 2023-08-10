@@ -44,7 +44,7 @@ const Sidebar = styled.div`
 
   &.collapsed {
     padding-right: 26px;
-    max-width: 120px;
+    max-width: 94px;
   }
 
   @media (max-width: 768px) {
@@ -141,6 +141,16 @@ const Sidebar = styled.div`
         gap: 4px;
       }
     }
+
+    li .title {
+      display: none;
+    }
+
+    .group {
+      li:not(:first-child) {
+        display: none;
+      }
+    }
   }
 `;
 
@@ -231,13 +241,13 @@ return (
                       >
                         {subItem.href ? (
                           <a href={subItem.href}>
-                            {subItem.icon}
-                            {subItem.title}
+                            <span className="icon">{subItem.icon}</span>
+                            <span className="title">{subItem.title}</span>
                           </a>
                         ) : (
                           <div onClick={subItem.onClick} role="button">
-                            {subItem.icon}
-                            {subItem.title}
+                            <span className="icon">{subItem.icon}</span>
+                            <span className="title">{subItem.title}</span>
                           </div>
                         )}
                       </li>
@@ -252,13 +262,13 @@ return (
               <li key={i} className={item.active && "active"}>
                 {item.href ? (
                   <a href={item.href}>
-                    {item.icon}
-                    {item.title}
+                    <span className="icon">{item.icon}</span>
+                    <span className="title">{item.title}</span>
                   </a>
                 ) : (
                   <div onClick={item.onClick} role="button">
-                    {item.icon}
-                    {item.title}
+                    <span className="icon">{item.icon}</span>
+                    <span className="title">{item.title}</span>
                   </div>
                 )}
               </li>

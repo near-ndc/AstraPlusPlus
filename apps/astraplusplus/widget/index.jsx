@@ -5,13 +5,30 @@ if (!tab) {
 const currentLink = "#//*__@appAccount__*//widget/index";
 
 const tabs = [
-  {
-    title: "Home",
-    icon: <i className="bi bi-house-door"></i>,
-    href: currentLink + "?tab=home",
-    active: tab === "home",
-    widgetName: "home",
-  },
+  [
+    {
+      title: "Home",
+      icon: <i className="bi bi-house-door"></i>,
+      active: tab.split("-")[0] === "home",
+      href: currentLink + "?tab=home",
+      widgetName: "home",
+      defaultProps: {},
+    },
+    {
+      title: "Social feed",
+      active: tab === "home-social-feed",
+      href: currentLink + "?tab=home-social-feed",
+      widgetName: "home",
+      defaultProps: {},
+    },
+    {
+      title: "My proposals",
+      active: tab === "home-my-proposals",
+      href: currentLink + "?tab=home-my-proposals",
+      widgetName: "home",
+      defaultProps: {},
+    },
+  ],
   [
     {
       title: "DAOs",
