@@ -158,7 +158,7 @@ const Toggle = styled.div`
   position: absolute;
   top: 10px;
   right: -20px;
-  z-index: 1000;
+  z-index: 10;
   height: 40px;
   width: 40px;
   background: #4498e0;
@@ -195,12 +195,37 @@ return (
         <i className="bi bi-list"></i>
       </MobileToggle>
       <a
-        href="#//*__@appAccount__*//widget/home"
+        href="#//*__@appAccount__*//widget/index"
         className="h4 text-decoration-none fw-bold text-black m-0"
       >
-        ASTRA++
+        <Widget
+          src="/*__@appAccount__*//widget/Common.logo"
+          props={{
+            height: "18px",
+          }}
+        />
       </a>
-      <span>{context.accountId}</span>
+      <span
+        style={{
+          border: context.accountId ? "1px solid #4498E0" : "1px solid #E5E5E5",
+          borderRadius: "400px",
+          padding: context.accountId
+            ? "8px 20px 8px 14px"
+            : "8px 20px 8px 20px",
+          background: context.accountId ? "rgba(236, 245, 252, 0.40)" : "#fff",
+        }}
+      >
+        {context.accountId ? (
+          <Widget
+            src="/*__@replace:nui__*//widget/Element.User"
+            props={{
+              accountId: context.accountId,
+            }}
+          />
+        ) : (
+          "Not connected"
+        )}
+      </span>
     </Header>
     <Sidebar
       className={[
