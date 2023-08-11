@@ -46,7 +46,7 @@ const res = fetch(
       "x-api-key": publicApiKey,
       "no-cache": true,
     },
-  },
+  }
 );
 
 return (

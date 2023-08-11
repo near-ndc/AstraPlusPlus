@@ -145,13 +145,9 @@ return (
     </div>
     <div>
       <h5>Description</h5>
-      {typeName === "Vote" || typeName === "Bounty Done" ? (
-        <MarkdownContainer>
-          <Markdown text={description} />
-        </MarkdownContainer>
-      ) : (
-        <p>{description}</p>
-      )}
+      <MarkdownContainer>
+        <Markdown text={description} />
+      </MarkdownContainer>
     </div>
     <div
       className="d-flex flex-wrap align-items-start"
