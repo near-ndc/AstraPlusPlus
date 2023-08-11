@@ -65,7 +65,7 @@ const tabs = [
     icon: <i class="bi bi-briefcase"></i>,
     active: tab === "bounties",
     href: currentLink + "?tab=bounties",
-    widgetName: "bounties",
+    widgetName: "Bounties.index",
     defaultProps: {},
   },
   {
