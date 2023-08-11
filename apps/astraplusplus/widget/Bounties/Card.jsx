@@ -85,19 +85,26 @@ return (
     <div className="d-flex justify-content-center gap-4">
       <IconWrapper>
         <Icon success={true} />
-        <p  style={{fontSize:"11px"}}> Proposal <br/> Phase</p>
+        <p style={{ fontSize: "11px" }}>
+          {" "}
+          Proposal <br /> Phase
+        </p>
       </IconWrapper>
       <IconWrapper>
         <Icon success={true} />
-        <p style={{fontSize:"11px"}}> Available<br/> Bounty</p>
+        <p style={{ fontSize: "11px" }}>
+          {" "}
+          Available
+          <br /> Bounty
+        </p>
       </IconWrapper>
       <IconWrapper>
         <Icon success={false} />
-        <p style={{fontSize:"11px"}}> In Progress</p>
+        <p style={{ fontSize: "11px" }}> In Progress</p>
       </IconWrapper>
       <IconWrapper>
         <Icon success={false} />
-        <p style={{fontSize:"11px"}}> Completed</p>
+        <p style={{ fontSize: "11px" }}> Completed</p>
       </IconWrapper>
     </div>
     <p className="text-muted small">Description</p>

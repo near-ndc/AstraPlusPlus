@@ -1,18 +1,10 @@
-const accountId = props.accountId ?? context.accountId ?? "sking.near";
+/*__@import:daoHelpers/getFollowedDAOs__*/
 
-let following = Social.keys(`${accountId}/graph/follow/*`, "final", {
-  return_type: "BlockHeight",
-});
+const following = getFollowedDAOs(props.accountId ?? context.accountId ?? "");
 
 if (following === null) {
   return "";
 }
-
-following = Object.keys(following[accountId].graph.follow).filter((account) =>
-  account.endsWith(".sputnik-dao.near")
-);
-
-
 
 const feeds = [
   {
