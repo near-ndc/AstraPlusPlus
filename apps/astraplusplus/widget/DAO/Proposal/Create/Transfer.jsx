@@ -119,7 +119,11 @@ return (
   <>
     <div className="mb-2">
       <h5>Recipient</h5>
-      <input type="text" onChange={(e) => onChangeRecipient(e.target.value)} />
+      <input
+        type="text"
+        onChange={(e) => onChangeRecipient(e.target.value)}
+        placeholder="Specify target account"
+      />
     </div>
     <div className="mb-3">
       <h5>Token Address</h5>
