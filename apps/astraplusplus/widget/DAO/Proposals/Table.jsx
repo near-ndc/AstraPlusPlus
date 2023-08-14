@@ -40,9 +40,9 @@ const renderRow = (proposal, proposal_type, proposal_id, i) => {
           }}
         />
       </td>
-      <td>{proposal_type}</td>
-      <td>{proposal.status}</td>
-      <td>
+      <td className="text-center">{proposal_type}</td>
+      <td className="text-center">{proposal.status}</td>
+      <td className="text-end">
         <Widget
           src="nearui.near/widget/Layout.Modal"
           props={{
@@ -75,6 +75,10 @@ const renderRow = (proposal, proposal_type, proposal_id, i) => {
 const Table = styled.div`
   font-size: 13px;
   font-weight: 600;
+  max-width: 100%;
+  overflow-x: auto;
+  height: 100%;
+  min-height: 100%;
 
   td,
   th {
@@ -100,7 +104,7 @@ return (
   <Table
     class="table-responsive my-3"
     style={{
-      height: 65 * (proposals?.length ?? resPerPage),
+      minHeight: 65 * (proposals?.length ?? resPerPage),
     }}
   >
     {proposals === null ? (
@@ -114,8 +118,8 @@ return (
             <th scope="col">ID</th>
             <th scope="col">Date</th>
             <th scope="col">Proposer</th>
-            <th scope="col">Type</th>
-            <th scope="col">Status</th>
+            <th scope="col" className="text-center">Type</th>
+            <th scope="col" className="text-center">Status</th>
             <th scope="col"></th>
           </tr>
         </thead>
