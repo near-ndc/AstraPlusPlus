@@ -42,31 +42,33 @@ const renderRow = (proposal, proposal_type, proposal_id, i) => {
       </td>
       <td className="text-center">{proposal_type}</td>
       <td className="text-center">{proposal.status}</td>
-      <td className="text-end">
-        <Widget
-          src="nearui.near/widget/Layout.Modal"
-          props={{
-            toggle: (
-              <Widget
-                src="nearui.near/widget/Input.Button"
-                props={{
-                  children: "More details",
-                  variant: "info",
-                }}
-              />
-            ),
-            content: (
-              <Widget
-                src="astraplusplus.ndctools.near/widget/DAO.Proposals.Card.index"
-                props={{
-                  daoId: state.daoId,
-                  proposalString: JSON.stringify(proposal),
-                  multiSelectMode: state.multiSelectMode,
-                }}
-              />
-            ),
-          }}
-        />
+      <td>
+        <div className="d-flex justify-content-end">
+          <Widget
+            src="nearui.near/widget/Layout.Modal"
+            props={{
+              toggle: (
+                <Widget
+                  src="nearui.near/widget/Input.Button"
+                  props={{
+                    children: "More details",
+                    variant: "info",
+                  }}
+                />
+              ),
+              content: (
+                <Widget
+                  src="astraplusplus.ndctools.near/widget/DAO.Proposals.Card.index"
+                  props={{
+                    daoId: state.daoId,
+                    proposalString: JSON.stringify(proposal),
+                    multiSelectMode: state.multiSelectMode,
+                  }}
+                />
+              ),
+            }}
+          />
+        </div>
       </td>
     </tr>
   );
@@ -118,8 +120,12 @@ return (
             <th scope="col">ID</th>
             <th scope="col">Date</th>
             <th scope="col">Proposer</th>
-            <th scope="col" className="text-center">Type</th>
-            <th scope="col" className="text-center">Status</th>
+            <th scope="col" className="text-center">
+              Type
+            </th>
+            <th scope="col" className="text-center">
+              Status
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
