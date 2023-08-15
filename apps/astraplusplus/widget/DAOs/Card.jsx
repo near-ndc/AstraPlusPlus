@@ -118,6 +118,7 @@ const Wrapper = styled.div`
 
     p > b {
       font-size: 1.15rem;
+      font-weight: 700;
     }
   }
 
