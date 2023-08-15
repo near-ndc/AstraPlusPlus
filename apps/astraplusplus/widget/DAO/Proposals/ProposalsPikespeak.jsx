@@ -6,9 +6,10 @@ const publicApiKey = "/*__@replace:pikespeakApiKey__*/";
 const resPerPage = 10;
 
 const defaultMultiSelectMode = Storage.privateGet("multiSelectMode");
+const defaultTableView = Storage.privateGet("tableView");
 
 if (defaultMultiSelectMode === null) return "";
-console.log(defaultMultiSelectMode);
+if (defaultTableView === null) return "";
 
 State.init({
   daoId,
@@ -22,7 +23,10 @@ State.init({
   },
   filtersOpen: false,
   multiSelectMode: defaultMultiSelectMode ?? false,
+  tableView: defaultTableView ?? false,
 });
+
+const update = (newState) => State.update(newState);
 
 const forgeUrl = (apiUrl, params) =>
   apiUrl +
@@ -44,14 +48,33 @@ const res = fetch(
     mode: "cors",
     headers: {
       "x-api-key": publicApiKey,
-      "no-cache": true,
     },
   }
 );
 
+const preloadNextPage = () => {
+  fetch(
+    forgeUrl(apiUrl, {
+      offset: (state.page + 1) * resPerPage,
+      limit: resPerPage,
+      daos: state.daos,
+      proposal_types: state.filters.proposal_types,
+      status: state.filters.status,
+      time_start: state.filters.time_start,
+      time_end: state.filters.time_end,
+    }),
+    {
+      mode: "cors",
+      headers: {
+        "x-api-key": publicApiKey,
+      },
+    }
+  );
+};
+
 return (
   <>
-    <div className="d-flex align-items-center gap-2">
+    <div className="d-flex align-items-center gap-2" id="proposals-top">
       <Widget
         src="nearui.near/widget/Input.Text"
         props={{
@@ -93,6 +116,26 @@ return (
             State.update({
               ...state,
               multiSelectMode: !state.multiSelectMode,
+            });
+          },
+        }}
+      />
+      <Widget
+        src="nearui.near/widget/Input.Button"
+        props={{
+          children: (
+            <>
+              Table View {state.tableView ? "On" : "Off"}
+              <i class="bi bi-table"></i>
+            </>
+          ),
+          variant: "secondary outline",
+          size: "md",
+          onClick: () => {
+            Storage.privateSet("tableView", !state.tableView);
+            State.update({
+              ...state,
+              tableView: !state.tableView,
             });
           },
         }}
@@ -152,67 +195,52 @@ return (
       </div>
     )}
 
-    <div
-      style={{
-        minHeight: 650 * (res.body?.length ?? resPerPage),
-      }}
-    >
-      {res == null && (
-        <>
-          {new Array(resPerPage).fill(0).map((_, i) => (
-            <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
-          ))}
-        </>
+    <div>
+      {state.tableView ? (
+        <Widget
+          src="/*__@appAccount__*//widget/DAO.Proposals.Table"
+          props={{
+            state,
+            resPerPage,
+            proposals: res === null ? null : res.body,
+          }}
+        />
+      ) : (
+        <Widget
+          src="/*__@appAccount__*//widget/DAO.Proposals.CardsList"
+          props={{
+            state,
+            resPerPage,
+            proposals: res === null ? null : res.body,
+          }}
+        />
       )}
-      {res !== null &&
-        res.body.map(({ proposal, proposal_type, proposal_id }, i) => {
-          proposal.kind = {
-            [proposal_type]: {
-              ...proposal.kind,
-            },
-          };
-          proposal.id = proposal_id;
-          if (proposal.status === "Removed") return <></>;
-          Object.keys(proposal.vote_counts).forEach((k) => {
-            if (typeof proposal.vote_counts[k] == "string") {
-              proposal.vote_counts[k] = proposal.vote_counts[k]
-                .match(/.{1,2}/g)
-                .map((x) => parseInt(x));
-            }
-          });
-          return (
-            <Widget
-              key={i}
-              src={"/*__@appAccount__*//widget/DAO.Proposals.Card.index"}
-              props={{
-                daoId: state.daoId,
-                proposalString: JSON.stringify(proposal),
-                multiSelectMode: state.multiSelectMode,
-              }}
-            />
-          );
-        })}
 
       <div className="d-flex justify-content-center my-4">
         <Widget
           src="nearui.near/widget/Navigation.PrevNext"
           props={{
             hasPrev: state.page > 0,
-            hasNext: res.body.length == resPerPage,
+            hasNext: res && res.body.length == resPerPage,
             onPrev: () => {
-              State.update({
+              update({
                 page: state.page - 1,
               });
             },
             onNext: () => {
-              State.update({
+              update({
                 page: state.page + 1,
               });
             },
+            nextProps: {
+              onMouseEnter: preloadNextPage,
+            },
+            nextHref: `#proposals-top`,
           }}
         />
       </div>
     </div>
+
     {state.multiSelectMode && (
       <>
         <div
