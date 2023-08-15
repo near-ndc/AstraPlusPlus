@@ -10,7 +10,8 @@ State.init({
 const update = (state) => State.update(state);
 
 const constructURL = (paramObj, base) => {
-  const baseURL = base ?? `#/${widgetOwner}/widget/DAO`;
+  paramObj = { ...paramObj, page: "dao" };
+  const baseURL = base ?? `#/${widgetOwner}/widget/index`;
   let params = "";
   for (const [key, value] of Object.entries(paramObj)) {
     params += `${key}=${value}&`;

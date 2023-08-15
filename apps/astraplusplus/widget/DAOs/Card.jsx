@@ -1,3 +1,4 @@
+const { router } = props;
 const daoId = props.daoId;
 const balance = props.balance;
 
@@ -28,13 +29,13 @@ const fether = {
   balances: (accounts) => {
     return fetch(
       constructURL(`${baseApi}/account/balances`, { accounts }),
-      fetchApiConfig,
+      fetchApiConfig
     );
   },
   proposalsStatus: (daoId) => {
     return fetch(
       constructURL(`${baseApi}/daos/proposals/status/${daoId}`),
-      fetchApiConfig,
+      fetchApiConfig
     );
   },
 };
@@ -82,7 +83,7 @@ const shortenNumber = (n) => {
 };
 
 const daoLink = ({ daoId, tab }) => {
-  return `#//*__@appAccount__*//widget/DAO?daoId=${daoId}${
+  return `#//*__@appAccount__*//widget/index?page=dao&daoId=${daoId}${
     tab && `&tab=${tab}`
   }`;
 };
@@ -139,7 +140,13 @@ return (
       src="nearui.near/widget/Element.User"
       props={{
         accountId: daoId,
-        href: "#//*__@appAccount__*//widget/DAO?daoId=" + daoId,
+        href: daoLink({ daoId }),
+        onClick: () => {
+          router.navigate({
+            page: "dao",
+            daoId,
+          });
+        },
       }}
     />
     <p className="text-muted overflow-hidden small my-3 mx-1">
@@ -167,19 +174,55 @@ return (
       </p>
     </div>
     <div className="d-flex gap-2 justify-content-around gap-3 mb-3">
-      <a href={daoLink({ daoId, tab: "settings" })}>
+      <a
+        href={daoLink({ daoId, tab: "settings" })}
+        onClick={() => {
+          router.navigate({
+            page: "dao",
+            daoId,
+            tab: "settings",
+          });
+        }}
+      >
         <i className="bi me-1 bi-gear" />
         Settings
       </a>
-      <a href={daoLink({ daoId, tab: "nfts" })}>
+      <a
+        href={daoLink({ daoId, tab: "nfts" })}
+        onClick={() => {
+          router.navigate({
+            page: "dao",
+            daoId,
+            tab: "nfts",
+          });
+        }}
+      >
         <i className="bi me-1 bi-image" />
         NFTs
       </a>
-      <a href={daoLink({ daoId, tab: "bounties" })}>
+      <a
+        href={daoLink({ daoId, tab: "bounties" })}
+        onClick={() => {
+          router.navigate({
+            page: "dao",
+            daoId,
+            tab: "bounties",
+          });
+        }}
+      >
         <i className="bi me-1 bi-briefcase" />
         Bounties
       </a>
-      <a href={daoLink({ daoId, tab: "proposals" })}>
+      <a
+        href={daoLink({ daoId, tab: "proposals" })}
+        onClick={() => {
+          router.navigate({
+            page: "dao",
+            daoId,
+            tab: "proposals",
+          });
+        }}
+      >
         <i className="bi me-1 bi-question-circle" />
         Polls
       </a>
@@ -205,6 +248,12 @@ return (
           },
           children: <>View Profile</>,
           href: daoLink({ daoId }),
+          onClick: () => {
+            router.navigate({
+              page: "dao",
+              daoId,
+            });
+          },
         }}
       />
     </div>

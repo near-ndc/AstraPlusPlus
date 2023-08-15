@@ -1,30 +1,71 @@
-let { tab } = props;
-if (!tab) {
-  tab = "home";
+let { page, tab, daoId } = props;
+if (!page) {
+  page = "home";
 }
 const currentLink = "#//*__@appAccount__*//widget/index";
 
-const tabs = [
+State.init({
+  activePage: page,
+  activeTab: tab,
+  activeDaoId: daoId,
+});
+
+if (
+  page !== state.activePage ||
+  tab !== state.activeTab ||
+  daoId !== state.activeDaoId
+) {
+  State.update({
+    activePage: page,
+    activeTab: tab,
+    activeDaoId: daoId,
+  });
+}
+
+page = state.activePage;
+
+const router = {
+  params: {
+    page: page,
+    tab: tab,
+    daoId: daoId,
+  },
+  navigate: (newParams) => {
+    router.params = {
+      ...newParams,
+    };
+    State.update({
+      activePage: router.params.page,
+      activeTab: router.params.tab,
+      activeDaoId: router.params.daoId,
+    });
+  },
+};
+
+const pages = [
   [
     {
       title: "Home",
       icon: <i className="bi bi-house-door"></i>,
-      active: tab.split("-")[0] === "home",
-      href: currentLink + "?tab=home",
+      active: page.split("-")[0] === "home",
+      href: currentLink + "?page=home",
+      onClick: () => router.navigate({ page: "home" }),
       widgetName: "Feed.index",
       defaultProps: {},
     },
     {
       title: "Social feed",
-      active: tab === "home",
-      href: currentLink + "?tab=home",
+      active: page === "home",
+      href: currentLink + "?page=home",
+      onClick: () => router.navigate({ page: "home" }),
       widgetName: "Feed.index",
       defaultProps: {},
     },
     {
       title: "My proposals",
-      active: tab === "my-proposals",
-      href: currentLink + "?tab=my-proposals",
+      active: page === "my-proposals",
+      href: currentLink + "?page=my-proposals",
+      onClick: () => router.navigate({ page: "my-proposals" }),
       widgetName: "MyProposals.index",
       defaultProps: {},
     },
@@ -33,15 +74,17 @@ const tabs = [
     {
       title: "DAOs",
       icon: <i class="bi bi-grid"></i>,
-      active: tab === "daos",
-      href: currentLink + "?tab=daos",
+      active: page === "daos",
+      href: currentLink + "?page=daos",
+      onClick: () => router.navigate({ page: "daos" }),
       widgetName: "DAOs.index",
       defaultProps: {},
     },
     {
       title: "NDC Governance",
-      active: tab === "daos-ndc",
-      href: currentLink + "?tab=daos-ndc",
+      active: page === "daos-ndc",
+      href: currentLink + "?page=daos-ndc",
+      onClick: () => router.navigate({ page: "daos-ndc" }),
       widgetName: "DAOs.index",
       defaultProps: {
         filter: "ndcDAOs",
@@ -49,77 +92,92 @@ const tabs = [
     },
     {
       title: "My DAOs",
-      active: tab === "my-daos",
-      href: currentLink + "?tab=my-daos",
+      active: page === "my-daos",
+      href: currentLink + "?page=my-daos",
       widgetName: "DAOs.index",
+      onClick: () => router.navigate({ page: "my-daos" }),
       defaultProps: {
         filter: "myDAOs",
       },
     },
     {
       title: "Following",
-      active: tab === "daos-following",
-      href: currentLink + "?tab=daos-following",
+      active: page === "daos-following",
+      href: currentLink + "?page=daos-following",
       widgetName: "DAOs.index",
+      onClick: () => router.navigate({ page: "daos-following" }),
       defaultProps: {
         filter: "followedDAOs",
       },
     },
     {
       title: "All",
-      active: tab === "daos",
-      href: currentLink + "?tab=daos",
+      active: page === "daos",
+      href: currentLink + "?page=daos",
       widgetName: "DAOs.index",
+      onClick: () => router.navigate({ page: "daos" }),
       defaultProps: {},
     },
   ],
   {
     title: "Bounties area",
     icon: <i class="bi bi-briefcase"></i>,
-    active: tab === "bounties",
-    href: currentLink + "?tab=bounties",
+    active: page === "bounties",
+    href: currentLink + "?page=bounties",
+    onClick: () => router.navigate({ page: "bounties" }),
     widgetName: "Bounties.index",
     defaultProps: {},
   },
   {
     title: "Actions library",
     icon: <i class="bi bi-code-slash"></i>,
-    active: tab === "actions",
-    href: currentLink + "?tab=actions",
+    active: page === "actions",
+    href: currentLink + "?page=actions",
+    onClick: () => router.navigate({ page: "actions" }),
     widgetName: "actions",
   },
   {
     title: "Create DAO",
-    active: tab === "create-dao",
-    href: currentLink + "?tab=create-dao",
+    active: page === "create-dao",
+    href: currentLink + "?page=create-dao",
+    onClick: () => router.navigate({ page: "create-dao" }),
     widgetName: "CreateDAO.index",
+    hidden: true,
+  },
+  {
+    title: "DAO",
+    active: page === "dao",
+    href: currentLink + "?page=dao",
+    onClick: (daoId, tab) => router.navigate({ page: "dao", daoId, tab }),
+    widgetName: "DAO.index",
     hidden: true,
   },
 ];
 
-let activeTab = null;
-tabs.find((tab) => {
-  if (Array.isArray(tab)) {
-    return tab.find((subTab) => {
-      if (subTab.active) {
-        activeTab = subTab;
+let activePage = null;
+pages.find((page) => {
+  if (Array.isArray(page)) {
+    return page.find((subPage) => {
+      if (subPage.active) {
+        activePage = subPage;
         return true;
       }
       return false;
     });
   }
-  if (tab.active) {
-    activeTab = tab;
+  if (page.active) {
+    activePage = page;
     return true;
   }
   return false;
 });
 
-const tabContent = activeTab ? (
+const pageContent = activePage ? (
   <Widget
-    src={"/*__@appAccount__*//widget/" + activeTab.widgetName}
+    src={"/*__@appAccount__*//widget/" + activePage.widgetName}
     props={{
-      ...activeTab.defaultProps,
+      router,
+      ...activePage.defaultProps,
       ...props,
     }}
   />
@@ -172,11 +230,9 @@ return (
     <Widget
       src="/*__@appAccount__*//widget/Common.Layout.Header"
       props={{
-        items: tabs,
+        items: pages,
       }}
     />
-    <div className="col ms-sm-4 ps-lg-5 py-3 py-md-5">
-      {tabContent}
-    </div>
+    <div className="col ms-sm-4 ps-lg-5 py-3 py-md-5">{pageContent}</div>
   </Root>
 );

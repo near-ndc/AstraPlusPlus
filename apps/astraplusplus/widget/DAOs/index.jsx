@@ -1,9 +1,8 @@
 /*__@import:daoHelpers/getFollowedDAOs__*/
 
+const { router } = props;
 const filter = props.filter;
 const accountId = props.accountId ?? context.accountId ?? "";
-
-console.log("filter", filter);
 
 let followedDAOs = null;
 if (filter === "followedDAOs") {
@@ -40,7 +39,7 @@ if (filter === "followedDAOs") {
         }));
       }),
     "my-daos-" + accountId,
-    { subscribe: false },
+    { subscribe: false }
   );
 } else if (filter === "ndcDAOs") {
   daos = [
@@ -61,7 +60,7 @@ if (filter === "followedDAOs") {
         },
       }).then((res) => res.body),
     "all-daos",
-    { subscribe: false },
+    { subscribe: false }
   );
 }
 
@@ -98,6 +97,7 @@ const renderDAOs = () => {
       src="/*__@appAccount__*//widget/DAOs.list"
       props={{
         daos,
+        router,
       }}
     />
   );
