@@ -32,7 +32,7 @@ const Profile = styled.div`
 `;
 
 const BG = styled.div`
-  --bs-aspect-ratio: 20%;
+  --bs-aspect-ratio: 16%;
   background-color: #eee;
   background-size: cover;
   background-position: center;

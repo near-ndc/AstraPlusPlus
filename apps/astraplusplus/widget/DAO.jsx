@@ -1,11 +1,16 @@
 const widgetOwner = "/*__@appAccount__*/";
 const currentLink = "#//*__@appAccount__*//widget/index";
+let { tab } = props;
+if (!tab) {
+  tab = "home";
+}
 
 const tabs = [
   [
     {
       title: "Home",
       icon: <i className="bi bi-house-door"></i>,
+      active: tab.split("-")[0] === "home",
       href: currentLink + "?tab=home",
       widgetName: "Feed.index",
       defaultProps: {},
@@ -28,29 +33,43 @@ const tabs = [
   [
     {
       title: "DAOs",
-      icon: <i class="bi bi-grid bi-"></i>,
-      href: currentLink + "?tab=daos-all",
+      icon: <i class="bi bi-grid"></i>,
+      active: tab === "daos",
+      href: currentLink + "?tab=daos",
       widgetName: "DAOs.index",
       defaultProps: {},
     },
     {
-      title: "NDC",
+      title: "NDC Governance",
       active: tab === "daos-ndc",
       href: currentLink + "?tab=daos-ndc",
       widgetName: "DAOs.index",
-      defaultProps: {},
+      defaultProps: {
+        filter: "ndcDAOs",
+      },
+    },
+    {
+      title: "My DAOs",
+      active: tab === "my-daos",
+      href: currentLink + "?tab=my-daos",
+      widgetName: "DAOs.index",
+      defaultProps: {
+        filter: "myDAOs",
+      },
     },
     {
       title: "Following",
       active: tab === "daos-following",
       href: currentLink + "?tab=daos-following",
       widgetName: "DAOs.index",
-      defaultProps: {},
+      defaultProps: {
+        filter: "followedDAOs",
+      },
     },
     {
       title: "All",
-      active: tab === "daos-all",
-      href: currentLink + "?tab=daos-all",
+      active: tab === "daos",
+      href: currentLink + "?tab=daos",
       widgetName: "DAOs.index",
       defaultProps: {},
     },
@@ -60,7 +79,7 @@ const tabs = [
     icon: <i class="bi bi-briefcase"></i>,
     active: tab === "bounties",
     href: currentLink + "?tab=bounties",
-    widgetName: "bounties",
+    widgetName: "Bounties.index",
     defaultProps: {},
   },
   {

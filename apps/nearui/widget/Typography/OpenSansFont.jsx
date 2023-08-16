@@ -1,7 +1,7 @@
 const demoMode = props.demoMode ?? false;
 
 const fontCss = fetch(
-  "https://fonts.googleapis.com/css?family=Open%20Sans",
+  "https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap",
 ).body;
 
 if (!fontCss) {

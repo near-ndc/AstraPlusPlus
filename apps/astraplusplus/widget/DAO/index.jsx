@@ -76,17 +76,6 @@ const tabContent = (
   />
 );
 
-const Main = styled.div`
-  display: grid;
-  gap: 40px;
-  grid-template-columns: 352px minmax(0, 1fr);
-  align-items: start;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-`;
-
 // To keep our styles  consistent across widgets, let's define them here based on html tags and classes
 const Root = styled.div`
   font-family:
@@ -147,6 +136,7 @@ const Root = styled.div`
   a {
     color: #000;
     text-decoration: none;
+    transition: color 0.1s ease-in-out;
   }
 
   a:hover {
@@ -172,24 +162,16 @@ return (
         daoId: state.daoId,
       }}
     />
-    <Main>
+    <div className="w-100">
       <Widget
-        src={`${widgetOwner}/widget/DAO.Layout.Sidebar`}
+        src={`${widgetOwner}/widget/DAO.Layout.Tabs`}
         props={{
-          daoId: state.daoId,
+          tabs: tabs,
+          tab: state.tab,
+          update,
         }}
       />
-      <div>
-        <Widget
-          src={`${widgetOwner}/widget/DAO.Layout.Tabs`}
-          props={{
-            tabs: tabs,
-            tab: state.tab,
-            update,
-          }}
-        />
-        {tabContent}
-      </div>
-    </Main>
+      {tabContent}
+    </div>
   </Root>
 );
