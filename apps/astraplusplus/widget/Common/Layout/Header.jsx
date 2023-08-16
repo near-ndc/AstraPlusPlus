@@ -265,7 +265,7 @@ return (
                         }}
                       >
                         {subItem.href ? (
-                          <a href={subItem.href}>
+                          <a href={subItem.href} onClick={subItem.onClick}>
                             <span className="icon">{subItem.icon}</span>
                             <span className="title">{subItem.title}</span>
                           </a>
@@ -286,7 +286,7 @@ return (
             return (
               <li key={i} className={item.active && "active"}>
                 {item.href ? (
-                  <a href={item.href}>
+                  <a href={item.href} onClick={item.onClick}>
                     <span className="icon">{item.icon}</span>
                     <span className="title">{item.title}</span>
                   </a>
