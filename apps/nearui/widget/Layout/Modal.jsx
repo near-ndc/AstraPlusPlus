@@ -1,4 +1,5 @@
 const toggle = props.toggle ?? <button>Open Modal</button>;
+const toggleContainerProps = props.toggleContainerProps ?? {};
 const content = props.content ?? (
   <div className="p-5 bg-white">Modal Content</div>
 );
@@ -32,7 +33,7 @@ const Content = styled.div`
   }
 `;
 
-const NoButton = styled.button`
+const NoButton = styled.div`
   background: transparent;
   border: none;
   padding: 0;
@@ -43,7 +44,7 @@ const NoButton = styled.button`
 return (
   <Dialog.Root open={open} onOpenChange={onOpenChange}>
     <Dialog.Trigger asChild>
-      <NoButton>{toggle}</NoButton>
+      <NoButton {...toggleContainerProps}>{toggle}</NoButton>
     </Dialog.Trigger>
     <Dialog.Overlay asChild>
       <Overlay>
