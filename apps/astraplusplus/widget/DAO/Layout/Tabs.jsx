@@ -7,13 +7,12 @@ const Container = styled.div`
   height: 48px;
   border-bottom: 1px solid #eceef0;
   margin-bottom: 28px;
-  overflow: auto;
+  overflow-x: auto;
   scroll-behavior: smooth;
+  max-width: 100%;
 
   @media (max-width: 1200px) {
     border-top: 1px solid #eceef0;
-    margin: 0 -12px 26px;
-
     > * {
       flex: 1;
     }

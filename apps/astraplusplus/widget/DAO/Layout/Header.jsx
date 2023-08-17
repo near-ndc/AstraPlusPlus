@@ -47,10 +47,6 @@ const config = useCache(
 if (policy === null) return "";
 if (config === null) return "";
 
-console.log(config);
-
-console.log(profile);
-
 profile = {
   ...profile,
   name: profile.name || config.metadata?.displayName || daoId,
@@ -121,6 +117,25 @@ const Root = styled.div`
     display: grid;
     grid-template-columns: 140px 1fr 240px;
     grid-gap: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .profile__metadata {
+      grid-template-columns: 140px 1fr;
+      grid-gap: 1rem;
+    }
+    .profile__buttons {
+      grid-column: 1 / span 2;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .profile__metadata {
+      grid-template-columns: 1fr;
+    }
+    .profile__buttons {
+      grid-column: 1 / span 1;
+    }
   }
 `;
 
@@ -282,10 +297,13 @@ return (
             children: "See more details",
           }}
         />
-        <div className="d-flex gap-2">
+        <div className="d-flex gap-2 mb-4">
           <Widget
             src="nearui.near/widget/Layout.Modal"
             props={{
+              toggleContainerProps: {
+                className: "w-100",
+              },
               toggle: (
                 <Widget
                   src="/*__@replace:nui__*//widget/Input.Button"
