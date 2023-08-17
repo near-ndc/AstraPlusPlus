@@ -4,7 +4,8 @@ const accountId = context.accountId;
 
 const proposal = proposalString ? JSON.parse(proposalString) : null;
 
-let roles = Near.view(daoId, "get_policy");
+const policy = Near.view(daoId, "get_policy");
+let roles = policy;
 
 if (roles === null)
   return (
@@ -104,6 +105,55 @@ const expensiveWork = () => {
 
   // --- end check user permissions
 
+  // --- Votes required:
+  // TODO: Needs to be reviewed
+
+  let totalVotesNeeded = 0;
+
+  policy.roles.forEach((role) => {
+    // Determine if the role is eligible for the given proposalType
+    const isRoleAllowedToVote =
+      role.permissions.includes(`${proposalKinds[kindName]}:VoteApprove`) ||
+      role.permissions.includes(`${proposalKinds[kindName]}:VoteReject`) ||
+      role.permissions.includes(`${proposalKinds[kindName]}:*`) ||
+      role.permissions.includes(`*:VoteApprove`) ||
+      role.permissions.includes(`*:VoteReject`) ||
+      role.permissions.includes("*:*");
+
+    if (isRoleAllowedToVote) {
+      const threshold = (role.vote_policy &&
+        role.vote_policy[proposalKinds[kindName]]?.threshold) ||
+        policy["default_vote_policy"]?.threshold || [0, 0];
+      const eligibleVoters = role.kind.Group ? role.kind.Group.length : 0;
+
+      // Apply the threshold
+      const votesNeeded = Math.ceil(
+        (threshold[0] / threshold[1]) * eligibleVoters
+      );
+
+      totalVotesNeeded += votesNeeded;
+    }
+  });
+
+  let totalVotes = {
+    yes: 0,
+    no: 0,
+    spam: 0,
+    total: 0,
+  };
+
+  Object.keys(my_proposal.vote_counts).forEach((key) => {
+    totalVotes.yes += my_proposal.vote_counts[key][0];
+    totalVotes.no += my_proposal.vote_counts[key][1];
+    totalVotes.spam += my_proposal.vote_counts[key][2];
+  });
+
+  totalVotes.total = totalVotes.yes + totalVotes.no + totalVotes.spam;
+
+  my_proposal.totalVotesNeeded = totalVotesNeeded;
+  my_proposal.totalVotes = totalVotes;
+  // --- end Votes required
+
   my_proposal.typeName = kindName.replace(/([A-Z])/g, " $1").trim(); // Add spaces between camelCase
   my_proposal.statusName = proposal.status.replace(/([A-Z])/g, " $1").trim();
 
@@ -136,6 +186,7 @@ return (
       isAllowedToVote: state.isAllowedToVote,
       multiSelectMode,
       daoId,
+      policy,
     }}
   />
 );

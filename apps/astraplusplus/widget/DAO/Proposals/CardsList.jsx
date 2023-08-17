@@ -3,7 +3,6 @@ const { proposals, resPerPage, state, update } = props;
 return (
   <div
     style={{
-      minHeight: 650 * (proposals?.length ?? resPerPage),
     }}
   >
     {proposals === null && (
