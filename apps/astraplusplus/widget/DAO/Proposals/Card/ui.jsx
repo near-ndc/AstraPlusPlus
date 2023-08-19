@@ -17,6 +17,7 @@ const {
   proposal,
   policy,
   handleVote,
+  comments,
 } = props;
 const accountId = context.accountId;
 
@@ -27,14 +28,12 @@ const Wrapper = styled.div`
   margin: 16px auto;
   border-radius: 16px;
   padding: 24px;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
   min-height: 500px;
   width: 100%;
   border: 1px solid #fff;
-  background-color: #fff;
 
   ${({ status }) =>
     status === "Approved" &&
@@ -80,8 +79,6 @@ function renderHeader({ typeName, id, daoId, statusName }) {
   let statusicon;
   let statustext;
   let statusvariant;
-
-  console.log(statusName);
 
   switch (statusName) {
     case "Approved":
@@ -194,7 +191,7 @@ function renderData({
             <h5 className="text-muted h6">Submission date</h5>
             <p className="text-muted">
               {new Date(
-                parseInt(Big(submission_time).div(1000000))
+                parseInt(Big(submission_time).div(1000000)),
               ).toLocaleString()}
             </p>
           </div>
@@ -210,7 +207,13 @@ function renderData({
   );
 }
 
-function renderVoteButtons({ totalVotes, statusName, votes, accountId }) {
+function renderVoteButtons({
+  totalVotes,
+  statusName,
+  votes,
+  accountId,
+  isAllowedToVote,
+}) {
   const VoteButton = styled.button`
     width: 100%;
     border-radius: 15px;
@@ -236,7 +239,7 @@ function renderVoteButtons({ totalVotes, statusName, votes, accountId }) {
       color: #000;
       transition: all 0.4s ease-in-out;
     }
-    ${({ finsihed, percentage }) => {
+    ${({ finsihed, percentage, disabled }) => {
       if (finsihed) {
         if (percentage > 80) {
           return `
@@ -245,7 +248,7 @@ function renderVoteButtons({ totalVotes, statusName, votes, accountId }) {
         }
       `;
         }
-      } else {
+      } else if (!disabled) {
         return `
         &:hover.no > div:last-child {
           color: rgb(var(--vote-button-color)) !important;
@@ -348,8 +351,6 @@ function renderVoteButtons({ totalVotes, statusName, votes, accountId }) {
 
   const alreadyVoted = voted.yes || voted.no || voted.spam;
 
-  // TODO: check permision if user can Vote
-
   return (
     <div
       className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
@@ -375,7 +376,7 @@ function renderVoteButtons({ totalVotes, statusName, votes, accountId }) {
           wins={wins.yes}
           myVote={voted.yes}
           onClick={() => handleVote("Approve")}
-          disabled={alreadyVoted || finsihed}
+          disabled={alreadyVoted || finsihed || !isAllowedToVote[0]}
         >
           <div>
             {wins.yes && (
@@ -414,7 +415,7 @@ function renderVoteButtons({ totalVotes, statusName, votes, accountId }) {
           wins={wins.no}
           myVote={voted.no}
           onClick={() => handleVote("Reject")}
-          disabled={alreadyVoted || finsihed}
+          disabled={alreadyVoted || finsihed || !isAllowedToVote[1]}
         >
           <div className="d-flex gap-2 align-items-center">
             {wins.no && (
@@ -453,7 +454,7 @@ function renderVoteButtons({ totalVotes, statusName, votes, accountId }) {
           wins={wins.spam}
           myVote={voted.spam}
           onClick={() => handleVote("Remove")}
-          disabled={alreadyVoted || finsihed}
+          disabled={alreadyVoted || finsihed || !isAllowedToVote[2]}
         >
           <div>
             <span>Spam</span>
@@ -466,9 +467,97 @@ function renderVoteButtons({ totalVotes, statusName, votes, accountId }) {
   );
 }
 
+function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
+  const items = [
+    {
+      title: "Comments",
+      icon: "bi bi-chat-left-text",
+      count: comments.length || 0,
+      widget: "Common.Modals.Comments",
+      props: {
+        daoId,
+        proposal,
+        commentsCount: comments.length,
+        item: {
+          type: "dao_proposal_comment",
+          path: `${daoId}/proposal/main`,
+          proposal_id: proposal.id + "-beta",
+        },
+      },
+    },
+    {
+      title: "Voters",
+      icon: "bi bi-people",
+      count: totalVotes.total,
+      widget: "Common.Modals.Voters",
+      props: {
+        daoId,
+        votes,
+        totalVotes,
+      },
+    },
+    {
+      title: "Share",
+      icon: "bi bi-share",
+      widget: "Common.Modals.Share",
+      props: {
+        daoId,
+        proposal,
+      },
+    },
+    {
+      title: "More details",
+      icon: "bi bi-three-dots",
+      widget: "Common.Modals.ProposalDetails",
+      props: {
+        daoId,
+        proposal,
+      },
+    },
+  ];
+
+  const renderModal = (item, index) => {
+    return (
+      <Widget
+        src="/*__@replace:nui__*//widget/Layout.Modal"
+        props={{
+          content: (
+            <Widget
+              src={`/*__@appAccount__*//widget/${item.widget}`}
+              props={item.props}
+            />
+          ),
+          toggle: (
+            <div
+              key={index}
+              className={
+                "d-flex gap-2 align-items-center justify-content-center user-select-none" +
+                (index !== items.length - 1 ? " border-end" : "")
+              }
+            >
+              <i className={item.icon} style={{ color: "#4498E0" }}></i>
+              {item.count && <span>{item.count}</span>}
+              <span>{item.title}</span>
+            </div>
+          ),
+          toggleContainerProps: {
+            className: "flex-fill",
+          },
+        }}
+      />
+    );
+  };
+
+  return (
+    <div className="d-flex gap-3 justify-content-between mt-2 border-top pt-4">
+      {items.map(renderModal)}
+    </div>
+  );
+}
+
 return (
-  <Wrapper status={statusName}>
-    {renderPermission({ isAllowedToVote })}
+  <Wrapper className="ndc-card" status={statusName}>
+    {renderPermission({ isAllowedToVote: isAllowedToVote.every((v) => v) })}
     {renderHeader({ typeName, id, daoId, statusName })}
     {renderData({
       proposer,
@@ -477,6 +566,19 @@ return (
       submission_time,
       totalVotesNeeded,
     })}
-    {renderVoteButtons({ totalVotes, statusName, votes, accountId })}
+    {renderVoteButtons({
+      totalVotes,
+      statusName,
+      votes,
+      accountId,
+      isAllowedToVote,
+    })}
+    {renderFooter({
+      totalVotes,
+      votes,
+      comments,
+      daoId,
+      proposal,
+    })}
   </Wrapper>
 );

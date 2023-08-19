@@ -29,13 +29,13 @@ const fether = {
   balances: (accounts) => {
     return fetch(
       constructURL(`${baseApi}/account/balances`, { accounts }),
-      fetchApiConfig
+      fetchApiConfig,
     );
   },
   proposalsStatus: (daoId) => {
     return fetch(
       constructURL(`${baseApi}/daos/proposals/status/${daoId}`),
-      fetchApiConfig
+      fetchApiConfig,
     );
   },
 };

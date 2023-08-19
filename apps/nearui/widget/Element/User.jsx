@@ -21,7 +21,7 @@ if (showHumanBadge) {
     "sbt_tokens_by_owner",
     {
       account: accountId,
-    }
+    },
   );
   if (userSBTs) {
     userSBTs.forEach((sbt) => {

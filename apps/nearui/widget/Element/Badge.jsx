@@ -82,14 +82,14 @@ const Wrapper = styled[as]`
   }
 
   &.success {
-    background: #82E299;
+    background: #82e299;
     color: #11181c;
-    border-color: #82E299;
+    border-color: #82e299;
 
     &.outline {
-      background: #82E29910;
-      color: #82E299;
-      border-color: #82E299;
+      background: #82e29910;
+      color: #82e299;
+      border-color: #82e299;
     }
   }
 
@@ -130,14 +130,14 @@ const Wrapper = styled[as]`
   }
 
   &.disabled {
-    background: #EFEFEF;
+    background: #efefef;
     color: #11181c;
-    border-color: #EFEFEF;
+    border-color: #efefef;
 
     &.outline {
       background: transparent;
       color: #11181c;
-      border-color: #EFEFEF;
+      border-color: #efefef;
     }
   }
 

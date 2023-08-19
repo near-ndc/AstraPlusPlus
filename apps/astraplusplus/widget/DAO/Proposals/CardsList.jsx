@@ -1,10 +1,7 @@
 const { proposals, resPerPage, state, update } = props;
 
 return (
-  <div
-    style={{
-    }}
-  >
+  <div style={{}}>
     {proposals === null && (
       <>
         {new Array(resPerPage).fill(0).map((_, i) => (

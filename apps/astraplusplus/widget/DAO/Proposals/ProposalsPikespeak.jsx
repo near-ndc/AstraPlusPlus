@@ -49,7 +49,7 @@ const res = fetch(
     headers: {
       "x-api-key": publicApiKey,
     },
-  }
+  },
 );
 
 const preloadNextPage = () => {
@@ -68,13 +68,16 @@ const preloadNextPage = () => {
       headers: {
         "x-api-key": publicApiKey,
       },
-    }
+    },
   );
 };
 
 return (
   <>
-    <div className="d-flex align-items-center gap-2 flex-wrap-reverse justify-content-end" id="proposals-top">
+    <div
+      className="d-flex align-items-center gap-2 flex-wrap-reverse justify-content-end"
+      id="proposals-top"
+    >
       <Widget
         src="nearui.near/widget/Input.Text"
         props={{

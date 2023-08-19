@@ -128,7 +128,7 @@ const expensiveWork = () => {
 
       // Apply the threshold
       const votesNeeded = Math.ceil(
-        (threshold[0] / threshold[1]) * eligibleVoters
+        (threshold[0] / threshold[1]) * eligibleVoters,
       );
 
       totalVotesNeeded += votesNeeded;
@@ -170,6 +170,12 @@ const expensiveWork = () => {
   }
 };
 
+const comments = Social.index("comment", {
+  type: "dao_proposal_comment",
+  path: `${daoId}/proposal/main`,
+  proposal_id: proposal.id + "-beta",
+});
+
 if (!state || state.proposal.id !== proposal.id) {
   // Only execute expensive work once
   expensiveWork();
@@ -187,6 +193,7 @@ return (
       multiSelectMode,
       daoId,
       policy,
+      comments: comments,
     }}
   />
 );
