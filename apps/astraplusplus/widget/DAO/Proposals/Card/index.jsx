@@ -184,6 +184,20 @@ if (!state || state.proposal.id !== proposal.id) {
   );
 }
 
+const handleVote = ({ action, proposalId, daoId }) => {
+  Near.call([
+    {
+      contractName: daoId,
+      methodName: "act_proposal",
+      args: {
+        id: JSON.parse(proposalId),
+        action: action,
+      },
+      gas: 200000000000000,
+    },
+  ]);
+};
+
 return (
   <Widget
     src="/*__@appAccount__*//widget/DAO.Proposals.Card.ui"
@@ -194,6 +208,7 @@ return (
       daoId,
       policy,
       comments: comments,
+      handleVote,
     }}
   />
 );

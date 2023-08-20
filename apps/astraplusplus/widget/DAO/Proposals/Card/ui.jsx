@@ -213,6 +213,7 @@ function renderVoteButtons({
   votes,
   accountId,
   isAllowedToVote,
+  handleVote,
 }) {
   const VoteButton = styled.button`
     width: 100%;
@@ -375,7 +376,7 @@ function renderVoteButtons({
           finsihed={finsihed}
           wins={wins.yes}
           myVote={voted.yes}
-          onClick={() => handleVote("Approve")}
+          onClick={() => handleVote("VoteApprove")}
           disabled={alreadyVoted || finsihed || !isAllowedToVote[0]}
         >
           <div>
@@ -414,7 +415,7 @@ function renderVoteButtons({
           finsihed={finsihed}
           wins={wins.no}
           myVote={voted.no}
-          onClick={() => handleVote("Reject")}
+          onClick={() => handleVote("VoteReject")}
           disabled={alreadyVoted || finsihed || !isAllowedToVote[1]}
         >
           <div className="d-flex gap-2 align-items-center">
@@ -453,7 +454,7 @@ function renderVoteButtons({
           finsihed={finsihed}
           wins={wins.spam}
           myVote={voted.spam}
-          onClick={() => handleVote("Remove")}
+          onClick={() => handleVote("VoteRemove")}
           disabled={alreadyVoted || finsihed || !isAllowedToVote[2]}
         >
           <div>
@@ -572,6 +573,13 @@ return (
       votes,
       accountId,
       isAllowedToVote,
+      handleVote: (action) => {
+        return handleVote({
+          action,
+          daoId,
+          proposalId: proposal.id,
+        });
+      },
     })}
     {renderFooter({
       totalVotes,
