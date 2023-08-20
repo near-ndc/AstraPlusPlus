@@ -87,7 +87,7 @@ State.init({
 });
 
 return (
-  <Wrapper className="ndc-card p-5">
+  <Wrapper className="ndc-card p-4">
     <h3 className="mb-4">Share with friends</h3>
     <div className="d-flex gap-4 justify-content-between mb-4">
       {socialMedia.map((item, index) => (
