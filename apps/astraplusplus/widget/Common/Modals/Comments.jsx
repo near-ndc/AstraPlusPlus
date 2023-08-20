@@ -25,26 +25,25 @@ const Hr = styled.hr`
 `;
 
 return (
-    <Wrapper className="mb-2 w-100 ndc-card">
-      <Widget
-        src={`mob.near/widget/MainPage.N.Comment.Compose`}
-        props={{
-          item,
-          onComment: () => State.update({ showReply: false }),
-        }}
-      />
-      <Hr />
-        <Widget
+  <Wrapper className="mb-2 w-100 ndc-card">
+    <Widget
+      src={`mob.near/widget/MainPage.N.Comment.Compose`}
+      props={{
+        item,
+        onComment: () => State.update({ showReply: false }),
+      }}
+    />
+    <Widget
       src="mob.near/widget/MainPage.N.Comment.Feed"
       props={{
         item,
         subscribe: true,
       }}
     />
-      {commentsCount === 0 && (
-        <span className="text-muted text-center">
-          No comments yet. Be the first to comment!
-        </span>
-      )}
-    </Wrapper>
+    {commentsCount === 0 && (
+      <span className="text-muted text-center mt-3">
+        No comments yet. Be the first to comment!
+      </span>
+    )}
+  </Wrapper>
 );
