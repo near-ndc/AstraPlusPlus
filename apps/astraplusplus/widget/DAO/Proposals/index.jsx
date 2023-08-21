@@ -1,4 +1,16 @@
 const daoId = props.daoId;
+const proposalId = props.proposalId;
+
+if (proposalId) {
+  return (
+    <div>
+      <Widget
+        src="/*__@appAccount__*//widget/DAO.Proposals.Card.index"
+        props={props}
+      />
+    </div>
+  );
+}
 
 return (
   <>

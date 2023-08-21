@@ -14,16 +14,25 @@ if (roles === null)
 
 let new_proposal = null;
 if (!proposalString && proposalId && daoId) {
-  new_proposal = Near.view(daoId, "get_proposal", {
-    id: Number(proposalId),
-  });
+  // TODO: THIS API IS SO WEIRD AND INCONSISTENT WITH PROPOSALS API, VOTE IS BROKEN
+  new_proposal = fetch(
+    `https://api.pikespeak.ai/daos/proposal/${daoId}?id=${proposalId}`,
+    {
+      mode: "cors",
+      headers: {
+        "x-api-key": "/*__@replace:pikespeakApiKey__*/",
+      },
+    },
+  );
   if (new_proposal === null) {
     return (
       <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
     );
-  } else if (!new_proposal) {
+  } else if (!new_proposal.ok) {
     return "Proposal not found, check console for details.";
   }
+  new_proposal = new_proposal.body[0].proposal;
+  console.log("new", new_proposal);
 } else if (!proposalString) {
   return "Please provide a daoId and a proposal or proposalId.";
 }
@@ -93,16 +102,16 @@ const expensiveWork = () => {
   };
 
   const kindName =
-    typeof proposal.kind === "string"
-      ? proposal.kind
-      : Object.keys(proposal.kind)[0];
-
+    typeof my_proposal.kind === "string"
+      ? my_proposal.kind
+      : typeof my_proposal.kind.typeEnum === "string"
+      ? my_proposal.kind.typeEnum
+      : Object.keys(my_proposal.kind)[0];
   const isAllowedToVote = [
     isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
     isAllowedTo(proposalKinds[kindName], actions.VoteReject),
     isAllowedTo(proposalKinds[kindName], actions.VoteRemove),
   ];
-
   // --- end check user permissions
 
   // --- Votes required:
@@ -147,7 +156,6 @@ const expensiveWork = () => {
     totalVotes.no += my_proposal.vote_counts[key][1];
     totalVotes.spam += my_proposal.vote_counts[key][2];
   });
-
   totalVotes.total = totalVotes.yes + totalVotes.no + totalVotes.spam;
 
   my_proposal.totalVotesNeeded = totalVotesNeeded;
@@ -155,7 +163,7 @@ const expensiveWork = () => {
   // --- end Votes required
 
   my_proposal.typeName = kindName.replace(/([A-Z])/g, " $1").trim(); // Add spaces between camelCase
-  my_proposal.statusName = proposal.status.replace(/([A-Z])/g, " $1").trim();
+  my_proposal.statusName = my_proposal.status.replace(/([A-Z])/g, " $1").trim();
 
   if (!state) {
     State.init({
