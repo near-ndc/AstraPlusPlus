@@ -2,7 +2,7 @@ const { proposals, resPerPage, state, update } = props;
 
 return (
   <div style={{}}>
-    {proposals === null && (
+    {proposals === null && state.multiSelectMode && (
       <>
         {new Array(resPerPage).fill(0).map((_, i) => (
           <Widget src="astraplusplus.ndctools.near/widget/DAO.Proposals.Card.skeleton" />

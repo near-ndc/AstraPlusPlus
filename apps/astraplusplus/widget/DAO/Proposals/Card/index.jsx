@@ -32,7 +32,6 @@ if (!proposalString && proposalId && daoId) {
     return "Proposal not found, check console for details.";
   }
   new_proposal = new_proposal.body[0].proposal;
-  console.log("new", new_proposal);
 } else if (!proposalString) {
   return "Please provide a daoId and a proposal or proposalId.";
 }
@@ -113,9 +112,17 @@ const expensiveWork = () => {
     isAllowedTo(proposalKinds[kindName], actions.VoteRemove),
   ];
   // --- end check user permissions
-
   // --- Votes required:
   // TODO: Needs to be reviewed
+
+  // Fixes pikespeak API for single proposal
+  Object.keys(my_proposal.vote_counts).forEach((k) => {
+    if (typeof my_proposal.vote_counts[k] !== "string") return;
+    my_proposal.vote_counts[k] = my_proposal.vote_counts[k]
+      .match(/.{1,2}/g)
+      .slice(0, 3)
+      .map((a) => parseInt(a));
+  });
 
   let totalVotesNeeded = 0;
 
@@ -187,7 +194,9 @@ const comments = Social.index("comment", {
 if (!state || state.proposal.id !== proposal.id) {
   // Only execute expensive work once
   expensiveWork();
-  return (
+  return multiSelectMode ? (
+    ""
+  ) : (
     <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
   );
 }

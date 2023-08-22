@@ -22,7 +22,7 @@ const {
 const accountId = context.accountId;
 
 // TODO: implement category
-const category = "Gov Design";
+const category = "";
 
 const Wrapper = styled.div`
   margin: 16px auto;
@@ -468,6 +468,20 @@ function renderVoteButtons({
   );
 }
 
+function renderMultiVoteButtons({ daoId, proposal, canVote }) {
+  return (
+    <Widget
+      src="/*__@appAccount__*//widget/DAO.Proposals.MultiVote"
+      props={{
+        daoId,
+        proposal,
+        canVote,
+        view: "multiVote",
+      }}
+    />
+  );
+}
+
 function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
   const items = [
     {
@@ -555,6 +569,40 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
     </div>
   );
 }
+const voted = {
+  yes: votes[accountId || ";;;"] === "Approve",
+  no: votes[accountId || ";;;"] === "Reject",
+  spam: votes[accountId || ";;;"] === "Remove",
+};
+
+const alreadyVoted = voted.yes || voted.no || voted.spam;
+
+const canVote =
+  isAllowedToVote.every((v) => v) &&
+  statusName === "In Progress" &&
+  !alreadyVoted;
+
+const showMultiVote = multiSelectMode && canVote;
+
+if (multiSelectMode && !canVote) {
+  let reason = "";
+
+  if (!isAllowedToVote.every((v) => v)) {
+    reason = "you don't have permissions to vote";
+  }
+  if (statusName !== "In Progress") {
+    reason = `it's already ${statusName}`;
+  }
+  if (alreadyVoted) {
+    reason = ` you've already voted ${votes[accountId]}`;
+  }
+
+  return (
+    <div>
+      Hiding #{id} because {reason}
+    </div>
+  );
+}
 
 return (
   <Wrapper className="ndc-card" status={statusName}>
@@ -567,20 +615,27 @@ return (
       submission_time,
       totalVotesNeeded,
     })}
-    {renderVoteButtons({
-      totalVotes,
-      statusName,
-      votes,
-      accountId,
-      isAllowedToVote,
-      handleVote: (action) => {
-        return handleVote({
-          action,
-          daoId,
-          proposalId: proposal.id,
-        });
-      },
-    })}
+    {!!showMultiVote &&
+      renderMultiVoteButtons({
+        daoId,
+        proposal,
+        canVote,
+      })}
+    {!showMultiVote &&
+      renderVoteButtons({
+        totalVotes,
+        statusName,
+        votes,
+        accountId,
+        isAllowedToVote,
+        handleVote: (action) => {
+          return handleVote({
+            action,
+            daoId,
+            proposalId: proposal.id,
+          });
+        },
+      })}
     {renderFooter({
       totalVotes,
       votes,
