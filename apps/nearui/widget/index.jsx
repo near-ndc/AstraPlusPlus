@@ -148,6 +148,8 @@ const mock = {
   "Input.Checkbox.demo": 0,
   "Social.FollowButton": 0,
   "Social.ImageUpload": 0,
+  "Element.Badge": 0,
+  "Element.Badge.demo": 0,
   overview: 0,
 };
 const widgets = mock ?? data[NDCUI_ACCOUNT].widget;

@@ -1,12 +1,8 @@
 const { proposals, resPerPage, state, update } = props;
 
 return (
-  <div
-    style={{
-      minHeight: 650 * (proposals?.length ?? resPerPage),
-    }}
-  >
-    {proposals === null && (
+  <div style={{}}>
+    {proposals === null && state.multiSelectMode && (
       <>
         {new Array(resPerPage).fill(0).map((_, i) => (
           <Widget src="astraplusplus.ndctools.near/widget/DAO.Proposals.Card.skeleton" />

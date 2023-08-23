@@ -1,203 +1,647 @@
-const { id, typeName, proposer, description, kind, statusName } =
-  props.proposal;
-const { daoId, isAllowedToVote, multiSelectMode, proposal } = props;
+const {
+  id,
+  typeName,
+  proposer,
+  description,
+  kind,
+  statusName,
+  totalVotesNeeded,
+  totalVotes,
+  submission_time,
+  votes,
+} = props.proposal;
+const {
+  daoId,
+  isAllowedToVote,
+  multiSelectMode,
+  proposal,
+  policy,
+  handleVote,
+  comments,
+} = props;
+const accountId = context.accountId;
 
-const statusColor =
-  statusName === "Approved"
-    ? "#28a930"
-    : statusName === "In Progress"
-    ? "#58a1ff"
-    : statusName === "Failed"
-    ? "#dc3545"
-    : "#6c757d";
-
-const statusBackgroundColor =
-  statusName === "Approved"
-    ? "#ecf7ef"
-    : statusName === "Failed" || statusName === "Rejected"
-    ? "#fdf4f4"
-    : "#fff";
+// TODO: implement category
+const category = "";
 
 const Wrapper = styled.div`
-  background-color: ${statusBackgroundColor};
   margin: 16px auto;
-  max-width: 900px;
   border-radius: 16px;
   padding: 24px;
-  box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px;
   display: flex;
   flex-direction: column;
   gap: 24px;
   min-height: 500px;
-
-  p {
-    line-height: 1.4;
-    font-weight: 400;
-    font-size: 15px;
-    color: #868682;
-    margin: 0;
-  }
-
-  h3 {
-    font-weight: 600;
-    font-size: 24px;
-    color: #1b1b18;
-  }
-
-  h5 {
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.2;
-    color: #6c757d;
-  }
-
-  .status {
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.2;
-    color: ${statusColor};
-  }
-`;
-
-const MarkdownContainer = styled.div`
-  position: relative;
   width: 100%;
-  padding: 24px;
-  background-color: #f8f9fa;
-  color: #1b1b18;
-  border-radius: 14px;
-  max-height: 700px;
-  overflow-y: auto;
-  color: #333;
-  line-height: 1.6;
-  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+  border: 1px solid #fff;
 
-  h1 {
-    font-size: 2em;
-    color: #111;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 0.3em;
-    margin-bottom: 1em;
-  }
+  ${({ status }) =>
+    status === "Approved" &&
+    `
+    border-color: #82E299;
+  `}
 
-  h2 {
-    font-size: 1.5em;
-    color: #222;
-    margin-bottom: 0.75em;
-  }
+  ${({ status }) =>
+    status === "In Progress" &&
+    `
+    border-color: #fff;
+  `}
 
-  h3 {
-    font-size: 1.3em;
-    color: #333;
-    margin-bottom: 0.6em;
-  }
+  ${({ status }) =>
+    (status === "Failed" || status === "Rejected") &&
+    `
+    border-color: #C23F38;
+  `}
 
-  h4 {
-    font-size: 1.2em;
-    color: #444;
-    margin-bottom: 0.5em;
-  }
-
-  h5 {
-    font-size: 1.1em;
-    color: #555;
-    margin-bottom: 0.4em;
-  }
-
-  p {
-    font-size: 1em;
-    margin-bottom: 1em;
-  }
-
-  a {
-    color: #0645ad;
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
+  .text-muted {
+    color: #8c8c8c !important;
   }
 `;
 
-return (
-  <Wrapper>
-    <div className="d-flex justify-content-between align-items-center">
-      <div>
-        <h5>Proposal ID: {id}</h5>
-        <h3>
-          {typeName}
-          <a href={proposalURL} target="_blank" rel="noreferrer">
-            <i className="bi bi-link-45deg"></i>
-          </a>
-        </h3>
-      </div>
-      <div className="d-flex flex-column align-items-end">
-        <h5>Status</h5>
-        <span className="status">{statusName}</span>
-      </div>
-    </div>
-    <div>
-      <h5>Proposer</h5>
-      <Widget
-        src="mob.near/widget/Profile.ShortInlineBlock"
-        props={{ accountId: proposer, tooltip: true }}
-      />
-    </div>
-    <div>
-      <h5>Description</h5>
-      <MarkdownContainer>
-        <Markdown text={description} />
-      </MarkdownContainer>
-    </div>
+const cls = (c) => c.join(" ");
+
+function renderPermission({ isAllowedToVote }) {
+  return (
     <div
-      className="d-flex flex-wrap align-items-start"
+      className={"text-center p-2 rounded-pill"}
       style={{
-        rowGap: "16px",
-        columnGap: "48px",
+        backgroundColor: isAllowedToVote ? "#82E29926" : "#C23F381A",
       }}
     >
-      <Widget
-        src="/*__@appAccount__*//widget/DAO.Proposals.Card.Arguments"
-        props={{
-          kind,
-          daoId,
-        }}
-      />
+      {isAllowedToVote
+        ? "You are allowed to vote on this proposal"
+        : "You are not allowed to vote on this proposal"}
     </div>
+  );
+}
 
-    <div className="w-100">
-      <h5>Votes</h5>
-      {multiSelectMode ? (
-        <Widget
-          src="/*__@appAccount__*//widget/DAO.Proposals.Card.MultiVote"
-          props={{
-            daoId,
-            proposal,
-            isAllowedToVote,
-            canVote:
-              context.accountId &&
-              !proposal.votes[context.accountId || ""] &&
-              proposal.statusName === "In Progress",
-          }}
-        />
-      ) : (
-        <Widget
-          src="/*__@appAccount__*//widget/DAO.Proposals.Card.Vote"
-          props={{
-            daoId: daoId,
-            proposal,
-            isAllowedToVote,
-          }}
-        />
-      )}
+function renderHeader({ typeName, id, daoId, statusName }) {
+  let statusicon;
+  let statustext;
+  let statusvariant;
+
+  switch (statusName) {
+    case "Approved":
+      statusicon = "bi bi-check-circle";
+      statustext = "Proposal Approved";
+      statusvariant = "success";
+      break;
+    case "In Progress":
+      statusicon = "spinner-border spinner-border-sm";
+      statustext = "Proposal In Progress";
+      statusvariant = "primary";
+      break;
+    case "Expired":
+      statusicon = "bi bi-x-circle";
+      statustext = "Proposal Expired";
+      statusvariant = "black";
+      break;
+    case "Failed":
+      statusicon = "bi bi-x-circle";
+      statustext = "Proposal Failed";
+      statusvariant = "black";
+      break;
+    case "Rejected":
+      statusicon = "bi bi-x-circle";
+      statustext = "Proposal Rejected";
+      statusvariant = "danger";
+      break;
+  }
+  return (
+    <div className="card__header">
+      <div className="d-flex justify-content-between gap-3">
+        <div>
+          <h3 className="d-flex align-items-center gap-2">
+            {typeName}
+            <Widget
+              src="/*__@replace:nui__*//widget/Element.Badge"
+              props={{
+                children: `Proposal ID #${id}`,
+                variant: `outline info round`,
+                size: "md",
+              }}
+            />
+          </h3>
+          <h5 className="text-muted h6">{daoId}</h5>
+        </div>
+        <div>
+          <Widget
+            src="/*__@replace:nui__*//widget/Element.Badge"
+            props={{
+              children: (
+                <>
+                  <i
+                    className={statusicon}
+                    style={{
+                      fontSize: "18px",
+                      marginRight: "5px",
+                      borderWidth: "2px",
+                      animationDuration: "8s",
+                    }}
+                  ></i>
+                  {statustext}
+                </>
+              ),
+              variant: `${statusvariant} round`,
+              size: "lg",
+            }}
+          />
+        </div>
+      </div>
     </div>
+  );
+}
 
+function renderData({
+  proposer,
+  category,
+  description,
+  submission_time,
+  totalVotesNeeded,
+}) {
+  return (
+    <div className="d-flex gap-3 flex-column">
+      <div className="d-flex gap-3 justify-content-between">
+        <div className="w-50">
+          <h5 className="text-muted h6">Proposer</h5>
+          <Widget
+            src="/*__@replace:nui__*//widget/Element.User"
+            props={{ accountId: proposer }}
+          />
+        </div>
+        <div className="w-50">
+          <h5 className="text-muted h6">Category</h5>
+          <Widget
+            src="/*__@replace:nui__*//widget/Element.Badge"
+            props={{
+              children: category,
+              variant: `disabled round`,
+              size: "lg",
+            }}
+          />
+        </div>
+      </div>
+      <div className="mt-4">
+        <h5 className="text-muted h6">Description</h5>
+        <Markdown text={description} />
+      </div>
+      <div className="d-flex gap-3 justify-content-between">
+        {submission_time && (
+          <div className="flex-fill">
+            <h5 className="text-muted h6">Submission date</h5>
+            <p className="text-muted">
+              {new Date(
+                parseInt(Big(submission_time).div(1000000)),
+              ).toLocaleString()}
+            </p>
+          </div>
+        )}
+        {totalVotesNeeded && (
+          <div className="flex-fill">
+            <h5 className="text-muted h6">Total Votes Required</h5>
+            <p className="text-muted">{totalVotesNeeded}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function renderVoteButtons({
+  totalVotes,
+  statusName,
+  votes,
+  accountId,
+  isAllowedToVote,
+  handleVote,
+}) {
+  const VoteButton = styled.button`
+    width: 100%;
+    border-radius: 15px;
+    border: 1px solid transparent;
+    padding: 0 20px;
+    line-height: 45px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    color: rgb(var(--vote-button-color));
+
+    --vote-button-bg: 130, 226, 153;
+    --vote-button-color: 0, 0, 0;
+
+    &.no {
+      --vote-button-bg: 194, 63, 56;
+      --vote-button-color: 255, 255, 255;
+    }
+
+    &.no > div:last-child {
+      color: #000;
+      transition: all 0.4s ease-in-out;
+    }
+    ${({ finsihed, percentage, disabled }) => {
+      if (finsihed) {
+        if (percentage > 80) {
+          return `
+        &.no > div:last-child {
+          color: rgb(var(--vote-button-color)) !important;
+        }
+      `;
+        }
+      } else if (!disabled) {
+        return `
+        &:hover.no > div:last-child {
+          color: rgb(var(--vote-button-color)) !important;
+        } 
+        `;
+      }
+    }}}
+
+    &.spam {
+      --vote-button-bg: 245, 197, 24;
+    }
+
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: 12px;
+      transition: all 0.4s ease-in-out;
+      z-index: 0;
+      background-color: rgb(var(--vote-button-bg));
+      min-width: 120px;
+
+      ${({ finsihed, percentage }) =>
+        finsihed &&
+        `
+        min-width: ${percentage ? `${percentage}%` : "120px"};
+      `}
+    }
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: 12px;
+      transition: all 0.4s ease-in-out;
+      z-index: 1;
+      background-color: rgba(var(--vote-button-bg), 0.2);
+
+      min-width: ${({ percentage }) =>
+        percentage ? `${percentage}%` : "120px"};
+
+      ${({ finsihed, wins }) =>
+        finsihed &&
+        wins &&
+        `
+        display: none;
+      `}
+    }
+
+    ${({ disabled }) =>
+      !disabled &&
+      `
+    &:hover {
+      &:before {
+        min-width: 100%;
+      }
+    }
+  `}
+
+    & > div {
+      z-index: 2;
+    }
+
+    & > div:last-child span {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+
+      &:last-child {
+        font-size: 12px;
+        font-weight: 400;
+      }
+    }
+  `;
+
+  const percentages = {
+    yes: Math.round((totalVotes.yes / totalVotes.total) * 100) || 0,
+    no: Math.round((totalVotes.no / totalVotes.total) * 100) || 0,
+    spam: Math.round((totalVotes.spam / totalVotes.total) * 100) || 0,
+  };
+
+  const wins = {
+    yes: statusName === "Approved",
+    no: statusName === "Rejected",
+    spam: statusName === "Failed",
+  };
+
+  const finsihed = statusName !== "In Progress";
+
+  const voted = {
+    yes: votes[accountId || ";;;"] === "Approve",
+    no: votes[accountId || ";;;"] === "Reject",
+    spam: votes[accountId || ";;;"] === "Remove",
+  };
+
+  const alreadyVoted = voted.yes || voted.no || voted.spam;
+
+  return (
+    <div
+      className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
+      style={{
+        gridTemplateColumns: "1fr 1fr 120px",
+      }}
+    >
+      <div className="w-100">
+        {voted.yes && (
+          <Widget
+            src="/*__@replace:nui__*//widget/Element.Badge"
+            props={{
+              size: "sm",
+              variant: "info outline mb-1",
+              children: "You voted",
+            }}
+          />
+        )}
+        <VoteButton
+          className="yes"
+          percentage={percentages.yes}
+          finsihed={finsihed}
+          wins={wins.yes}
+          myVote={voted.yes}
+          onClick={() => handleVote("VoteApprove")}
+          disabled={alreadyVoted || finsihed || !isAllowedToVote[0]}
+        >
+          <div>
+            {wins.yes && (
+              <span title="Yes won">
+                <i className="bi bi-check-circle"></i>
+              </span>
+            )}
+            <span>Yes</span>
+            <i className="bi bi-hand-thumbs-up"></i>
+          </div>
+
+          <div>
+            <span>
+              {percentages.yes}
+              <i className="bi bi-percent"></i>
+            </span>
+            <span>{totalVotes.yes} Votes</span>
+          </div>
+        </VoteButton>
+      </div>
+      <div className="w-100">
+        {voted.no && (
+          <Widget
+            src="/*__@replace:nui__*//widget/Element.Badge"
+            props={{
+              size: "sm",
+              variant: "info outline mb-1",
+              children: "You voted",
+            }}
+          />
+        )}
+        <VoteButton
+          className="no"
+          percentage={percentages.no}
+          finsihed={finsihed}
+          wins={wins.no}
+          myVote={voted.no}
+          onClick={() => handleVote("VoteReject")}
+          disabled={alreadyVoted || finsihed || !isAllowedToVote[1]}
+        >
+          <div className="d-flex gap-2 align-items-center">
+            {wins.no && (
+              <span title="No won">
+                <i className="bi bi-check-circle"></i>
+              </span>
+            )}
+            <span>No</span>
+            <i className="bi bi-hand-thumbs-down"></i>
+          </div>
+
+          <div>
+            <span>
+              {percentages.no}
+              <i className="bi bi-percent"></i>
+            </span>
+            <span>{totalVotes.no} Votes</span>
+          </div>
+        </VoteButton>
+      </div>
+      <div className="w-100">
+        {voted.spam && (
+          <Widget
+            src="/*__@replace:nui__*//widget/Element.Badge"
+            props={{
+              size: "sm",
+              variant: "info outline mb-1",
+              children: "You voted",
+            }}
+          />
+        )}
+        <VoteButton
+          className="spam"
+          percentage={percentages.spam}
+          finsihed={finsihed}
+          wins={wins.spam}
+          myVote={voted.spam}
+          onClick={() => handleVote("VoteRemove")}
+          disabled={alreadyVoted || finsihed || !isAllowedToVote[2]}
+        >
+          <div>
+            <span>Spam</span>
+            <i className="bi bi-exclamation-circle"></i>
+          </div>
+          <div></div>
+        </VoteButton>
+      </div>
+    </div>
+  );
+}
+
+function renderMultiVoteButtons({ daoId, proposal, canVote }) {
+  return (
     <Widget
-      src="sking.near/widget/DAO.Proposal.Additional"
+      src="/*__@appAccount__*//widget/DAO.Proposals.MultiVote"
       props={{
-        daoId: daoId,
-        proposal: proposal,
+        daoId,
+        proposal,
+        canVote,
+        view: "multiVote",
       }}
     />
+  );
+}
+
+function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
+  const items = [
+    {
+      title: "Comments",
+      icon: "bi bi-chat-left-text",
+      count: comments.length || 0,
+      widget: "Common.Modals.Comments",
+      props: {
+        daoId,
+        proposal,
+        commentsCount: comments.length,
+        item: {
+          type: "dao_proposal_comment",
+          path: `${daoId}/proposal/main`,
+          proposal_id: proposal.id + "-beta",
+        },
+      },
+    },
+    {
+      title: "Voters",
+      icon: "bi bi-people",
+      count: totalVotes.total,
+      widget: "Common.Modals.Voters",
+      props: {
+        daoId,
+        votes,
+        totalVotes,
+      },
+    },
+    {
+      title: "Share",
+      icon: "bi bi-share",
+      widget: "Common.Modals.Share",
+      props: {
+        url: `https://near.org//*__@appAccount__*//widget/index?page=dao&tab=proposals&daoId=${daoId}&proposalId=${proposal.id}`,
+        text: "Explore this new proposal from our DAO! Your support and feedback are essential as we work towards a decentralized future. Review the details and join the discussion here:",
+      },
+    },
+    {
+      title: "More details",
+      icon: "bi bi-three-dots",
+      widget: "Common.Modals.ProposalArguments",
+      props: {
+        daoId,
+        proposal,
+      },
+    },
+  ];
+
+  const renderModal = (item, index) => {
+    return (
+      <Widget
+        src="/*__@replace:nui__*//widget/Layout.Modal"
+        props={{
+          content: (
+            <Widget
+              src={`/*__@appAccount__*//widget/${item.widget}`}
+              props={item.props}
+            />
+          ),
+          toggle: (
+            <div
+              key={index}
+              className={
+                "d-flex gap-2 align-items-center justify-content-center user-select-none" +
+                (index !== items.length - 1 ? " border-end" : "")
+              }
+            >
+              <i className={item.icon} style={{ color: "#4498E0" }}></i>
+              {item.count && <span>{item.count}</span>}
+              <span>{item.title}</span>
+            </div>
+          ),
+          toggleContainerProps: {
+            className: "flex-fill",
+          },
+        }}
+      />
+    );
+  };
+
+  return (
+    <div className="d-flex gap-3 justify-content-between mt-2 border-top pt-4">
+      {items.map(renderModal)}
+    </div>
+  );
+}
+const voted = {
+  yes: votes[accountId || ";;;"] === "Approve",
+  no: votes[accountId || ";;;"] === "Reject",
+  spam: votes[accountId || ";;;"] === "Remove",
+};
+
+const alreadyVoted = voted.yes || voted.no || voted.spam;
+
+const canVote =
+  isAllowedToVote.every((v) => v) &&
+  statusName === "In Progress" &&
+  !alreadyVoted;
+
+const showMultiVote = multiSelectMode && canVote;
+
+if (multiSelectMode && !canVote) {
+  let reason = "";
+
+  if (!isAllowedToVote.every((v) => v)) {
+    reason = "you don't have permissions to vote";
+  }
+  if (statusName !== "In Progress") {
+    reason = `it's already ${statusName}`;
+  }
+  if (alreadyVoted) {
+    reason = ` you've already voted ${votes[accountId]}`;
+  }
+
+  return (
+    <div>
+      Hiding #{id} because {reason}
+    </div>
+  );
+}
+
+return (
+  <Wrapper className="ndc-card" status={statusName}>
+    {renderPermission({ isAllowedToVote: isAllowedToVote.every((v) => v) })}
+    {renderHeader({ typeName, id, daoId, statusName })}
+    {renderData({
+      proposer,
+      category,
+      description,
+      submission_time,
+      totalVotesNeeded,
+    })}
+    {!!showMultiVote &&
+      renderMultiVoteButtons({
+        daoId,
+        proposal,
+        canVote,
+      })}
+    {!showMultiVote &&
+      renderVoteButtons({
+        totalVotes,
+        statusName,
+        votes,
+        accountId,
+        isAllowedToVote,
+        handleVote: (action) => {
+          return handleVote({
+            action,
+            daoId,
+            proposalId: proposal.id,
+          });
+        },
+      })}
+    {renderFooter({
+      totalVotes,
+      votes,
+      comments,
+      daoId,
+      proposal,
+    })}
   </Wrapper>
 );

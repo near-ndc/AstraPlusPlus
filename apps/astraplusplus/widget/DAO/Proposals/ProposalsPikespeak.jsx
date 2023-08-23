@@ -49,7 +49,7 @@ const res = fetch(
     headers: {
       "x-api-key": publicApiKey,
     },
-  }
+  },
 );
 
 const preloadNextPage = () => {
@@ -68,13 +68,16 @@ const preloadNextPage = () => {
       headers: {
         "x-api-key": publicApiKey,
       },
-    }
+    },
   );
 };
 
 return (
   <>
-    <div className="d-flex align-items-center gap-2 flex-wrap-reverse justify-content-end" id="proposals-top">
+    <div
+      className="d-flex align-items-center gap-2 flex-wrap-reverse justify-content-end"
+      id="proposals-top"
+    >
       <Widget
         src="nearui.near/widget/Input.Text"
         props={{
@@ -100,12 +103,12 @@ return (
         props={{
           children: state.multiSelectMode ? (
             <>
-              Hide Multi-Select
+              Multi-Vote
               <i class="bi bi-x-lg"></i>
             </>
           ) : (
             <>
-              Show Multi-Select
+              Multi-Vote
               <i class="bi bi-card-checklist"></i>
             </>
           ),
@@ -125,8 +128,12 @@ return (
         props={{
           children: (
             <>
-              Table View {state.tableView ? "On" : "Off"}
-              <i class="bi bi-table"></i>
+              Table View
+              {state.tableView ? (
+                <i className="bi bi-x-lg"></i>
+              ) : (
+                <i className="bi bi-table"></i>
+              )}
             </>
           ),
           variant: "secondary outline",
@@ -198,7 +205,7 @@ return (
     <div>
       {state.tableView ? (
         <Widget
-          src="/*__@appAccount__*//widget/DAO.Proposals.Table"
+          src="/*__@appAccount__*//widget/DAO.Proposals.Table.index"
           props={{
             state,
             resPerPage,
@@ -240,7 +247,6 @@ return (
         />
       </div>
     </div>
-
     {state.multiSelectMode && (
       <>
         <div
@@ -250,9 +256,10 @@ return (
           }}
         ></div>
         <Widget
-          src="/*__@appAccount__*//widget/DAO.Proposals.MultiVoteSubmit"
+          src="/*__@appAccount__*//widget/DAO.Proposals.MultiVote"
           props={{
             daoId: state.daoId,
+            view: "submit",
             onHideMultiSelect: () => {
               State.update({
                 ...state,
