@@ -100,8 +100,6 @@ State.init({
     data: data
 });
 
-console.log(state.data);
-
 const Wrapper = styled.div`
     border: 1px solid transparent;
 
@@ -533,8 +531,8 @@ return (
                                     });
                                 },
                                 applyFilters: (filters) => {
+                                    // TODO: Update filters after getting API
                                     const filteredData = [...state.data];
-                                    console.log(filters);
                                     if (
                                         filters.includes(groupTypes.ASCENDING)
                                     ) {
