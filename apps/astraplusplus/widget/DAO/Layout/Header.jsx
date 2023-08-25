@@ -1,6 +1,7 @@
 const daoId = props.daoId;
 const profile = daoId ? Social.get(`${daoId}/profile/**`, "final") : {};
 const currentLink = `#//*__@appAccount__*//widget/index?page=dao&daoId=${daoId}`;
+const accountId = context.accountId;
 
 State.init({
   joinRole: "council",
