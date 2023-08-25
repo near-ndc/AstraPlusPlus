@@ -120,7 +120,7 @@ return (
 
           if (
             !proposalTypes.find(
-              ({ value }) => state.proposalType.value === value
+              ({ value }) => state.proposalType.value === value,
             )
           ) {
             throw {

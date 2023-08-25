@@ -77,7 +77,6 @@ let layout = [
 const Wrapper = styled.div`
   background-color: ${statusBackgroundColor};
   margin: 16px auto;
-  max-width: 900px;
   border-radius: 16px;
   padding: 24px;
   box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px;

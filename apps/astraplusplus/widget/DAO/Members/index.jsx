@@ -56,6 +56,12 @@ fetchVotes();
 // State.init({
 //     filterByRole
 // });
+const policy = useCache(
+  () =>
+    Near.asyncView(daoId, "get_policy").then((policy) => processPolicy(policy)),
+  daoId + "-processed_policy",
+  { subscribe: false }
+);
 
 // const processPolicy = (policy) => {
 //     const obj = {
@@ -114,6 +120,112 @@ fetchVotes();
 //         allowed = allowed || allowedRole;
 //         return allowedRole;
 //     });
+
+const renderUserRow = (user, roles, i) => {
+  return (
+    <div key={i} className="ndc-card ratio ratio-1x1 userRow">
+      <div className=" d-flex flex-column p-4">
+        <Widget
+          src="nearui.near/widget/Element.User"
+          props={{
+            accountId: user,
+            options: {
+              showHumanBadge: true,
+              showImage: true,
+              showSocialName: true,
+            },
+          }}
+        />
+        <div className="d-flex gap-1 mt-3 flex-wrap mb-3">
+          {roles.map((role, i) => {
+            return (
+              <Widget
+                src="nearui.near/widget/Input.Button"
+                props={{
+                  children: role,
+                  size: "sm",
+                  variant: "default",
+                  className: "text-capitalize",
+                }}
+                key={i}
+              />
+            );
+          })}
+        </div>
+        <div className="d-flex flex-column gap-2 mt-auto flex-wrap w-100">
+          <Widget
+            src="nearui.near/widget/Social.FollowButton"
+            props={{
+              accountId: user,
+              size: "sm",
+              className: "w-100",
+            }}
+          />
+          <Widget
+            src="nearui.near/widget/Input.Button"
+            props={{
+              children: "Propose to Mint SBT",
+              size: "sm",
+              variant: ["secondary", "outline"],
+              className: "w-100",
+            }}
+          />
+          {isUserAllowedTo(
+            context.accountId,
+            "remove_member_from_role",
+            "AddProposal"
+          ) && (
+            <Widget
+              src="nearui.near/widget/Layout.Modal"
+              props={{
+                toggle: (
+                  <Widget
+                    src="nearui.near/widget/Input.Button"
+                    props={{
+                      children: "Propose to Remove",
+                      size: "sm",
+                      variant: ["danger", "outline"],
+                      className: "w-100",
+                    }}
+                  />
+                ),
+                content: (
+                  <div className="ndc-card p-4">
+                    <Widget
+                      src="nearui.near/widget/Input.Select"
+                      props={{
+                        label: "Propose to remove from role:",
+                        options: roles.map((r) => {
+                          return {
+                            title: r,
+                            value: r,
+                          };
+                        }),
+                        onChange: (v) => State.update({ removeFromRole: v }),
+                        value: state.removeFromRole,
+                      }}
+                    />
+                    <Widget
+                      src="nearui.near/widget/Input.Button"
+                      props={{
+                        children: "Propose to Remove",
+                        size: "sm",
+                        variant: ["danger"],
+                        className: "w-100",
+                        onClick: () =>
+                          onRemoveUserProposal(user, state.removeFromRole),
+                      }}
+                    />
+                  </div>
+                ),
+              }}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 //     return allowed;
 // };
@@ -348,6 +460,21 @@ fetchVotes();
 
 //         const kind = kinds[kindKey] || kindKey;
 //         const action = actions[actionKey] || actionKey;
+  const filteredPermissions = new Map(
+    [...permissions].filter(([action, kindsSet]) => kindsSet.size > 0)
+  );
+
+  const sortedPermissions = Array.from(filteredPermissions.entries()).sort(
+    (a, b) => {
+      if (a[0] === actions.AddProposal) {
+        return -1;
+      }
+      if (b[0] === actions.AddProposal) {
+        return 1;
+      }
+      return 0;
+    }
+  );
 
 //         if (!permissions.has(action)) {
 //             permissions.set(action, new Set());
@@ -392,6 +519,11 @@ fetchVotes();
 //     : Object.keys(policy.users).filter((user) =>
 //           policy.users[user].includes(state.filterByRole)
 //       );
+const users = !state.filterByRole
+  ? Object.keys(policy.users)
+  : Object.keys(policy.users).filter((user) =>
+      policy.users[user].includes(state.filterByRole)
+    );
 
 return (
     <div>

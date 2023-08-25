@@ -1,4 +1,4 @@
-const toggle = props.toggle ?? <button>Open Modal</button>;
+const toggle = props.toggle ?? <button role="none">Open Modal</button>;
 const toggleContainerProps = props.toggleContainerProps ?? {};
 const content = props.content ?? (
   <div className="p-5 bg-white">Modal Content</div>
@@ -27,13 +27,10 @@ const Content = styled.div`
   max-width: 1000px;
   margin-top: 20px;
   margin-bottom: 20px;
-
-  &.focus-visible {
-    outline: none !important;
-  }
+  outline: none !important;
 `;
 
-const NoButton = styled.div`
+const NoButton = styled.button`
   background: transparent;
   border: none;
   padding: 0;

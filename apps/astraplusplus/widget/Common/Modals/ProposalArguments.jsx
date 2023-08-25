@@ -1,9 +1,10 @@
 const daoId = props.daoId;
-const kind = props.kind;
+const proposal = props.proposal;
+const kind = props.kind ?? proposal.kind;
 
-const proposal_type = typeof kind === "string" ? kind : Object.keys(kind)[0];
+if (!kind) return "";
 
-if (proposal_type === "Vote") return "";
+const proposal_type = typeof kind === "string" ? kind : Object.keys(kind)?.[0];
 
 const MarkdownContainer = styled.div`
   position: relative;
@@ -65,8 +66,14 @@ const MarkdownContainer = styled.div`
   }
 `;
 
+const content = <></>;
+
+if (proposal_type === "Vote") {
+  content = <>Nothing to show</>;
+}
+
 if (proposal_type === "Transfer")
-  return (
+  content = (
     <>
       <div>
         <h5>Amount</h5>
@@ -92,7 +99,7 @@ if (proposal_type === "Transfer")
   );
 
 if (proposal_type === "FunctionCall") {
-  return (
+  content = (
     <>
       {kind.FunctionCall.actions.reduce(
         (acc, { method_name, args, deposit }) => {
@@ -150,7 +157,7 @@ if (
   proposal_type === "AddMemberToRole" ||
   proposal_type === "RemoveMemberFromRole"
 )
-  return (
+  content = (
     <>
       <div>
         <h5>Member</h5>
@@ -170,7 +177,7 @@ if (
   );
 
 if (proposal_type === "AddBounty")
-  return (
+  content = (
     <>
       <div>
         <h5>Amount</h5>
@@ -200,7 +207,7 @@ if (proposal_type === "AddBounty")
   );
 
 if (proposal_type === "BountyDone")
-  return (
+  content = (
     <>
       <div>
         <h5>Receiver</h5>
@@ -247,7 +254,7 @@ function deepSortObject(obj) {
 if (proposal_type === "ChangePolicy") {
   const old_policy = Near.view(daoId, "get_policy");
   if (old_policy === null) return "";
-  return (
+  content = (
     <>
       <div className="w-100">
         <h5>Policy Changes</h5>
@@ -274,3 +281,18 @@ if (proposal_type === "ChangePolicy") {
     </>
   );
 }
+
+return (
+  <div className="ndc-card p-4">
+    <h3 class="mb-4">Proposal arguments</h3>
+    <div
+      className="d-flex flex-wrap align-items-start"
+      style={{
+        rowGap: "16px",
+        columnGap: "48px",
+      }}
+    >
+      {content}
+    </div>
+  </div>
+);

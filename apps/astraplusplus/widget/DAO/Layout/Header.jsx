@@ -1,6 +1,7 @@
 const daoId = props.daoId;
 const profile = daoId ? Social.get(`${daoId}/profile/**`, "final") : {};
 const currentLink = `#//*__@appAccount__*//widget/index?page=dao&daoId=${daoId}`;
+const accountId = context.accountId;
 
 State.init({
   joinRole: "council",
@@ -29,7 +30,7 @@ const policy = useCache(
       };
     }),
   daoId + "-policy",
-  { subscribe: false }
+  { subscribe: false },
 );
 
 const config = useCache(
@@ -41,7 +42,7 @@ const config = useCache(
         : null,
     })),
   daoId + "-config",
-  { subscribe: false }
+  { subscribe: false },
 );
 
 if (policy === null) return "";
@@ -191,11 +192,11 @@ twitterUrl.searchParams.set("text", clickbaitPrompt);
 const mailtoUrl = new URL("mailto:");
 mailtoUrl.searchParams.set(
   "subject",
-  `Join the ${profile.name || daoId} DAO on the BOS`
+  `Join the ${profile.name || daoId} DAO on the BOS`,
 );
 mailtoUrl.searchParams.set(
   "body",
-  `Take a look at this DAO. \n https://near.org/${currentLink}`
+  `Take a look at this DAO. \n https://near.org/${currentLink}`,
 );
 
 return (

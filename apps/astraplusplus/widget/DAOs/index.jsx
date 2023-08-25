@@ -39,7 +39,7 @@ if (filter === "followedDAOs") {
         }));
       }),
     "my-daos-" + accountId,
-    { subscribe: false }
+    { subscribe: false },
   );
 } else if (filter === "ndcDAOs") {
   daos = [
@@ -60,7 +60,7 @@ if (filter === "followedDAOs") {
         },
       }).then((res) => res.body),
     "all-daos",
-    { subscribe: false }
+    { subscribe: false },
   );
 }
 
