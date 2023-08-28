@@ -125,16 +125,10 @@ const Wrapper = styled.div`
     }
 
     table {
-        width: -webkit-fill-available;
+        display: inline-block;
+        overflow-x: auto;
         font-size: 13px;
-    }
-
-    @media (max-width: 900px) {
-        table {
-            display: inline-block;
-            overflow-x: auto;
-            font-size: 13px;
-        }
+        width: -webkit-fill-available;
     }
 
     th,
@@ -344,16 +338,8 @@ const Table = ({ title, tableData, showExpand }) => {
                                                 onClick: () => {}
                                             }}
                                         />
-                                        <Widget
-                                            src="nearui.near/widget/Input.Button"
-                                            props={{
-                                                children: "Propose to Mint",
-                                                size: "sm",
-                                                variant: "info outline",
-                                                disabled: item.isHuman,
-                                                onClick: () => {}
-                                            }}
-                                        />
+                                        <ProposeToMintSBT itemDetails={item} />
+                                        <ProposeToRemove user={item.account} />
                                     </td>
                                 </tr>
                             );
@@ -462,6 +448,21 @@ const isUserAllowedTo = (user, kind, action) => {
     return allowed;
 };
 
+const ProposeToMintSBT = ({ itemDetails }) => {
+    return (
+        <Widget
+            src="nearui.near/widget/Input.Button"
+            props={{
+                children: "Propose to Mint SBT",
+                variant: "info",
+                disabled: itemDetails.isHuman,
+                size: "sm",
+                onClick: () => {}
+            }}
+        />
+    );
+};
+
 const ProposeToRemove = ({ user }) => {
     if (
         isUserAllowedTo(
@@ -486,7 +487,7 @@ const ProposeToRemove = ({ user }) => {
                         />
                     ),
                     content: (
-                        <div className="ndc-card p-4">
+                        <div className="ndc-card p-4 d-flex flex-column gap-2">
                             <Widget
                                 src="nearui.near/widget/Input.Select"
                                 props={{
@@ -774,17 +775,8 @@ return (
                                     </div>
                                     <div style={{ height: "4rem" }}></div>
                                     <div className="d-flex justify-content-between">
-                                        <Widget
-                                            src="nearui.near/widget/Input.Button"
-                                            props={{
-                                                children: "Propose to Mint SBT",
-                                                variant: "info",
-                                                disabled: item.isHuman,
-                                                size: "sm",
-                                                onClick: () => {}
-                                            }}
-                                        />
-                                        {/* <ProposeToRemove user={item.account} /> */}
+                                        <ProposeToMintSBT itemDetails={item} />
+                                        <ProposeToRemove user={item.account} />
                                     </div>
                                     <Widget
                                         src="nearui.near/widget/Input.Button"
