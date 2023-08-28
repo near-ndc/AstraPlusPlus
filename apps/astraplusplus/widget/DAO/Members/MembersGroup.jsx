@@ -149,6 +149,10 @@ const Wrapper = styled.div`
         color: #4498e0;
     }
 
+    .danger i {
+        color: rgb(229, 72, 77);
+    }
+
     .card-view-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -176,7 +180,35 @@ const Wrapper = styled.div`
     }
 `;
 
+function followUser(user, isFollowing) {
+    const dataToSend = {
+        graph: { follow: { [user]: isFollowing ? null : "" } },
+        index: {
+            graph: JSON.stringify({
+                key: "follow",
+                value: {
+                    type,
+                    accountId: user
+                }
+            }),
+            notify: JSON.stringify({
+                key: user,
+                value: {
+                    type
+                }
+            })
+        }
+    };
+    Social.set(dataToSend, {
+        force: true
+    });
+}
+
 const PermissionsPopover = ({ currentRole }) => {
+    const permissions =
+        currentRole === "Everyone"
+            ? policy?.everyone?.permissions
+            : policy?.roles?.[currentRole]?.permissions;
     return (
         <Widget
             src="nearui.near/widget/Layout.Popover"
@@ -188,11 +220,9 @@ const PermissionsPopover = ({ currentRole }) => {
                             Admins have permissions to:
                         </h5>
                         <ul className="text-black text-sm">
-                            {policy?.roles?.[currentRole]?.permissions?.map(
-                                (i) => (
-                                    <li>{i}</li>
-                                )
-                            )}
+                            {permissions?.map((i) => (
+                                <li>{i}</li>
+                            ))}
                         </ul>
                     </div>
                 )
@@ -203,19 +233,50 @@ const PermissionsPopover = ({ currentRole }) => {
 
 const RoleTag = ({ roles, showIcon }) => {
     const tags = [];
-    roles.map((item) => {
+    if (Array.isArray(roles)) {
+        roles.map((item) => {
+            tags.push(
+                <div
+                    className={`custom-tag ${
+                        RolesColor.find((i) => i.role === item)?.color
+                    }-bg`}
+                >
+                    {item}
+                    {showIcon && <PermissionsPopover currentRole={item} />}
+                </div>
+            );
+        });
+    } else {
+        // for everyone
         tags.push(
-            <div
-                className={`custom-tag ${
-                    RolesColor.find((i) => i.role === item)?.color
-                }-bg`}
-            >
-                {item}
-                {showIcon && <PermissionsPopover currentRole={item} />}
+            <div className={`custom-tag`}>
+                {roles}
+                {showIcon && <PermissionsPopover currentRole={roles} />}
             </div>
         );
-    });
+    }
     return <div className="d-flex gap-2">{tags.map((i) => i)}</div>;
+};
+
+const FollowBtn = ({ itemDetails }) => {
+    return (
+        <Widget
+            src="nearui.near/widget/Input.Button"
+            props={{
+                children: itemDetails.isUserFollowed ? (
+                    <i class="bi bi-person-dash"></i>
+                ) : (
+                    <i class="bi bi-person-plus"></i>
+                ),
+                variant:
+                    (itemDetails.isUserFollowed ? "danger" : "info") +
+                    " icon outline",
+                size: "sm",
+                onClick: () =>
+                    followUser(itemDetails.account, itemDetails.isUserFollowed)
+            }}
+        />
+    );
 };
 
 const Table = ({ title, tableData, showExpand }) => {
@@ -316,22 +377,12 @@ const Table = ({ title, tableData, showExpand }) => {
                                         {item.totalProposals}
                                     </td>
                                     <td className="d-flex gap-2 align-items-center">
+                                        <FollowBtn itemDetails={item} />
                                         <Widget
                                             src="nearui.near/widget/Input.Button"
                                             props={{
                                                 children: (
-                                                    <i class="bi bi-person-plus"></i>
-                                                ),
-                                                variant: "icon info outline",
-                                                size: "sm",
-                                                onClick: () => {}
-                                            }}
-                                        />
-                                        <Widget
-                                            src="nearui.near/widget/Input.Button"
-                                            props={{
-                                                children: (
-                                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                                    <i class="bi bi-clock-history"></i>
                                                 ),
                                                 size: "sm",
                                                 variant: "icon info outline",
@@ -559,7 +610,7 @@ return (
             } d-flex gap-2 flex-wrap`}
         >
             <Widget
-                src="nearui.near/widget/Input.Text"
+                src="nearui.near/widget/Input.ExperimentalText"
                 props={{
                     value: state.search,
                     placeholder:
@@ -678,23 +729,31 @@ return (
                                 },
                                 applyFilters: (filters) => {
                                     const filteredData = [...data];
-
                                     const rolesFilter = filters?.filter(
                                         (i) =>
                                             i !== groupTypes.ASCENDING &&
                                             i !== groupTypes.DESCENDING
                                     );
+
                                     if (rolesFilter?.length > 0) {
                                         filteredData = filteredData.filter(
-                                            (item) =>
-                                                item.groups.some((i) =>
-                                                    filters?.includes(i)
-                                                )
+                                            (item) => {
+                                                if (
+                                                    Array.isArray(item.groups)
+                                                ) {
+                                                    return item?.groups?.some(
+                                                        (i) =>
+                                                            rolesFilter?.includes(
+                                                                i
+                                                            )
+                                                    );
+                                                }
+                                            }
                                         );
                                     }
 
                                     if (
-                                        filters.includes(groupTypes.ASCENDING)
+                                        filters?.includes(groupTypes.ASCENDING)
                                     ) {
                                         filteredData = filteredData
                                             .slice()
@@ -704,8 +763,9 @@ return (
                                                 )
                                             );
                                     }
+
                                     if (
-                                        filters.includes(groupTypes.DESCENDING)
+                                        filters?.includes(groupTypes.DESCENDING)
                                     ) {
                                         filteredData = filteredData
                                             .slice()
@@ -756,16 +816,7 @@ return (
                                                 }
                                             }}
                                         />
-                                        <Widget
-                                            src="nearui.near/widget/Input.Button"
-                                            props={{
-                                                children: (
-                                                    <i class="bi bi-person-plus"></i>
-                                                ),
-                                                variant: "icon info outline",
-                                                onClick: () => {}
-                                            }}
-                                        />
+                                        <FollowBtn itemDetails={item} />
                                     </div>
                                     <div className="mt-3">
                                         <RoleTag
