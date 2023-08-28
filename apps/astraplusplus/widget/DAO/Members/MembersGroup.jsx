@@ -91,12 +91,13 @@ const Wrapper = styled.div`
         border-bottom-right-radius: 9999px;
         border-top-left-radius: 9999px;
         border-bottom-left-radius: 9999px;
-        padding-inline: 1.3rem;
-        padding-block: 0.5rem;
+        padding-inline: 0.8rem;
+        padding-block: 0.3rem;
         display: flex;
         gap: 0.5rem;
         border-width: 1px;
         border-style: solid;
+        font-size: 13px;
     }
 
     .blue-bg {
