@@ -5,7 +5,6 @@ const viewList = props.viewList;
 
 const Wrapper = styled.div`
     width: max-content;
-    padding: 2rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -51,7 +50,7 @@ const Wrapper = styled.div`
 `;
 
 return (
-    <Wrapper className="ndc-card">
+    <Wrapper>
         <div>
             {viewList?.map((item) => (
                 <div
