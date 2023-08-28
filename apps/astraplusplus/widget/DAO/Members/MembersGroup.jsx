@@ -582,16 +582,41 @@ const ProposeToRemove = ({ user }) => {
 const UIData =
     state.filters?.length > 0 || state.search ? state.filteredData : data;
 
+function containsOnly(array, item) {
+    return array.length === 1 && array[0] === item;
+}
+
 const GroupView = () => {
-    const view = rolesArray?.map((role) => {
-        return (
-            <Table
-                title={role}
-                tableData={UIData?.filter((item) => item.groups.includes(role))}
-                showExpand={true}
-            />
-        );
-    });
+    let view = [];
+    if (
+        containsOnly(state.filters, groupTypes.ASCENDING) ||
+        containsOnly(state.filters, groupTypes.DESCENDING) ||
+        !state.filters?.length > 0
+    ) {
+        view = rolesArray?.map((role) => {
+            return (
+                <Table
+                    title={role}
+                    tableData={UIData?.filter((item) =>
+                        item.groups.includes(role)
+                    )}
+                    showExpand={true}
+                />
+            );
+        });
+    } else {
+        view = state.filters?.map((role) => {
+            return (
+                <Table
+                    title={role}
+                    tableData={UIData?.filter((item) =>
+                        item.groups.includes(role)
+                    )}
+                    showExpand={true}
+                />
+            );
+        });
+    }
     return <div>{view?.map((item) => item)}</div>;
 };
 
