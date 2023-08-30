@@ -64,7 +64,7 @@ if (filter === "followedDAOs") {
   );
 }
 
-const createDAOLink = "#//*__@appAccount__*//widget/index?tab=create-dao";
+const createDAOLink = "#//*__@appAccount__*//widget/home?tab=create-dao";
 
 const renderHeader = () => (
   <div className="d-flex justify-content-between gap-2 align-items-center">
