@@ -1,12 +1,14 @@
 const data = props.data;
 const policy = props.policy;
 
-const rolesArray = Object.keys(policy?.roles ?? {});
+const EVERYONE = "Everyone";
+
+const rolesArray = Object.keys(policy?.roles ?? {}).concat(EVERYONE);
 
 const colorsArray = ["blue", "green", "pink", "red"];
 
 const RolesColor = rolesArray.map((item, i) => {
-    return { color: colorsArray[i], role: item };
+    return { color: colorsArray[i] ?? "", role: item };
 });
 
 const onRemoveUserProposal = (memberId, roleId) => {
@@ -73,7 +75,7 @@ State.init({
 });
 
 const Wrapper = styled.div`
-    border: 1px solid transparent;
+    width: 98%;
 
     a {
         color: #4498e0;
@@ -125,10 +127,11 @@ const Wrapper = styled.div`
     }
 
     table {
-        display: inline-block;
+        display: block;
         overflow-x: auto;
         font-size: 13px;
-        width: -webkit-fill-available;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     th,
@@ -206,9 +209,10 @@ function followUser(user, isFollowing) {
 
 const PermissionsPopover = ({ currentRole }) => {
     const permissions =
-        currentRole === "Everyone"
+        currentRole === EVERYONE
             ? policy?.everyone?.permissions
             : policy?.roles?.[currentRole]?.permissions;
+
     return (
         <Widget
             src="nearui.near/widget/Layout.Popover"
@@ -219,11 +223,13 @@ const PermissionsPopover = ({ currentRole }) => {
                         <h5 className="text-gray">
                             Admins have permissions to:
                         </h5>
-                        <ul className="text-black text-sm">
-                            {permissions?.map((i) => (
-                                <li>{i}</li>
-                            ))}
-                        </ul>
+                        {permissions?.length > 0 && (
+                            <ul className="text-black text-sm">
+                                {permissions?.map((i) => (
+                                    <li>{i}</li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                 )
             }}
@@ -238,7 +244,7 @@ const RoleTag = ({ roles, showIcon }) => {
             tags.push(
                 <div
                     className={`custom-tag ${
-                        RolesColor.find((i) => i.role === item)?.color
+                        RolesColor.find((i) => i.role === item)?.color ?? ""
                     }-bg`}
                 >
                     {item}
@@ -281,7 +287,7 @@ const FollowBtn = ({ itemDetails }) => {
 
 const Table = ({ title, tableData, showExpand }) => {
     if (!tableData?.length > 0) {
-        return;
+        return null;
     }
 
     return (
@@ -486,14 +492,16 @@ const isUserAllowedTo = (user, kind, action) => {
         if (role === "Everyone") {
             permissions = policy.everyone.permissions;
         }
-
-        const allowedRole =
-            permissions?.includes(`${kind.toString()}:${action.toString()}`) ||
-            permissions?.includes(`${kind.toString()}:*`) ||
-            permissions?.includes(`*:${action.toString()}`) ||
-            permissions?.includes("*:*");
-
-        allowed = allowed || allowedRole;
+        if (permissions) {
+            const allowedRole =
+                permissions?.includes(
+                    `${kind.toString()}:${action.toString()}`
+                ) ||
+                permissions?.includes(`${kind.toString()}:*`) ||
+                permissions?.includes(`*:${action.toString()}`) ||
+                permissions?.includes("*:*");
+            allowed = allowed || allowedRole;
+        }
         return allowedRole;
     });
     return allowed;
@@ -593,8 +601,8 @@ const GroupView = () => {
         containsOnly(state.filters, groupTypes.DESCENDING) ||
         !state.filters?.length > 0
     ) {
-        view = rolesArray?.map((role) => {
-            return (
+        rolesArray?.map((role) => {
+            view.push(
                 <Table
                     title={role}
                     tableData={UIData?.filter((item) =>
@@ -605,8 +613,8 @@ const GroupView = () => {
             );
         });
     } else {
-        view = state.filters?.map((role) => {
-            return (
+        state.filters?.map((role) => {
+            view.push(
                 <Table
                     title={role}
                     tableData={UIData?.filter((item) =>
@@ -763,20 +771,34 @@ return (
                                     if (rolesFilter?.length > 0) {
                                         filteredData = filteredData.filter(
                                             (item) => {
+                                                let results = [];
+                                                if (
+                                                    rolesFilter.includes(
+                                                        EVERYONE
+                                                    )
+                                                ) {
+                                                    results.push(
+                                                        item?.groups ===
+                                                            EVERYONE
+                                                    );
+                                                }
+
                                                 if (
                                                     Array.isArray(item.groups)
                                                 ) {
-                                                    return item?.groups?.some(
-                                                        (i) =>
-                                                            rolesFilter?.includes(
-                                                                i
-                                                            )
+                                                    results.push(
+                                                        item?.groups?.some(
+                                                            (i) =>
+                                                                rolesFilter?.includes(
+                                                                    i
+                                                                )
+                                                        )
                                                     );
                                                 }
+                                                return results.includes(true);
                                             }
                                         );
                                     }
-
                                     if (
                                         filters?.includes(groupTypes.ASCENDING)
                                     ) {
