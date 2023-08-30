@@ -50,21 +50,18 @@ if (filter === "followedDAOs") {
     contract_id: dao,
   }));
 } else {
-  daos = useCache(
-    () =>
-      asyncFetch(forgeUrl(`https://api.pikespeak.ai/daos/all`, {}), {
-        mode: "cors",
-        headers: {
-          "x-api-key": publicApiKey,
-          "cache-control": "max-age=86400", // 1 day
-        },
-      }).then((res) => res.body),
-    "all-daos",
-    { subscribe: false },
-  );
+  daos = fetch(forgeUrl(`https://api.pikespeak.ai/daos/all`, {}), {
+    mode: "cors",
+    headers: {
+      "x-api-key": publicApiKey,
+      "cache-control": "max-age=86400", // 1 day
+    },
+  });
+  if (daos === null) return "";
+  daos = daos?.body;
 }
 
-const createDAOLink = "#//*__@appAccount__*//widget/index?tab=create-dao";
+const createDAOLink = "#//*__@appAccount__*//widget/home?tab=create-dao";
 
 const renderHeader = () => (
   <div className="d-flex justify-content-between gap-2 align-items-center">

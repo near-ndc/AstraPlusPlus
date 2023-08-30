@@ -1,6 +1,6 @@
 const defaultFilters = props.defaultFilters ?? {};
 
-const bountiesLink = "#//*__@appAccount__*//widget/index?tab=bounties";
+const bountiesLink = "#//*__@appAccount__*//widget/home?tab=bounties";
 
 const publicApiKey = "/*__@replace:pikespeakApiKey__*/";
 const resPerPage = 10;
