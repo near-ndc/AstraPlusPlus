@@ -195,7 +195,7 @@ return (
         <i className="bi bi-list"></i>
       </MobileToggle>
       <a
-        href="#//*__@appAccount__*//widget/index"
+        href="#//*__@appAccount__*//widget/home"
         className="h4 text-decoration-none fw-bold text-black m-0"
       >
         <Widget

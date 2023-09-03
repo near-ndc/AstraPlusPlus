@@ -149,14 +149,14 @@ const Wrapper = styled[tag]`
 
   &.disabled,
   &:disabled {
-    background: #f0f0f0;
-    color: #aaa;
-    border-color: #f0f0f0;
+    background: #f0f0f0 !important;
+    color: #aaa !important;
+    border-color: #f0f0f0 !important;
 
     &.outline {
-      background: transparent;
-      color: #aaa;
-      border-color: #aaa;
+      background: transparent !important;
+      color: #aaa !important;
+      border-color: #aaa !important;
     }
   }
 `;

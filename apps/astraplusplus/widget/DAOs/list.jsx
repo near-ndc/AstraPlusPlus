@@ -3,7 +3,7 @@ const currentPage = props.page ?? 1;
 const resPerPage = props.resPerPage ?? 6;
 const { router } = props;
 
-const createDAOLink = "#//*__@appAccount__*//widget/index?tab=create-dao";
+const createDAOLink = "#//*__@appAccount__*//widget/home?tab=create-dao";
 
 State.init({
   currentPage: currentPage,
@@ -105,7 +105,7 @@ const renderEmpty = () => (
         children: "Go to home",
         variant: "info outline w-100",
         size: "lg",
-        href: "#//*__@appAccount__*//widget/index",
+        href: "#//*__@appAccount__*//widget/home",
       }}
     />
   </div>

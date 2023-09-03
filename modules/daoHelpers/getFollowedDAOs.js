@@ -3,11 +3,10 @@ const getFollowedDAOs = (accountId) => {
     return_type: "BlockHeight",
   });
 
-  following =
-    following === null
-      ? null
-      : Object.keys(following[accountId].graph.follow).filter((account) =>
-          account.endsWith(".sputnik-dao.near"),
-        );
+  if (following === null) return null;
+
+  following = Object.keys(following[accountId].graph.follow || {}).filter(
+    (account) => account.endsWith(".sputnik-dao.near"),
+  );
   return following;
 };

@@ -83,7 +83,7 @@ const shortenNumber = (n) => {
 };
 
 const daoLink = ({ daoId, tab }) => {
-  return `#//*__@appAccount__*//widget/index?page=dao&daoId=${daoId}${
+  return `#//*__@appAccount__*//widget/home?page=dao&daoId=${daoId}${
     tab && `&tab=${tab}`
   }`;
 };

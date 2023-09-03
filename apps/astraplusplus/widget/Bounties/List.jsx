@@ -2,7 +2,7 @@ const bounties = props.bounties;
 const currentPage = props.page ?? 1;
 const resPerPage = props.resPerPage ?? 6;
 
-const bountieslink = "#//*__@appAccount__*//widget/index?tab=bounties";
+const bountieslink = "#//*__@appAccount__*//widget/home?tab=bounties";
 
 State.init({
   currentPage: currentPage,
@@ -96,7 +96,7 @@ const renderEmpty = () => (
         children: "Go to home",
         variant: "info outline w-100",
         size: "lg",
-        href: "#//*__@appAccount__*//widget/index",
+        href: "#//*__@appAccount__*//widget/home",
       }}
     />
   </div>
