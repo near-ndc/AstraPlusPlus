@@ -21,7 +21,7 @@ const post = props.post ?? {
 };
 const on = props.on ?? {
   like: () => {},
-  comment: () => {},
+  showComments: () => {},
   react: () => {},
   save: () => {},
 };
@@ -146,15 +146,18 @@ return (
           selected: post.reaction,
         }}
       />
-      <Button
-        children={
-          <>
-            <i className="bi bi-chat-left"></i>
-            {post.stats.comments} comments
-          </>
-        }
-        variant="outline info"
-      />
+      {!!on.showComments && (
+        <Button
+          children={
+            <>
+              <i className="bi bi-chat-left"></i>
+              {post.stats.comments} comments
+            </>
+          }
+          variant="outline info"
+          onClick={on.showComments}
+        />
+      )}
       {false && (
         <Button
           children={

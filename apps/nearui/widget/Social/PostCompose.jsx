@@ -1,6 +1,7 @@
 const initialBody = props.initialBody ?? `Create Post`;
 const onPost = props.onPost ?? ((p) => console.log(p));
 const disabled = props.disabled;
+const buttonText = props.buttonText ?? "Post";
 
 State.init({});
 
@@ -45,7 +46,7 @@ return (
         src="/*__@appAccount__*//widget/Input.Button"
         props={{
           variant: "info",
-          children: "Post",
+          children: buttonText,
           onClick: () => onPost(state.body || initialBody),
           disabled: !context.accountId,
         }}

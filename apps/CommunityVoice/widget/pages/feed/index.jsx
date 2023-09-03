@@ -5,18 +5,30 @@ const communities = [
     id: "og",
     name: "OGs",
     rules: {
-      SBTs: ["community.i-am-human.near"],
+      posting: {
+        SBTs: ["community.i-am-human.near"],
+      },
+      commenting: {},
     },
   },
   {
     id: "general",
     name: "General",
+    rules: {
+      commenting: {
+        SBTs: ["fractal.i-am-human.near"],
+      },
+    },
+  },
+  {
+    id: "public",
+    name: "Public",
     rules: {},
   },
 ];
 
 State.init({
-  community: "og",
+  community: "general",
 });
 
 const activeCommunity = communities.find((c) => c.id === state.community);
@@ -49,12 +61,24 @@ const handleCreatePost = (body) => {
   );
 };
 
+const handleCommentsModal = (postAuthor, postBlockHeight, newState) => {
+  State.update({
+    commentsModal: {
+      open: newState,
+      props: {
+        postAuthor,
+        postBlockHeight,
+      },
+    },
+  });
+};
+
 // -- Gating based on Community Rules
 let canPost = true;
 
-if (Array.isArray(activeCommunity.rules.SBTs)) {
+if (Array.isArray(activeCommunity.rules.posting.SBTs)) {
   // user should have the SBTs
-  activeCommunity.rules.SBTs.forEach((SBT) => {
+  activeCommunity.rules.posting.SBTs.forEach((SBT) => {
     const allSBTs = Near.view(Config.SBTRegistry, "sbt_tokens_by_owner", {
       account: context.accountId,
     });
@@ -64,7 +88,6 @@ if (Array.isArray(activeCommunity.rules.SBTs)) {
     canPost = canPost && hasSBT;
   });
 }
-
 // -- End
 return (
   <div className="d-flex gap-4 p-4 w-100">
@@ -89,6 +112,18 @@ return (
           disabled: !canPost,
         }}
       />
+      {state.commentsModal.open && (
+        <Widget
+          src="/*__@appAccount__*//widget/pages.feed.comments"
+          props={{
+            onClose: () => State.update({ commentsModal: undefined }),
+            Config,
+            Post,
+            community: activeCommunity,
+            ...state.commentsModal.props,
+          }}
+        />
+      )}
       <Widget
         src="mob.near/widget/MergedIndexFeed"
         props={{
@@ -97,7 +132,13 @@ return (
             return (
               <Widget
                 src="/*__@appAccount__*//widget/pages.feed.post"
-                props={{ ...p, Config, Post, communities }}
+                props={{
+                  ...p,
+                  Config,
+                  Post,
+                  communities,
+                  onCommentsModal: (a, b) => handleCommentsModal(a, b, true),
+                }}
               />
             );
           },
@@ -105,7 +146,14 @@ return (
       />
     </div>
     <div className="d-lg-block d-none" style={{ width: 300 }}>
-      sidebar
+      <Markdown
+        text={
+          "```json \n// Selected Group \n" +
+          JSON.stringify(activeCommunity, null, 2) +
+          "\n```"
+        }
+      />
+      <h5>Can post: {canPost.toString()}</h5>
     </div>
   </div>
 );

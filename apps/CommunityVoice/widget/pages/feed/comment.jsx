@@ -1,25 +1,15 @@
-const {
-  accountId,
-  blockHeight,
-  Config,
-  Post,
-  key,
-  communities,
-  onCommentsModal,
-} = props;
+const { accountId, blockHeight, Config, Post, community } = props;
 const update = (s) => State.update(s);
 const refresh = (ms) => setTimeout(() => update({ rd: Math.random() }), ms);
-
-const community = props.community ?? communities.find((c) => c.id === key);
 
 State.init({});
 
 // -- Filters
-if (Array.isArray(community.rules.posting.SBTs)) {
+if (Array.isArray(community.rules.commenting.SBTs)) {
   // author should have the SBTs
   let isValid = false;
 
-  community.rules.posting.SBTs.forEach((SBT) => {
+  community.rules.commenting.SBTs.forEach((SBT) => {
     const allSBTs = Near.view(Config.SBTRegistry, "sbt_tokens_by_owner", {
       account: accountId,
     });
@@ -33,9 +23,17 @@ if (Array.isArray(community.rules.posting.SBTs)) {
 }
 
 // --
-const post = Post.get(accountId, blockHeight);
-const likesByUsers = Post.getLikes(accountId, blockHeight);
-const reactionsByUsers = Post.getReactions(accountId, blockHeight);
+const post = Post.get(accountId, blockHeight, Config.commentDataKey);
+const likesByUsers = Post.getLikes(
+  accountId,
+  blockHeight,
+  Config.commentDataKey,
+);
+const reactionsByUsers = Post.getReactions(
+  accountId,
+  blockHeight,
+  Config.commentDataKey,
+);
 
 if (post === null) {
   refresh(500);
@@ -88,7 +86,7 @@ const on = {
       {
         postAuthor: accountId,
         postBlockHeight: blockHeight,
-        dataKey: Config.postDataKey,
+        dataKey: Config.commentDataKey,
       },
       post.liked ? true : false,
       () => update({ forcedLike: post.liked ? false : true }),
@@ -100,18 +98,13 @@ const on = {
       {
         postAuthor: accountId,
         postBlockHeight: blockHeight,
-        dataKey: Config.postDataKey,
+        dataKey: Config.commentDataKey,
       },
       newReaction,
       () => update({ forcedReaction: newReaction }),
       () => console.log("canceled"),
     );
   },
-  showComments: onCommentsModal
-    ? () => {
-        onCommentsModal(accountId, blockHeight);
-      }
-    : undefined,
 };
 
 return (

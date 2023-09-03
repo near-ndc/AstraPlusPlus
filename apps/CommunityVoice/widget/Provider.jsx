@@ -35,11 +35,9 @@ const Helpers = {
       return null;
     },
     prepare: (post) => {
-      const pid = post.pid ?? UUID.generate();
       return {
         [Config.postDataKey]: {
           main: JSON.stringify({
-            id: pid,
             type: post.type ?? "md",
             community: post.community ?? "general",
             tags: post.tags ?? [],
@@ -56,7 +54,46 @@ const Helpers = {
             key: post.community ?? "general",
             value: {
               type: post.type ?? "md",
-              id: pid,
+            },
+          }),
+        },
+      };
+    },
+    prepareComment: (comment, postAuthor, postBlockHeight) => {
+      return {
+        [Config.commentDataKey]: {
+          main: JSON.stringify({
+            type: comment.type ?? "md",
+            community: comment.community ?? "general",
+            tags: comment.tags ?? [],
+            author: context.accountId,
+            updatedAt: comment.updatedAt || comment.createdAt || Date.now(),
+            createdAt: comment.createdAt || Date.now(),
+            body: comment.body,
+            version: Config.version,
+          }),
+        },
+        index: {
+          // TODO, index by tags
+          [Config.commentDataKey]: JSON.stringify({
+            key: {
+              type: "social",
+              path: `${postAuthor}/${Config.postDataKey}/main`,
+              blockHeight: postBlockHeight,
+            },
+            value: {
+              type: comment.type ?? "md",
+            },
+          }),
+          [Config.notifyKey]: JSON.stringify({
+            key: postAuthor,
+            value: {
+              type: "comment",
+              item: {
+                type: "social",
+                path: `${postAuthor}/${Config.postDataKey}/main`,
+                blockHeight: postBlockHeight,
+              },
             },
           }),
         },
@@ -67,20 +104,24 @@ const Helpers = {
 
 // --- Main
 const Post = {
-  get: (author, blockHeight) => {
+  get: (author, blockHeight, dataKey) => {
     return JSON.parse(
-      Social.get(`${author}/${Config.postDataKey}/main`, blockHeight, {
-        subscribe: false,
-      }) ?? "null",
+      Social.get(
+        `${author}/${dataKey ?? Config.postDataKey}/main`,
+        blockHeight,
+        {
+          subscribe: false,
+        },
+      ) ?? "null",
     );
   },
-  getLikes: (author, blockHeight) => {
+  getLikes: (author, blockHeight, dataKey) => {
     const likesArray = Social.index(
       Config.likeKey,
       {
         type: "social",
         blockHeight: blockHeight,
-        path: `${author}/${Config.postDataKey}/main`,
+        path: `${author}/${dataKey ?? Config.postDataKey}/main`,
       },
       {
         subscribe: false,
@@ -97,13 +138,13 @@ const Post = {
     });
     return likesByUsers;
   },
-  getReactions: (author, blockHeight) => {
+  getReactions: (author, blockHeight, dataKey) => {
     const reactionsArray = Social.index(
       Config.reactKey,
       {
         type: "social",
         blockHeight: blockHeight,
-        path: `${author}/${Config.postDataKey}/main`,
+        path: `${author}/${dataKey ?? Config.postDataKey}/main`,
       },
       {
         subscribe: false,
@@ -129,11 +170,16 @@ const Post = {
     const commit = Helpers.post.prepare(post);
     Social.set(commit, { force: true, onCommit, onCancel });
   },
-  like: ({ postAuthor, postBlockHeight }, unlike, onCommit, onCancel) => {
+  like: (
+    { postAuthor, postBlockHeight, dataKey },
+    unlike,
+    onCommit,
+    onCancel,
+  ) => {
     const postItem = {
       type: "social", // TODO: IDK if this should be changed
       blockHeight: postBlockHeight,
-      path: `${postAuthor}/${Config.postDataKey}/main`,
+      path: `${postAuthor}/${dataKey ?? Config.postDataKey}/main`,
     };
     const commit = {
       index: {
@@ -154,11 +200,16 @@ const Post = {
     };
     Social.set(commit, { force: true, onCommit, onCancel });
   },
-  react: ({ postAuthor, postBlockHeight }, reaction, onCommit, onCancel) => {
+  react: (
+    { postAuthor, postBlockHeight, dataKey },
+    reaction,
+    onCommit,
+    onCancel,
+  ) => {
     const postItem = {
       type: "social", // TODO: IDK if this should be changed
       blockHeight: postBlockHeight,
-      path: `${postAuthor}/${Config.postDataKey}/main`,
+      path: `${postAuthor}/${dataKey ?? Config.postDataKey}/main`,
     };
     const commit = {
       index: {
@@ -183,12 +234,30 @@ const Post = {
 
     Social.set(commit, { force: true, onCommit, onCancel });
   },
-  comment: (pid, comment) => {},
-  save: (pid) => {},
+  comment: (
+    comment,
+    postAuthor,
+    postBlockHeight,
+    onCommit,
+    onCancel,
+    onError,
+  ) => {
+    const error = Helpers.post.validate(comment);
+    if (error !== null) {
+      return onError(error);
+    }
+    const commit = Helpers.post.prepareComment(
+      comment,
+      postAuthor,
+      postBlockHeight,
+    );
+    Social.set(commit, { force: true, onCommit, onCancel });
+  },
 };
 
 const Config = {
   postDataKey: isDev ? "voice-dev" : "voice",
+  commentDataKey: isDev ? "echo-dev" : "echo",
   postTypes: ["md"],
   likeKey: "like",
   reactKey: "react",
