@@ -1,8 +1,25 @@
 const { Config, Post } = props;
 
+const communities = [
+  {
+    id: "og",
+    name: "OGs",
+    rules: {
+      SBTs: ["community.i-am-human.near"],
+    },
+  },
+  {
+    id: "general",
+    name: "General",
+    rules: {},
+  },
+];
+
 State.init({
-  community: "general",
+  community: "og",
 });
+
+const activeCommunity = communities.find((c) => c.id === state.community);
 
 const index = [
   {
@@ -19,7 +36,6 @@ const index = [
 ];
 
 const handleCreatePost = (body) => {
-  console.log(state.community);
   Post.create(
     {
       body: body,
@@ -27,12 +43,29 @@ const handleCreatePost = (body) => {
       community: state.community,
       tags: [],
     },
-    undefined,
-    undefined,
+    () => console.log("posted successfully"),
+    () => console.log("user canceled"),
     (e) => console.log("error", e),
   );
 };
 
+// -- Gating based on Community Rules
+let canPost = true;
+
+if (Array.isArray(activeCommunity.rules.SBTs)) {
+  // user should have the SBTs
+  activeCommunity.rules.SBTs.forEach((SBT) => {
+    const allSBTs = Near.view(Config.SBTRegistry, "sbt_tokens_by_owner", {
+      account: context.accountId,
+    });
+
+    if (allSBTs === null) return "";
+    const hasSBT = (allSBTs || []).find((s) => s[0] === SBT)[1].length > 0;
+    canPost = canPost && hasSBT;
+  });
+}
+
+// -- End
 return (
   <div className="d-flex gap-4 p-4 w-100">
     <div className="d-flex flex-column gap-4 flex-fill">
@@ -41,10 +74,10 @@ return (
           State.update({ community: value });
         }}
       >
-        {["general", "og", "hello"].map((o, i) => {
+        {communities.map((c, i) => {
           return (
-            <option value={o} selected={state.community === o}>
-              {o}
+            <option value={c.id} selected={state.community === c.id}>
+              {c.name}
             </option>
           );
         })}
@@ -53,6 +86,7 @@ return (
         src="/*__@replace:nui__*//widget/Social.PostCompose"
         props={{
           onPost: handleCreatePost,
+          disabled: !canPost,
         }}
       />
       <Widget
@@ -63,7 +97,7 @@ return (
             return (
               <Widget
                 src="/*__@appAccount__*//widget/pages.feed.post"
-                props={{ ...p, Config }}
+                props={{ ...p, Config, Post, communities }}
               />
             );
           },

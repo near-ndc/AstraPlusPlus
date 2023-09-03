@@ -1,5 +1,6 @@
 const initialBody = props.initialBody ?? `Create Post`;
 const onPost = props.onPost ?? ((p) => console.log(p));
+const disabled = props.disabled;
 
 State.init({});
 
@@ -9,6 +10,8 @@ return (
     style={{
       boxShadow: "0px 4px 28px 0px rgba(140, 149, 159, 0.1)",
       gridTemplateColumns: "40px auto",
+      opacity: disabled ? 0.7 : 1,
+      pointerEvents: disabled ? "none" : "all",
     }}
   >
     <Widget

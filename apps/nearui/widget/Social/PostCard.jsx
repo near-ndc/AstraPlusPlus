@@ -9,7 +9,9 @@ const post = props.post ?? {
   stats: {
     likes: 0,
     comments: 0,
-    reactions: 0,
+    reactions: {
+      heart: 0,
+    },
     saves: 0,
   },
   reaction: null || "heart",
@@ -23,8 +25,6 @@ const on = props.on ?? {
   react: () => {},
   save: () => {},
 };
-
-console.log(post);
 
 State.init({
   expand: false,
@@ -134,7 +134,17 @@ return (
             {post.stats.likes}
           </>
         }
-        variant="outline info"
+        variant={["info", post.liked ? "" : "outline"]}
+        onClick={on.like}
+      />
+      <Widget
+        src="/*__@appAccount__*//widget/Social.ReactButton"
+        props={{
+          reactions: props.reactions,
+          stats: post.stats.reactions,
+          onChange: on.react,
+          selected: post.reaction,
+        }}
       />
       <Button
         children={
@@ -145,32 +155,27 @@ return (
         }
         variant="outline info"
       />
-      <Button
-        children={
-          <>
-            <i className="bi bi-emoji-smile"></i>
-            {post.stats.reactions} Reactions
-          </>
-        }
-        variant="outline info"
-      />
-      <Button
-        children={
-          <>
-            <i className="bi bi-bookmark"></i>
-            {post.stats.saves} Save
-          </>
-        }
-        variant="outline info"
-      />
-      <Button
-        children={
-          <>
-            <i className="bi bi-share" /> Share
-          </>
-        }
-        variant="outline info"
-      />
+      {false && (
+        <Button
+          children={
+            <>
+              <i className="bi bi-bookmark"></i>
+              {post.stats.saves} Save
+            </>
+          }
+          variant="outline info"
+        />
+      )}
+      {false && (
+        <Button
+          children={
+            <>
+              <i className="bi bi-share" /> Share
+            </>
+          }
+          variant="outline info"
+        />
+      )}
     </div>
   </div>
 );

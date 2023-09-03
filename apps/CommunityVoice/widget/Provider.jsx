@@ -67,7 +67,60 @@ const Helpers = {
 
 // --- Main
 const Post = {
-  get: (pid) => {},
+  get: (author, blockHeight) => {
+    return JSON.parse(
+      Social.get(`${author}/${Config.postDataKey}/main`, blockHeight, {
+        subscribe: false,
+      }) ?? "null",
+    );
+  },
+  getLikes: (author, blockHeight) => {
+    const likesArray = Social.index(
+      Config.likeKey,
+      {
+        type: "social",
+        blockHeight: blockHeight,
+        path: `${author}/${Config.postDataKey}/main`,
+      },
+      {
+        subscribe: false,
+      },
+    );
+    if (likesArray === null) return null;
+    const likesByUsers = {};
+    (likesArray || []).forEach((like) => {
+      if (like.value.type === "like") {
+        likesByUsers[like.accountId] = like;
+      } else if (like.value.type === "unlike") {
+        delete likesByUsers[like.accountId];
+      }
+    });
+    return likesByUsers;
+  },
+  getReactions: (author, blockHeight) => {
+    const reactionsArray = Social.index(
+      Config.reactKey,
+      {
+        type: "social",
+        blockHeight: blockHeight,
+        path: `${author}/${Config.postDataKey}/main`,
+      },
+      {
+        subscribe: false,
+      },
+    );
+    if (reactionsArray === null) return null;
+    const reactionsByUsers = {};
+    (reactionsArray || []).forEach((reaction) => {
+      if (reaction.value.type === "null") {
+        delete reactionsByUsers[like.accountId];
+      } else {
+        reactionsByUsers[reaction.accountId] = reaction.value.type;
+      }
+    });
+    return reactionsByUsers;
+  },
+
   create: (post, onCommit, onCancel, onError) => {
     const error = Helpers.post.validate(post);
     if (error !== null) {
@@ -76,20 +129,72 @@ const Post = {
     const commit = Helpers.post.prepare(post);
     Social.set(commit, { force: true, onCommit, onCancel });
   },
-  like: (pid, remove) => {},
-  comment: (pid, comment) => {},
-  react: (pid, reaction) => {},
-  save: (pid) => {},
-};
+  like: ({ postAuthor, postBlockHeight }, unlike, onCommit, onCancel) => {
+    const postItem = {
+      type: "social", // TODO: IDK if this should be changed
+      blockHeight: postBlockHeight,
+      path: `${postAuthor}/${Config.postDataKey}/main`,
+    };
+    const commit = {
+      index: {
+        [Config.likeKey]: JSON.stringify({
+          key: postItem,
+          value: {
+            type: unlike ? "unlike" : "like",
+          },
+        }),
+        [Config.notifyKey]: JSON.stringify({
+          key: postAuthor,
+          value: {
+            type: unlike ? "unlike" : "like",
+            item: postItem,
+          },
+        }),
+      },
+    };
+    Social.set(commit, { force: true, onCommit, onCancel });
+  },
+  react: ({ postAuthor, postBlockHeight }, reaction, onCommit, onCancel) => {
+    const postItem = {
+      type: "social", // TODO: IDK if this should be changed
+      blockHeight: postBlockHeight,
+      path: `${postAuthor}/${Config.postDataKey}/main`,
+    };
+    const commit = {
+      index: {
+        [Config.reactKey]: JSON.stringify({
+          key: postItem,
+          value: {
+            type: reaction ? reaction : "null",
+          },
+        }),
+      },
+    };
 
-const Feed = {
-  get: () => {},
+    if (reaction) {
+      commit.index[Config.notifyKey] = JSON.stringify({
+        key: postAuthor,
+        value: {
+          type: reaction ? reaction : "null",
+          item: postItem,
+        },
+      });
+    }
+
+    Social.set(commit, { force: true, onCommit, onCancel });
+  },
+  comment: (pid, comment) => {},
+  save: (pid) => {},
 };
 
 const Config = {
   postDataKey: isDev ? "voice-dev" : "voice",
   postTypes: ["md"],
+  likeKey: "like",
+  reactKey: "react",
+  notifyKey: "notify",
   version: "0" + (isDev ? ".alpha" : ""),
+  SBTRegistry: "registry.i-am-human.near",
 };
 
 // --- Return
@@ -99,7 +204,6 @@ return (
     props={{
       ...props,
       Config,
-      Feed,
       Post,
     }}
   />
