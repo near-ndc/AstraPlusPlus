@@ -701,7 +701,7 @@ return (
                     ),
                     content: (
                         <Widget
-                            src="/*__@appAccount__*//widget/DAO.Members.GroupModal"
+                            src="nearui.near/widget/Modals.GroupModal"
                             props={{
                                 viewList: viewList,
                                 cancel: () => {
@@ -750,7 +750,7 @@ return (
                     ),
                     content: (
                         <Widget
-                            src="/*__@appAccount__*//widget/DAO.Members.FilterModal"
+                            src="nearui.near/widget/Modals.FilterModal"
                             props={{
                                 selectedFilters: state.filters,
                                 groupTypes: groupTypes,
