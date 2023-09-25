@@ -1,4 +1,6 @@
 const data = props.data;
+const currentPage = props.page ?? 1;
+const resPerPage = props.resPerPage ?? 20;
 
 const viewTypes = {
     CARD: "Card",
@@ -17,7 +19,7 @@ const viewList = [
 ];
 
 const filterItems = {
-    MOST_RECENT: "Most Recent",
+    EARLIEST: "Earliest",
     LATEST: "Latest",
     ASCENDING: "Ascending",
     DESCENDING: "Descending"
@@ -33,7 +35,8 @@ State.init({
     expandedTables: {},
     isLoading: false,
     search: "",
-    filteredData: []
+    filteredData: [],
+    currentPage: currentPage
 });
 
 const Wrapper = styled.div`
@@ -90,6 +93,10 @@ const Wrapper = styled.div`
 
     .text-gray {
         color: gray;
+    }
+
+    .word-wrap {
+        word-break: break-word;
     }
 `;
 
@@ -188,6 +195,15 @@ const Table = ({ tableData }) => {
 
 const UIData =
     state.filters?.length > 0 || state.search ? state.filteredData : data;
+
+const currentPageState =
+    state.filters?.length > 0 || state.search ? 1 : state.currentPage;
+let paginatedFollowers = [];
+
+paginatedFollowers = UIData.slice(
+    (currentPageState - 1) * resPerPage,
+    currentPageState * resPerPage
+);
 
 return (
     <Wrapper>
@@ -321,21 +337,26 @@ return (
                                         },
                                         applyFilters: (filters) => {
                                             const filteredData = [...data];
-                                            console.log(
-                                                filters,
-                                                filters?.includes(
-                                                    filterItems.MOST_RECENT
-                                                )
-                                            );
                                             if (
                                                 filters?.includes(
-                                                    filterItems.MOST_RECENT
+                                                    filterItems.LATEST
                                                 )
                                             ) {
                                                 filteredData.sort(
                                                     (a, b) =>
                                                         b.blockHeight -
                                                         a.blockHeight
+                                                );
+                                            }
+                                            if (
+                                                filters?.includes(
+                                                    filterItems.EARLIEST
+                                                )
+                                            ) {
+                                                filteredData.sort(
+                                                    (a, b) =>
+                                                        a.blockHeight -
+                                                        b.blockHeight
                                                 );
                                             }
                                             if (
@@ -382,14 +403,14 @@ return (
                 ) : (
                     <div>
                         {state.selectedView === viewTypes.LIST && (
-                            <Table tableData={UIData} />
+                            <Table tableData={paginatedFollowers} />
                         )}
                         {state.selectedView === viewTypes.CARD && (
                             <div className="card-view-grid">
-                                {UIData?.map((item) => {
+                                {paginatedFollowers?.map((item) => {
                                     return (
                                         <div className="ndc-card p-4 d-flex flex-column gap-2">
-                                            <div className="d-flex justify-content-between align-items-center">
+                                            <div className="d-flex justify-content-between align-items-center word-wrap gap-2">
                                                 <Widget
                                                     src="nearui.near/widget/Element.User"
                                                     props={{
@@ -412,5 +433,21 @@ return (
                 )}
             </div>
         )}
+        <div className="d-flex justify-content-center align-items-center gap-2 mt-2">
+            <Widget
+                src="nearui.near/widget/Navigation.Paginate"
+                props={{
+                    pageSize: resPerPage,
+                    currentPage: state.currentPage,
+                    totalPageCount: Math.ceil(UIData.length / resPerPage),
+                    onPageChange: (page) => {
+                        State.update({
+                            currentPage: page
+                        });
+                    },
+                    revaluateOnRender: true
+                }}
+            />
+        </div>
     </Wrapper>
 );
