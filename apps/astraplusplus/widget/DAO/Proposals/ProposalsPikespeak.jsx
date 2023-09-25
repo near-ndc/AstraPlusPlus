@@ -112,7 +112,7 @@ return (
               <i class="bi bi-card-checklist"></i>
             </>
           ),
-          variant: "secondary outline",
+          variant: "info outline",
           size: "md",
           onClick: () => {
             Storage.privateSet("multiSelectMode", !state.multiSelectMode);
@@ -136,7 +136,7 @@ return (
               )}
             </>
           ),
-          variant: "secondary outline",
+          variant: "info outline",
           size: "md",
           onClick: () => {
             Storage.privateSet("tableView", !state.tableView);
@@ -167,7 +167,7 @@ return (
                     <i className="bi bi-funnel"></i>
                   </>
                 ),
-                variant: "secondary outline",
+                variant: "info outline",
                 size: "md",
               }}
             />
