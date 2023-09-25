@@ -87,6 +87,10 @@ const Wrapper = styled.div`
     .justify-end {
         justify-content: end;
     }
+
+    .text-gray {
+        color: gray;
+    }
 `;
 
 function followUser(user, isFollowing) {
@@ -186,204 +190,224 @@ const UIData =
     state.filters?.length > 0 || state.search ? state.filteredData : data;
 
 return (
-    <Wrapper className="d-flex flex-column gap-4">
-        <h2>Followers</h2>
-        <div className="d-flex gap-2 flex-wrap">
-            <Widget
-                src="nearui.near/widget/Input.ExperimentalText"
-                props={{
-                    value: state.search,
-                    placeholder: "Search by name",
-                    onChange: (value) => {
-                        const filteredData = [...data];
-                        if (value) {
-                            filteredData = filteredData?.filter((item) => {
-                                const searchTerm = value.toLowerCase();
-                                return item.account.includes(searchTerm);
-                            });
-                        }
-                        State.update({
-                            ...state,
-                            filteredData: filteredData,
-                            search: value
-                        });
-                    },
-                    icon: (
-                        <i
-                            className="bi bi-search"
-                            style={{
-                                color: "#4498e0 !important"
-                            }}
-                        />
-                    ),
-                    inputProps: {
-                        title: "Disabled because no API for searching yet"
-                    }
-                }}
-            />
-            <Widget
-                src="nearui.near/widget/Layout.Popover"
-                props={{
-                    triggerComponent: (
-                        <Widget
-                            src="nearui.near/widget/Input.Button"
-                            props={{
-                                style: {
-                                    color: "#4498e0"
-                                },
-                                children: (
-                                    <>
-                                        {state.selectedView} View
-                                        <i class="bi bi-caret-down"></i>
-                                    </>
-                                ),
-                                variant: "info outline ",
-                                size: "md",
-                                className: ""
-                            }}
-                        />
-                    ),
-                    content: (
-                        <Widget
-                            src="/*__@appAccount__*//widget/Common.Modals.ViewDropDown"
-                            props={{
-                                viewList: viewList,
-                                cancel: () => {
-                                    State.update({
-                                        ...state,
-                                        selectedView: ""
-                                    });
-                                },
-                                applyView: (selectedView) => {
-                                    State.update({
-                                        ...state,
-                                        selectedView
-                                    });
-                                },
-                                selectedView: state.selectedView
-                            }}
-                        />
-                    )
-                }}
-            />
-
-            <Widget
-                src="nearui.near/widget/Layout.Modal"
-                props={{
-                    open: state.filtersOpen,
-                    onOpenChange: (open) => {
-                        State.update({
-                            ...state,
-                            filtersOpen: open
-                        });
-                    },
-                    toggle: (
-                        <Widget
-                            src="nearui.near/widget/Input.Button"
-                            props={{
-                                children: (
-                                    <>
-                                        Filter
-                                        <i className="bi bi-funnel"></i>
-                                    </>
-                                ),
-                                variant: "info",
-                                size: "md"
-                            }}
-                        />
-                    ),
-                    content: (
-                        <Widget
-                            src="/*__@appAccount__*//widget/Common.Modals.FiltersModal"
-                            props={{
-                                selectedFilters: state.filters,
-                                groupTypes: filterItems,
-                                cancel: () => {
-                                    State.update({
-                                        ...state,
-                                        filters: []
-                                    });
-                                },
-                                applyFilters: (filters) => {
-                                    const filteredData = [...data];
-                                    console.log(
-                                        filters,
-                                        filters?.includes(
-                                            filterItems.MOST_RECENT
-                                        )
-                                    );
-                                    if (
-                                        filters?.includes(
-                                            filterItems.MOST_RECENT
-                                        )
-                                    ) {
-                                        filteredData.sort(
-                                            (a, b) =>
-                                                b.blockHeight - a.blockHeight
-                                        );
-                                    }
-                                    if (
-                                        filters?.includes(filterItems.ASCENDING)
-                                    ) {
-                                        filteredData.sort((a, b) =>
-                                            a.account.localeCompare(b.account)
-                                        );
-                                    }
-
-                                    if (
-                                        filters?.includes(
-                                            filterItems.DESCENDING
-                                        )
-                                    ) {
-                                        filteredData.sort((a, b) =>
-                                            b.account.localeCompare(a.account)
-                                        );
-                                    }
-
-                                    State.update({
-                                        ...state,
-                                        filters: filters,
-                                        filteredData: filteredData
-                                    });
-                                },
-                                filterlist: filterlist
-                            }}
-                        />
-                    )
-                }}
-            />
-        </div>
-        {state.isLoading ? (
-            <div>
-                <Widget src="nearui.near/widget/Feedback.Spinner" />
-            </div>
+    <Wrapper>
+        {data?.length === 0 ? (
+            <p className="text-gray">
+                This account doesn't have any followers yet.
+            </p>
         ) : (
-            <div>
-                {state.selectedView === viewTypes.LIST && (
-                    <Table tableData={UIData} />
-                )}
-                {state.selectedView === viewTypes.CARD && (
-                    <div className="card-view-grid">
-                        {UIData?.map((item) => {
-                            return (
-                                <div className="ndc-card p-4 d-flex flex-column gap-2">
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <Widget
-                                            src="nearui.near/widget/Element.User"
-                                            props={{
-                                                accountId: item.account,
-                                                options: {
-                                                    showHumanBadge: true,
-                                                    showImage: true,
-                                                    showSocialName: true
-                                                }
-                                            }}
-                                        />
-                                        <FollowBtn itemDetails={item} />
-                                    </div>
-                                </div>
-                            );
-                        })}
+            <div className="d-flex flex-column gap-4">
+                <h2>Followers</h2>
+                <div className="d-flex gap-2 flex-wrap">
+                    <Widget
+                        src="nearui.near/widget/Input.ExperimentalText"
+                        props={{
+                            value: state.search,
+                            placeholder: "Search by name",
+                            onChange: (value) => {
+                                const filteredData = [...data];
+                                if (value) {
+                                    filteredData = filteredData?.filter(
+                                        (item) => {
+                                            const searchTerm =
+                                                value.toLowerCase();
+                                            return item.account.includes(
+                                                searchTerm
+                                            );
+                                        }
+                                    );
+                                }
+                                State.update({
+                                    ...state,
+                                    filteredData: filteredData,
+                                    search: value
+                                });
+                            },
+                            icon: (
+                                <i
+                                    className="bi bi-search"
+                                    style={{
+                                        color: "#4498e0 !important"
+                                    }}
+                                />
+                            ),
+                            inputProps: {
+                                title: "Disabled because no API for searching yet"
+                            }
+                        }}
+                    />
+                    <Widget
+                        src="nearui.near/widget/Layout.Popover"
+                        props={{
+                            triggerComponent: (
+                                <Widget
+                                    src="nearui.near/widget/Input.Button"
+                                    props={{
+                                        style: {
+                                            color: "#4498e0"
+                                        },
+                                        children: (
+                                            <>
+                                                {state.selectedView} View
+                                                <i class="bi bi-caret-down"></i>
+                                            </>
+                                        ),
+                                        variant: "info outline ",
+                                        size: "md",
+                                        className: ""
+                                    }}
+                                />
+                            ),
+                            content: (
+                                <Widget
+                                    src="/*__@appAccount__*//widget/Common.Modals.ViewDropDown"
+                                    props={{
+                                        viewList: viewList,
+                                        cancel: () => {
+                                            State.update({
+                                                ...state,
+                                                selectedView: ""
+                                            });
+                                        },
+                                        applyView: (selectedView) => {
+                                            State.update({
+                                                ...state,
+                                                selectedView
+                                            });
+                                        },
+                                        selectedView: state.selectedView
+                                    }}
+                                />
+                            )
+                        }}
+                    />
+
+                    <Widget
+                        src="nearui.near/widget/Layout.Modal"
+                        props={{
+                            open: state.filtersOpen,
+                            onOpenChange: (open) => {
+                                State.update({
+                                    ...state,
+                                    filtersOpen: open
+                                });
+                            },
+                            toggle: (
+                                <Widget
+                                    src="nearui.near/widget/Input.Button"
+                                    props={{
+                                        children: (
+                                            <>
+                                                Filter
+                                                <i className="bi bi-funnel"></i>
+                                            </>
+                                        ),
+                                        variant: "info",
+                                        size: "md"
+                                    }}
+                                />
+                            ),
+                            content: (
+                                <Widget
+                                    src="/*__@appAccount__*//widget/Common.Modals.FiltersModal"
+                                    props={{
+                                        selectedFilters: state.filters,
+                                        groupTypes: filterItems,
+                                        cancel: () => {
+                                            State.update({
+                                                ...state,
+                                                filters: []
+                                            });
+                                        },
+                                        applyFilters: (filters) => {
+                                            const filteredData = [...data];
+                                            console.log(
+                                                filters,
+                                                filters?.includes(
+                                                    filterItems.MOST_RECENT
+                                                )
+                                            );
+                                            if (
+                                                filters?.includes(
+                                                    filterItems.MOST_RECENT
+                                                )
+                                            ) {
+                                                filteredData.sort(
+                                                    (a, b) =>
+                                                        b.blockHeight -
+                                                        a.blockHeight
+                                                );
+                                            }
+                                            if (
+                                                filters?.includes(
+                                                    filterItems.ASCENDING
+                                                )
+                                            ) {
+                                                filteredData.sort((a, b) =>
+                                                    a.account.localeCompare(
+                                                        b.account
+                                                    )
+                                                );
+                                            }
+
+                                            if (
+                                                filters?.includes(
+                                                    filterItems.DESCENDING
+                                                )
+                                            ) {
+                                                filteredData.sort((a, b) =>
+                                                    b.account.localeCompare(
+                                                        a.account
+                                                    )
+                                                );
+                                            }
+
+                                            State.update({
+                                                ...state,
+                                                filters: filters,
+                                                filteredData: filteredData
+                                            });
+                                        },
+                                        filterlist: filterlist
+                                    }}
+                                />
+                            )
+                        }}
+                    />
+                </div>
+                {state.isLoading ? (
+                    <div>
+                        <Widget src="nearui.near/widget/Feedback.Spinner" />
+                    </div>
+                ) : (
+                    <div>
+                        {state.selectedView === viewTypes.LIST && (
+                            <Table tableData={UIData} />
+                        )}
+                        {state.selectedView === viewTypes.CARD && (
+                            <div className="card-view-grid">
+                                {UIData?.map((item) => {
+                                    return (
+                                        <div className="ndc-card p-4 d-flex flex-column gap-2">
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <Widget
+                                                    src="nearui.near/widget/Element.User"
+                                                    props={{
+                                                        accountId: item.account,
+                                                        options: {
+                                                            showHumanBadge: true,
+                                                            showImage: true,
+                                                            showSocialName: true
+                                                        }
+                                                    }}
+                                                />
+                                                <FollowBtn itemDetails={item} />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

@@ -629,268 +629,302 @@ const GroupView = () => {
 };
 
 return (
-    <Wrapper className="d-flex flex-column gap-4">
-        <h2>Members</h2>
-        <div className="ndc-card p-4">
-            <h4 className="mb-4">Groups</h4>
-            <div className="d-flex gap-4 flex-wrap">
-                <RoleTag roles={rolesArray} showIcon={true} />
-            </div>
-        </div>
-        <div
-            className={`${
-                state.selectedView !== viewTypes.LIST ? "ndc-card p-4" : ""
-            } d-flex gap-2 flex-wrap`}
-        >
-            <Widget
-                src="nearui.near/widget/Input.ExperimentalText"
-                props={{
-                    value: state.search,
-                    placeholder:
-                        state.selectedView === viewTypes.GROUP
-                            ? "Search by name"
-                            : "Search by name or groups",
-                    onChange: (value) => {
-                        const filteredData = [...data];
-                        if (value) {
-                            filteredData = filteredData?.filter((item) => {
-                                const searchTerm = value.toLowerCase();
-                                return item.account.includes(searchTerm);
-                            });
-                        }
-                        State.update({
-                            ...state,
-                            filteredData: filteredData,
-                            search: value
-                        });
-                    },
-                    icon: (
-                        <i
-                            className="bi bi-search"
-                            style={{
-                                color: "#4498e0 !important"
-                            }}
-                        />
-                    ),
-                    inputProps: {
-                        title: "Disabled because no API for searching yet"
-                    }
-                }}
-            />
-            <Widget
-                src="nearui.near/widget/Layout.Popover"
-                props={{
-                    triggerComponent: (
-                        <Widget
-                            src="nearui.near/widget/Input.Button"
-                            props={{
-                                style: {
-                                    color: "#4498e0"
-                                },
-                                children: (
-                                    <>
-                                        {state.selectedView} View
-                                        <i class="bi bi-caret-down"></i>
-                                    </>
-                                ),
-                                variant: "info outline ",
-                                size: "md",
-                                className: ""
-                            }}
-                        />
-                    ),
-                    content: (
-                        <Widget
-                            src="/*__@appAccount__*//widget/Common.Modals.ViewDropDown"
-                            props={{
-                                viewList: viewList,
-                                cancel: () => {
-                                    State.update({
-                                        ...state,
-                                        selectedView: ""
-                                    });
-                                },
-                                applyView: (selectedView) => {
-                                    State.update({
-                                        ...state,
-                                        selectedView
-                                    });
-                                },
-                                selectedView: state.selectedView
-                            }}
-                        />
-                    )
-                }}
-            />
-
-            <Widget
-                src="nearui.near/widget/Layout.Modal"
-                props={{
-                    open: state.filtersOpen,
-                    onOpenChange: (open) => {
-                        State.update({
-                            ...state,
-                            filtersOpen: open
-                        });
-                    },
-                    toggle: (
-                        <Widget
-                            src="nearui.near/widget/Input.Button"
-                            props={{
-                                children: (
-                                    <>
-                                        Filter
-                                        <i className="bi bi-funnel"></i>
-                                    </>
-                                ),
-                                variant: "info",
-                                size: "md"
-                            }}
-                        />
-                    ),
-                    content: (
-                        <Widget
-                            src="/*__@appAccount__*//widget/Common.Modals.FiltersModal"
-                            props={{
-                                selectedFilters: state.filters,
-                                groupTypes: groupTypes,
-                                cancel: () => {
-                                    State.update({
-                                        ...state,
-                                        filters: []
-                                    });
-                                },
-                                applyFilters: (filters) => {
-                                    const filteredData = [...data];
-                                    const rolesFilter = filters?.filter(
-                                        (i) =>
-                                            i !== groupTypes.ASCENDING &&
-                                            i !== groupTypes.DESCENDING
+    <Wrapper>
+        {data?.length === 0 ? (
+            <p className="text-gray">This account doesn't have any members.</p>
+        ) : (
+            <div className="d-flex flex-column gap-4">
+                <h2>Members</h2>
+                <div className="ndc-card p-4">
+                    <h4 className="mb-4">Groups</h4>
+                    <div className="d-flex gap-4 flex-wrap">
+                        <RoleTag roles={rolesArray} showIcon={true} />
+                    </div>
+                </div>
+                <div
+                    className={`${
+                        state.selectedView !== viewTypes.LIST
+                            ? "ndc-card p-4"
+                            : ""
+                    } d-flex gap-2 flex-wrap`}
+                >
+                    <Widget
+                        src="nearui.near/widget/Input.ExperimentalText"
+                        props={{
+                            value: state.search,
+                            placeholder:
+                                state.selectedView === viewTypes.GROUP
+                                    ? "Search by name"
+                                    : "Search by name or groups",
+                            onChange: (value) => {
+                                const filteredData = [...data];
+                                if (value) {
+                                    filteredData = filteredData?.filter(
+                                        (item) => {
+                                            const searchTerm =
+                                                value.toLowerCase();
+                                            return item.account.includes(
+                                                searchTerm
+                                            );
+                                        }
                                     );
+                                }
+                                State.update({
+                                    ...state,
+                                    filteredData: filteredData,
+                                    search: value
+                                });
+                            },
+                            icon: (
+                                <i
+                                    className="bi bi-search"
+                                    style={{
+                                        color: "#4498e0 !important"
+                                    }}
+                                />
+                            ),
+                            inputProps: {
+                                title: "Disabled because no API for searching yet"
+                            }
+                        }}
+                    />
+                    <Widget
+                        src="nearui.near/widget/Layout.Popover"
+                        props={{
+                            triggerComponent: (
+                                <Widget
+                                    src="nearui.near/widget/Input.Button"
+                                    props={{
+                                        style: {
+                                            color: "#4498e0"
+                                        },
+                                        children: (
+                                            <>
+                                                {state.selectedView} View
+                                                <i class="bi bi-caret-down"></i>
+                                            </>
+                                        ),
+                                        variant: "info outline ",
+                                        size: "md",
+                                        className: ""
+                                    }}
+                                />
+                            ),
+                            content: (
+                                <Widget
+                                    src="/*__@appAccount__*//widget/Common.Modals.ViewDropDown"
+                                    props={{
+                                        viewList: viewList,
+                                        cancel: () => {
+                                            State.update({
+                                                ...state,
+                                                selectedView: ""
+                                            });
+                                        },
+                                        applyView: (selectedView) => {
+                                            State.update({
+                                                ...state,
+                                                selectedView
+                                            });
+                                        },
+                                        selectedView: state.selectedView
+                                    }}
+                                />
+                            )
+                        }}
+                    />
 
-                                    if (rolesFilter?.length > 0) {
-                                        filteredData = filteredData.filter(
-                                            (item) => {
-                                                let results = [];
-                                                if (
-                                                    rolesFilter.includes(
-                                                        EVERYONE
-                                                    )
-                                                ) {
-                                                    results.push(
-                                                        item?.groups ===
-                                                            EVERYONE
-                                                    );
-                                                }
+                    <Widget
+                        src="nearui.near/widget/Layout.Modal"
+                        props={{
+                            open: state.filtersOpen,
+                            onOpenChange: (open) => {
+                                State.update({
+                                    ...state,
+                                    filtersOpen: open
+                                });
+                            },
+                            toggle: (
+                                <Widget
+                                    src="nearui.near/widget/Input.Button"
+                                    props={{
+                                        children: (
+                                            <>
+                                                Filter
+                                                <i className="bi bi-funnel"></i>
+                                            </>
+                                        ),
+                                        variant: "info",
+                                        size: "md"
+                                    }}
+                                />
+                            ),
+                            content: (
+                                <Widget
+                                    src="/*__@appAccount__*//widget/Common.Modals.FiltersModal"
+                                    props={{
+                                        selectedFilters: state.filters,
+                                        groupTypes: groupTypes,
+                                        cancel: () => {
+                                            State.update({
+                                                ...state,
+                                                filters: []
+                                            });
+                                        },
+                                        applyFilters: (filters) => {
+                                            const filteredData = [...data];
+                                            const rolesFilter = filters?.filter(
+                                                (i) =>
+                                                    i !==
+                                                        groupTypes.ASCENDING &&
+                                                    i !== groupTypes.DESCENDING
+                                            );
 
-                                                if (
-                                                    Array.isArray(item.groups)
-                                                ) {
-                                                    results.push(
-                                                        item?.groups?.some(
-                                                            (i) =>
-                                                                rolesFilter?.includes(
-                                                                    i
+                                            if (rolesFilter?.length > 0) {
+                                                filteredData =
+                                                    filteredData.filter(
+                                                        (item) => {
+                                                            let results = [];
+                                                            if (
+                                                                rolesFilter.includes(
+                                                                    EVERYONE
                                                                 )
+                                                            ) {
+                                                                results.push(
+                                                                    item?.groups ===
+                                                                        EVERYONE
+                                                                );
+                                                            }
+
+                                                            if (
+                                                                Array.isArray(
+                                                                    item.groups
+                                                                )
+                                                            ) {
+                                                                results.push(
+                                                                    item?.groups?.some(
+                                                                        (i) =>
+                                                                            rolesFilter?.includes(
+                                                                                i
+                                                                            )
+                                                                    )
+                                                                );
+                                                            }
+                                                            return results.includes(
+                                                                true
+                                                            );
+                                                        }
+                                                    );
+                                            }
+                                            if (
+                                                filters?.includes(
+                                                    groupTypes.ASCENDING
+                                                )
+                                            ) {
+                                                filteredData = filteredData
+                                                    .slice()
+                                                    .sort((a, b) =>
+                                                        a.account.localeCompare(
+                                                            b.account
                                                         )
                                                     );
-                                                }
-                                                return results.includes(true);
                                             }
-                                        );
-                                    }
-                                    if (
-                                        filters?.includes(groupTypes.ASCENDING)
-                                    ) {
-                                        filteredData = filteredData
-                                            .slice()
-                                            .sort((a, b) =>
-                                                a.account.localeCompare(
-                                                    b.account
-                                                )
-                                            );
-                                    }
 
-                                    if (
-                                        filters?.includes(groupTypes.DESCENDING)
-                                    ) {
-                                        filteredData = filteredData
-                                            .slice()
-                                            .sort((a, b) =>
-                                                b.account.localeCompare(
-                                                    a.account
+                                            if (
+                                                filters?.includes(
+                                                    groupTypes.DESCENDING
                                                 )
-                                            );
-                                    }
+                                            ) {
+                                                filteredData = filteredData
+                                                    .slice()
+                                                    .sort((a, b) =>
+                                                        b.account.localeCompare(
+                                                            a.account
+                                                        )
+                                                    );
+                                            }
 
-                                    State.update({
-                                        ...state,
-                                        filters: filters,
-                                        filteredData: filteredData
-                                    });
-                                },
-                                filterlist: filterlist
-                            }}
-                        />
-                    )
-                }}
-            />
-        </div>
-        {state.isLoading ? (
-            <div>
-                <Widget src="nearui.near/widget/Feedback.Spinner" />
-            </div>
-        ) : (
-            <div>
-                {state.selectedView === viewTypes.GROUP && <GroupView />}
-                {state.selectedView === viewTypes.LIST && (
-                    <Table tableData={UIData} />
-                )}
-                {state.selectedView === viewTypes.CARD && (
-                    <div className="card-view-grid">
-                        {UIData?.map((item) => {
-                            return (
-                                <div className="ndc-card p-4 d-flex flex-column gap-2">
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <Widget
-                                            src="nearui.near/widget/Element.User"
-                                            props={{
-                                                accountId: item.account,
-                                                options: {
-                                                    showHumanBadge: true,
-                                                    showImage: true,
-                                                    showSocialName: true
-                                                }
-                                            }}
-                                        />
-                                        <FollowBtn itemDetails={item} />
-                                    </div>
-                                    <div className="mt-3">
-                                        <RoleTag
-                                            showIcon={true}
-                                            roles={item?.groups}
-                                        />
-                                    </div>
-                                    <div style={{ height: "4rem" }}></div>
-                                    <div className="d-flex justify-content-between">
-                                        <ProposeToMintSBT itemDetails={item} />
-                                        <ProposeToRemove user={item.account} />
-                                    </div>
-                                    <Widget
-                                        src="nearui.near/widget/Input.Button"
-                                        props={{
-                                            buttonProps: {
-                                                style: { width: "inherit" }
-                                            },
-                                            children: "View Voting History",
-                                            variant: "info outline",
-                                            size: "sm",
-                                            onClick: () => {}
-                                        }}
-                                    />
-                                </div>
-                            );
-                        })}
+                                            State.update({
+                                                ...state,
+                                                filters: filters,
+                                                filteredData: filteredData
+                                            });
+                                        },
+                                        filterlist: filterlist
+                                    }}
+                                />
+                            )
+                        }}
+                    />
+                </div>
+                {state.isLoading ? (
+                    <div>
+                        <Widget src="nearui.near/widget/Feedback.Spinner" />
+                    </div>
+                ) : (
+                    <div>
+                        {state.selectedView === viewTypes.GROUP && (
+                            <GroupView />
+                        )}
+                        {state.selectedView === viewTypes.LIST && (
+                            <Table tableData={UIData} />
+                        )}
+                        {state.selectedView === viewTypes.CARD && (
+                            <div className="card-view-grid">
+                                {UIData?.map((item) => {
+                                    return (
+                                        <div className="ndc-card p-4 d-flex flex-column gap-2">
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <Widget
+                                                    src="nearui.near/widget/Element.User"
+                                                    props={{
+                                                        accountId: item.account,
+                                                        options: {
+                                                            showHumanBadge: true,
+                                                            showImage: true,
+                                                            showSocialName: true
+                                                        }
+                                                    }}
+                                                />
+                                                <FollowBtn itemDetails={item} />
+                                            </div>
+                                            <div className="mt-3">
+                                                <RoleTag
+                                                    showIcon={true}
+                                                    roles={item?.groups}
+                                                />
+                                            </div>
+                                            <div
+                                                style={{ height: "4rem" }}
+                                            ></div>
+                                            <div className="d-flex justify-content-between">
+                                                <ProposeToMintSBT
+                                                    itemDetails={item}
+                                                />
+                                                <ProposeToRemove
+                                                    user={item.account}
+                                                />
+                                            </div>
+                                            <Widget
+                                                src="nearui.near/widget/Input.Button"
+                                                props={{
+                                                    buttonProps: {
+                                                        style: {
+                                                            width: "inherit"
+                                                        }
+                                                    },
+                                                    children:
+                                                        "View Voting History",
+                                                    variant: "info outline",
+                                                    size: "sm",
+                                                    onClick: () => {}
+                                                }}
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
