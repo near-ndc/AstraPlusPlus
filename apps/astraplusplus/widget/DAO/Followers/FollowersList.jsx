@@ -245,7 +245,7 @@ return (
                     ),
                     content: (
                         <Widget
-                            src="nearui.near/widget/Modals.GroupModal"
+                            src="/*__@appAccount__*//widget/Common.Modals.ViewDropDown"
                             props={{
                                 viewList: viewList,
                                 cancel: () => {
@@ -294,7 +294,7 @@ return (
                     ),
                     content: (
                         <Widget
-                            src="nearui.near/widget/Modals.FilterModal"
+                            src="/*__@appAccount__*//widget/Common.Modals.FiltersModal"
                             props={{
                                 selectedFilters: state.filters,
                                 groupTypes: filterItems,
