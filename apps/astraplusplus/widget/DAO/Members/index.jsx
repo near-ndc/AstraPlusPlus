@@ -3,6 +3,32 @@ const publicApiKey = "/*__@replace:pikespeakApiKey__*/";
 const baseApi = "https://api.pikespeak.ai";
 let voters = [];
 
+function fetchIsHuman(account) {
+    const userSBTs = Near.view("registry.i-am-human.near", "is_human", {
+        account: account
+    });
+    let isHuman = false;
+    if (userSBTs) {
+        userSBTs.forEach((sbt) => {
+            if ("fractal.i-am-human.near" === sbt[0]) {
+                isHuman = true;
+            }
+        });
+    }
+    return isHuman;
+}
+
+function fetchIsUserFollowed(account) {
+    const followEdge = Social.keys(
+        `${context.accountId}/graph/follow/${account}`,
+        undefined,
+        {
+            values_only: true
+        }
+    );
+    return Object.keys(followEdge || {}).length > 0;
+}
+
 function fetchVotes() {
     const res = fetch(`${baseApi}/daos/votes/${daoId}`, {
         method: "GET",
@@ -27,40 +53,32 @@ function fetchVotes() {
                             voters[accountIndex].approve + voterData.approve
                     };
                 } else {
-                    const userSBTs = Near.view(
-                        "registry.i-am-human.near",
-                        "is_human",
-                        {
-                            account: voterData.account
-                        }
-                    );
-                    let isHuman = false;
-                    if (userSBTs) {
-                        userSBTs.forEach((sbt) => {
-                            if ("fractal.i-am-human.near" === sbt[0]) {
-                                isHuman = true;
-                            }
-                        });
-                    }
-                    const followEdge = Social.keys(
-                        `${context.accountId}/graph/follow/${voterData.account}`,
-                        undefined,
-                        {
-                            values_only: true
-                        }
-                    );
                     voters.push({
                         ...voterData,
-                        isHuman: isHuman,
-                        isUserFollowed: Object.keys(followEdge || {}).length > 0
+                        isHuman: fetchIsHuman(voterData.account),
+                        isUserFollowed: fetchIsUserFollowed(voterData.account)
                     });
                 }
             });
         });
+        // if any member have not voted on any proposal their data is not their in voters API
+        if (policy?.users) {
+            Object.keys(policy.users)?.map((item) => {
+                const index = voters.findIndex((d) => d.account === item);
+                if (index === -1) {
+                    voters.push({
+                        account: item,
+                        groups: policy.users?.[item],
+                        approve: 0,
+                        rejected: 0,
+                        isHuman: fetchIsHuman(item),
+                        isUserFollowed: fetchIsUserFollowed(item)
+                    });
+                }
+            });
+        }
     }
 }
-
-fetchVotes();
 
 const processPolicy = (policy) => {
     const obj = {
@@ -100,6 +118,8 @@ const policy = useCache(
 );
 
 if (policy === null) return "";
+
+fetchVotes();
 
 const Wrapper = styled.div`
     .userRow {
