@@ -1,5 +1,7 @@
 const data = props.data;
 const policy = props.policy;
+const currentPage = props.page ?? 1;
+const resPerPage = props.resPerPage ?? 20;
 
 const EVERYONE = "Everyone";
 
@@ -71,7 +73,9 @@ State.init({
     isLoading: false,
     search: "",
     filteredData: [],
-    removeFromRole: null
+    removeFromRole: null,
+    currentPage: currentPage,
+    groupViewPages: null // current pages for each group
 });
 
 const Wrapper = styled.div`
@@ -590,41 +594,87 @@ const ProposeToRemove = ({ user }) => {
 const UIData =
     state.filters?.length > 0 || state.search ? state.filteredData : data;
 
+let paginatedMembers = [];
+
+const currentPageState =
+    state.filters?.length > 0 || state.search ? 1 : state.currentPage;
+
+paginatedMembers = UIData.slice(
+    (currentPageState - 1) * resPerPage,
+    currentPageState * resPerPage
+);
+
 function containsOnly(array, item) {
     return array.length === 1 && array[0] === item;
 }
 
 const GroupView = () => {
+    if (!state.groupViewPages) {
+        const pages = {};
+        rolesArray?.map((role) => {
+            pages[role] = 1;
+        });
+        State.update({
+            groupViewPages: pages
+        });
+    }
+
+    const Pagination = ({ role, data }) => {
+        return (
+            <div className="d-flex justify-content-center align-items-center gap-2 mt-2">
+                <Widget
+                    src="nearui.near/widget/Navigation.Paginate"
+                    props={{
+                        pageSize: resPerPage,
+                        currentPage: state.groupViewPages[role] ?? 1,
+                        totalPageCount: Math.ceil(data.length / resPerPage),
+                        onPageChange: (page) => {
+                            State.update({
+                                groupViewPages: {
+                                    ...state.groupViewPages,
+                                    ...{ [role]: page }
+                                }
+                            });
+                        },
+                        revaluateOnRender: true
+                    }}
+                />
+            </div>
+        );
+    };
+
     let view = [];
+    let data = state.filters;
     if (
         containsOnly(state.filters, groupTypes.ASCENDING) ||
         containsOnly(state.filters, groupTypes.DESCENDING) ||
         !state.filters?.length > 0
     ) {
-        rolesArray?.map((role) => {
-            view.push(
-                <Table
-                    title={role}
-                    tableData={UIData?.filter((item) =>
-                        item.groups.includes(role)
-                    )}
-                    showExpand={true}
-                />
-            );
-        });
-    } else {
-        state.filters?.map((role) => {
-            view.push(
-                <Table
-                    title={role}
-                    tableData={UIData?.filter((item) =>
-                        item.groups.includes(role)
-                    )}
-                    showExpand={true}
-                />
-            );
-        });
+        data = rolesArray;
     }
+    data?.map((role) => {
+        const currentPage =
+            state.filters?.length > 0 || state.search
+                ? 1
+                : state.groupViewPages[role] ?? 1;
+        const tableData = UIData?.filter((item) => item.groups.includes(role));
+        let paginatedGroupData = [];
+        paginatedGroupData = tableData.slice(
+            (currentPage - 1) * resPerPage,
+            currentPage * resPerPage
+        );
+
+        view.push(
+            <>
+                <Table
+                    title={role}
+                    tableData={paginatedGroupData}
+                    showExpand={true}
+                />
+                <Pagination role={role} data={tableData} />
+            </>
+        );
+    });
     return <div>{view?.map((item) => item)}</div>;
 };
 
@@ -863,67 +913,94 @@ return (
                     </div>
                 ) : (
                     <div>
-                        {state.selectedView === viewTypes.GROUP && (
+                        {state.selectedView === viewTypes.GROUP ? (
                             <GroupView />
-                        )}
-                        {state.selectedView === viewTypes.LIST && (
-                            <Table tableData={UIData} />
-                        )}
-                        {state.selectedView === viewTypes.CARD && (
-                            <div className="card-view-grid">
-                                {UIData?.map((item) => {
-                                    return (
-                                        <div className="ndc-card p-4 d-flex flex-column gap-2">
-                                            <div className="d-flex justify-content-between align-items-center">
-                                                <Widget
-                                                    src="nearui.near/widget/Element.User"
-                                                    props={{
-                                                        accountId: item.account,
-                                                        options: {
-                                                            showHumanBadge: true,
-                                                            showImage: true,
-                                                            showSocialName: true
-                                                        }
-                                                    }}
-                                                />
-                                                <FollowBtn itemDetails={item} />
-                                            </div>
-                                            <div className="mt-3">
-                                                <RoleTag
-                                                    showIcon={true}
-                                                    roles={item?.groups}
-                                                />
-                                            </div>
-                                            <div
-                                                style={{ height: "4rem" }}
-                                            ></div>
-                                            <div className="d-flex justify-content-between">
-                                                <ProposeToMintSBT
-                                                    itemDetails={item}
-                                                />
-                                                <ProposeToRemove
-                                                    user={item.account}
-                                                />
-                                            </div>
-                                            <Widget
-                                                src="nearui.near/widget/Input.Button"
-                                                props={{
-                                                    buttonProps: {
-                                                        style: {
-                                                            width: "inherit"
-                                                        }
-                                                    },
-                                                    children:
-                                                        "View Voting History",
-                                                    variant: "info outline",
-                                                    size: "sm",
-                                                    onClick: () => {}
-                                                }}
-                                            />
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                        ) : (
+                            <>
+                                {state.selectedView === viewTypes.LIST && (
+                                    <Table tableData={paginatedMembers} />
+                                )}
+                                {state.selectedView === viewTypes.CARD && (
+                                    <div className="card-view-grid">
+                                        {paginatedMembers?.map((item) => {
+                                            return (
+                                                <div className="ndc-card p-4 d-flex flex-column gap-2">
+                                                    <div className="d-flex justify-content-between align-items-center">
+                                                        <Widget
+                                                            src="nearui.near/widget/Element.User"
+                                                            props={{
+                                                                accountId:
+                                                                    item.account,
+                                                                options: {
+                                                                    showHumanBadge: true,
+                                                                    showImage: true,
+                                                                    showSocialName: true
+                                                                }
+                                                            }}
+                                                        />
+                                                        <FollowBtn
+                                                            itemDetails={item}
+                                                        />
+                                                    </div>
+                                                    <div className="mt-3">
+                                                        <RoleTag
+                                                            showIcon={true}
+                                                            roles={item?.groups}
+                                                        />
+                                                    </div>
+                                                    <div
+                                                        style={{
+                                                            height: "4rem"
+                                                        }}
+                                                    ></div>
+                                                    <div className="d-flex justify-content-between">
+                                                        <ProposeToMintSBT
+                                                            itemDetails={item}
+                                                        />
+                                                        <ProposeToRemove
+                                                            user={item.account}
+                                                        />
+                                                    </div>
+                                                    <Widget
+                                                        src="nearui.near/widget/Input.Button"
+                                                        props={{
+                                                            buttonProps: {
+                                                                style: {
+                                                                    width: "inherit"
+                                                                }
+                                                            },
+                                                            children:
+                                                                "View Voting History",
+                                                            variant:
+                                                                "info outline",
+                                                            size: "sm",
+                                                            onClick: () => {}
+                                                        }}
+                                                    />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                                <div className="d-flex justify-content-center align-items-center gap-2 mt-2">
+                                    <Widget
+                                        src="nearui.near/widget/Navigation.Paginate"
+                                        props={{
+                                            pageSize: resPerPage,
+                                            currentPage: state.currentPage,
+                                            totalPageCount: Math.ceil(
+                                                UIData.length / resPerPage
+                                            ),
+                                            onPageChange: (page) => {
+                                                State.update({
+                                                    currentPage: page
+                                                });
+                                            },
+                                            revaluateOnRender: true
+                                        }}
+                                    />
+                                </div>
+                            </>
                         )}
                     </div>
                 )}
