@@ -98,6 +98,10 @@ const Wrapper = styled.div`
     .word-wrap {
         word-break: break-word;
     }
+
+    .gap-y-3 {
+        row-gap: 1rem !important;
+    }
 `;
 
 function followUser(user, isFollowing) {
@@ -167,7 +171,7 @@ const Table = ({ tableData }) => {
                 <tbody>
                     {tableData?.map((item) => {
                         return (
-                            <tr>
+                            <tr className="word-wrap">
                                 <td>
                                     <Widget
                                         src="nearui.near/widget/Element.User"
@@ -213,8 +217,11 @@ return (
             </p>
         ) : (
             <div className="d-flex flex-column gap-4">
-                <h2>Followers</h2>
-                <div className="d-flex gap-2 flex-wrap">
+                <div>
+                    <h2 className="mb-1">Followers</h2>
+                    <p className="text-gray">{data.length} followers</p>
+                </div>
+                <div className="d-flex gap-2 gap-y-3 flex-wrap">
                     <Widget
                         src="nearui.near/widget/Input.ExperimentalText"
                         props={{
@@ -252,149 +259,152 @@ return (
                             }
                         }}
                     />
-                    <Widget
-                        src="nearui.near/widget/Layout.Popover"
-                        props={{
-                            triggerComponent: (
-                                <Widget
-                                    src="nearui.near/widget/Input.Button"
-                                    props={{
-                                        style: {
-                                            color: "#4498e0"
-                                        },
-                                        children: (
-                                            <>
-                                                {state.selectedView} View
-                                                <i class="bi bi-caret-down"></i>
-                                            </>
-                                        ),
-                                        variant: "info outline ",
-                                        size: "md",
-                                        className: ""
-                                    }}
-                                />
-                            ),
-                            content: (
-                                <Widget
-                                    src="/*__@appAccount__*//widget/Common.Modals.ViewDropDown"
-                                    props={{
-                                        viewList: viewList,
-                                        cancel: () => {
-                                            State.update({
-                                                ...state,
-                                                selectedView: ""
-                                            });
-                                        },
-                                        applyView: (selectedView) => {
-                                            State.update({
-                                                ...state,
-                                                selectedView
-                                            });
-                                        },
-                                        selectedView: state.selectedView
-                                    }}
-                                />
-                            )
-                        }}
-                    />
+                    <div className="d-flex gap-2 flex-wrap">
+                        <Widget
+                            src="nearui.near/widget/Layout.Popover"
+                            props={{
+                                triggerComponent: (
+                                    <Widget
+                                        src="nearui.near/widget/Input.Button"
+                                        props={{
+                                            style: {
+                                                color: "#4498e0"
+                                            },
+                                            children: (
+                                                <>
+                                                    {state.selectedView} View
+                                                    <i class="bi bi-caret-down"></i>
+                                                </>
+                                            ),
+                                            variant: "info outline ",
+                                            size: "md",
+                                            className: ""
+                                        }}
+                                    />
+                                ),
+                                content: (
+                                    <Widget
+                                        src="/*__@appAccount__*//widget/Common.Modals.ViewDropDown"
+                                        props={{
+                                            viewList: viewList,
+                                            cancel: () => {
+                                                State.update({
+                                                    ...state,
+                                                    selectedView: ""
+                                                });
+                                            },
+                                            applyView: (selectedView) => {
+                                                State.update({
+                                                    ...state,
+                                                    selectedView
+                                                });
+                                            },
+                                            selectedView: state.selectedView
+                                        }}
+                                    />
+                                )
+                            }}
+                        />
 
-                    <Widget
-                        src="nearui.near/widget/Layout.Modal"
-                        props={{
-                            open: state.filtersOpen,
-                            onOpenChange: (open) => {
-                                State.update({
-                                    ...state,
-                                    filtersOpen: open
-                                });
-                            },
-                            toggle: (
-                                <Widget
-                                    src="nearui.near/widget/Input.Button"
-                                    props={{
-                                        children: (
-                                            <>
-                                                Filter
-                                                <i className="bi bi-funnel"></i>
-                                            </>
-                                        ),
-                                        variant: "info",
-                                        size: "md"
-                                    }}
-                                />
-                            ),
-                            content: (
-                                <Widget
-                                    src="/*__@appAccount__*//widget/Common.Modals.FiltersModal"
-                                    props={{
-                                        selectedFilters: state.filters,
-                                        groupTypes: filterItems,
-                                        cancel: () => {
-                                            State.update({
-                                                ...state,
-                                                filters: []
-                                            });
-                                        },
-                                        applyFilters: (filters) => {
-                                            const filteredData = [...data];
-                                            if (
-                                                filters?.includes(
-                                                    filterItems.LATEST
-                                                )
-                                            ) {
-                                                filteredData.sort(
-                                                    (a, b) =>
-                                                        b.blockHeight -
-                                                        a.blockHeight
-                                                );
-                                            }
-                                            if (
-                                                filters?.includes(
-                                                    filterItems.EARLIEST
-                                                )
-                                            ) {
-                                                filteredData.sort(
-                                                    (a, b) =>
-                                                        a.blockHeight -
-                                                        b.blockHeight
-                                                );
-                                            }
-                                            if (
-                                                filters?.includes(
-                                                    filterItems.ASCENDING
-                                                )
-                                            ) {
-                                                filteredData.sort((a, b) =>
-                                                    a.account.localeCompare(
-                                                        b.account
+                        <Widget
+                            src="nearui.near/widget/Layout.Modal"
+                            props={{
+                                open: state.filtersOpen,
+                                onOpenChange: (open) => {
+                                    State.update({
+                                        ...state,
+                                        filtersOpen: open
+                                    });
+                                },
+                                toggle: (
+                                    <Widget
+                                        src="nearui.near/widget/Input.Button"
+                                        props={{
+                                            children: (
+                                                <>
+                                                    Filter
+                                                    <i className="bi bi-funnel"></i>
+                                                </>
+                                            ),
+                                            variant: "info",
+                                            size: "md"
+                                        }}
+                                    />
+                                ),
+                                content: (
+                                    <Widget
+                                        src="/*__@appAccount__*//widget/Common.Modals.FiltersModal"
+                                        props={{
+                                            selectedFilters: state.filters,
+                                            groupTypes: filterItems,
+                                            cancel: () => {
+                                                State.update({
+                                                    ...state,
+                                                    filters: [],
+                                                    filtersOpen: false
+                                                });
+                                            },
+                                            applyFilters: (filters) => {
+                                                const filteredData = [...data];
+                                                if (
+                                                    filters?.includes(
+                                                        filterItems.LATEST
                                                     )
-                                                );
-                                            }
-
-                                            if (
-                                                filters?.includes(
-                                                    filterItems.DESCENDING
-                                                )
-                                            ) {
-                                                filteredData.sort((a, b) =>
-                                                    b.account.localeCompare(
-                                                        a.account
+                                                ) {
+                                                    filteredData.sort(
+                                                        (a, b) =>
+                                                            b.blockHeight -
+                                                            a.blockHeight
+                                                    );
+                                                }
+                                                if (
+                                                    filters?.includes(
+                                                        filterItems.EARLIEST
                                                     )
-                                                );
-                                            }
+                                                ) {
+                                                    filteredData.sort(
+                                                        (a, b) =>
+                                                            a.blockHeight -
+                                                            b.blockHeight
+                                                    );
+                                                }
+                                                if (
+                                                    filters?.includes(
+                                                        filterItems.ASCENDING
+                                                    )
+                                                ) {
+                                                    filteredData.sort((a, b) =>
+                                                        a.account.localeCompare(
+                                                            b.account
+                                                        )
+                                                    );
+                                                }
 
-                                            State.update({
-                                                ...state,
-                                                filters: filters,
-                                                filteredData: filteredData
-                                            });
-                                        },
-                                        filterlist: filterlist
-                                    }}
-                                />
-                            )
-                        }}
-                    />
+                                                if (
+                                                    filters?.includes(
+                                                        filterItems.DESCENDING
+                                                    )
+                                                ) {
+                                                    filteredData.sort((a, b) =>
+                                                        b.account.localeCompare(
+                                                            a.account
+                                                        )
+                                                    );
+                                                }
+
+                                                State.update({
+                                                    ...state,
+                                                    filters: filters,
+                                                    filteredData: filteredData
+                                                });
+                                            },
+                                            filterlist: filterlist
+                                        }}
+                                    />
+                                )
+                            }}
+                        />
+                    </div>
                 </div>
                 {state.isLoading ? (
                     <div>
