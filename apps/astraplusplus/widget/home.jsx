@@ -72,6 +72,33 @@ const pages = [
   ],
   [
     {
+      title: "Congress",
+      icon: <i className="bi bi-bank"></i>,
+      active: page.split("-")[0] === "congress",
+      href: currentLink + "?page=congress",
+      onClick: () => router.navigate({ page: "congress" }),
+      widgetName: "Congress.index",
+      defaultProps: {},
+    },
+    {
+      title: "Proposals",
+      active: page === "proposals",
+      href: currentLink + "?page=proposals",
+      onClick: () => router.navigate({ page: "proposals" }),
+      widgetName: "Congress.Proposals",
+      defaultProps: {},
+    },
+    {
+      title: "Members",
+      active: page === "members",
+      href: currentLink + "?page=members",
+      onClick: () => router.navigate({ page: "members" }),
+      widgetName: "Congress.Members",
+      defaultProps: {},
+    },
+  ],
+  [
+    {
       title: "DAOs",
       icon: <i class="bi bi-grid"></i>,
       active: page === "daos",
@@ -233,6 +260,10 @@ return (
         items: pages,
       }}
     />
-    <div className="col ms-sm-4 ps-lg-5 py-3 py-md-5">{pageContent}</div>
+    {activePage.widgetName === "Congress.index" ? (
+      <div className="col p-0">{pageContent}</div>
+    ) : (
+      <div className="col ms-sm-4 ps-lg-5 py-3 py-md-5">{pageContent}</div>
+    )}
   </Root>
 );
