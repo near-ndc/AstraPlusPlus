@@ -1,7 +1,7 @@
 const widgetOwner = props.widgetOwner ?? "/*__@appAccount__*/";
 
 State.init({
-    tab: props.tab ?? "home",
+    tab: props.tab ?? "proposals",
     accountId: props.accountId ?? context.accountId,
     daoId: props.daoId,
     proposalId: props.proposalId
