@@ -185,6 +185,10 @@ const Wrapper = styled.div`
     .p-2 {
         padding: 0.8rem;
     }
+
+    .gap-y-3 {
+        row-gap: 1rem !important;
+    }
 `;
 
 function followUser(user, isFollowing) {
@@ -696,7 +700,7 @@ return (
                         state.selectedView !== viewTypes.LIST
                             ? "ndc-card p-4"
                             : ""
-                    } d-flex gap-2 flex-wrap`}
+                    } d-flex gap-2 flex-wrap gap-y-3`}
                 >
                     <Widget
                         src="nearui.near/widget/Input.ExperimentalText"
@@ -738,174 +742,181 @@ return (
                             }
                         }}
                     />
-                    <Widget
-                        src="nearui.near/widget/Layout.Popover"
-                        props={{
-                            triggerComponent: (
-                                <Widget
-                                    src="nearui.near/widget/Input.Button"
-                                    props={{
-                                        style: {
-                                            color: "#4498e0"
-                                        },
-                                        children: (
-                                            <>
-                                                {state.selectedView} View
-                                                <i class="bi bi-caret-down"></i>
-                                            </>
-                                        ),
-                                        variant: "info outline ",
-                                        size: "md",
-                                        className: ""
-                                    }}
-                                />
-                            ),
-                            content: (
-                                <Widget
-                                    src="/*__@appAccount__*//widget/Common.Modals.ViewDropDown"
-                                    props={{
-                                        viewList: viewList,
-                                        cancel: () => {
-                                            State.update({
-                                                ...state,
-                                                selectedView: ""
-                                            });
-                                        },
-                                        applyView: (selectedView) => {
-                                            State.update({
-                                                ...state,
-                                                selectedView
-                                            });
-                                        },
-                                        selectedView: state.selectedView
-                                    }}
-                                />
-                            )
-                        }}
-                    />
+                    <div className="d-flex gap-2 flex-wrap">
+                        <Widget
+                            src="nearui.near/widget/Layout.Popover"
+                            props={{
+                                triggerComponent: (
+                                    <Widget
+                                        src="nearui.near/widget/Input.Button"
+                                        props={{
+                                            style: {
+                                                color: "#4498e0"
+                                            },
+                                            children: (
+                                                <>
+                                                    {state.selectedView} View
+                                                    <i class="bi bi-caret-down"></i>
+                                                </>
+                                            ),
+                                            variant: "info outline ",
+                                            size: "md",
+                                            className: ""
+                                        }}
+                                    />
+                                ),
+                                content: (
+                                    <Widget
+                                        src="/*__@appAccount__*//widget/Common.Modals.ViewDropDown"
+                                        props={{
+                                            viewList: viewList,
+                                            cancel: () => {
+                                                State.update({
+                                                    ...state,
+                                                    selectedView: ""
+                                                });
+                                            },
+                                            applyView: (selectedView) => {
+                                                State.update({
+                                                    ...state,
+                                                    selectedView
+                                                });
+                                            },
+                                            selectedView: state.selectedView
+                                        }}
+                                    />
+                                )
+                            }}
+                        />
 
-                    <Widget
-                        src="nearui.near/widget/Layout.Modal"
-                        props={{
-                            open: state.filtersOpen,
-                            onOpenChange: (open) => {
-                                State.update({
-                                    ...state,
-                                    filtersOpen: open
-                                });
-                            },
-                            toggle: (
-                                <Widget
-                                    src="nearui.near/widget/Input.Button"
-                                    props={{
-                                        children: (
-                                            <>
-                                                Filter
-                                                <i className="bi bi-funnel"></i>
-                                            </>
-                                        ),
-                                        variant: "info",
-                                        size: "md"
-                                    }}
-                                />
-                            ),
-                            content: (
-                                <Widget
-                                    src="/*__@appAccount__*//widget/Common.Modals.FiltersModal"
-                                    props={{
-                                        selectedFilters: state.filters,
-                                        groupTypes: groupTypes,
-                                        cancel: () => {
-                                            State.update({
-                                                ...state,
-                                                filters: []
-                                            });
-                                        },
-                                        applyFilters: (filters) => {
-                                            const filteredData = [...data];
-                                            const rolesFilter = filters?.filter(
-                                                (i) =>
-                                                    i !==
-                                                        groupTypes.ASCENDING &&
-                                                    i !== groupTypes.DESCENDING
-                                            );
+                        <Widget
+                            src="nearui.near/widget/Layout.Modal"
+                            props={{
+                                open: state.filtersOpen,
+                                onOpenChange: (open) => {
+                                    State.update({
+                                        ...state,
+                                        filtersOpen: open
+                                    });
+                                },
+                                toggle: (
+                                    <Widget
+                                        src="nearui.near/widget/Input.Button"
+                                        props={{
+                                            children: (
+                                                <>
+                                                    Filter
+                                                    <i className="bi bi-funnel"></i>
+                                                </>
+                                            ),
+                                            variant: "info",
+                                            size: "md"
+                                        }}
+                                    />
+                                ),
+                                content: (
+                                    <Widget
+                                        src="/*__@appAccount__*//widget/Common.Modals.FiltersModal"
+                                        props={{
+                                            selectedFilters: state.filters,
+                                            groupTypes: groupTypes,
+                                            cancel: () => {
+                                                State.update({
+                                                    ...state,
+                                                    filters: []
+                                                });
+                                            },
+                                            applyFilters: (filters) => {
+                                                const filteredData = [...data];
+                                                const rolesFilter =
+                                                    filters?.filter(
+                                                        (i) =>
+                                                            i !==
+                                                                groupTypes.ASCENDING &&
+                                                            i !==
+                                                                groupTypes.DESCENDING
+                                                    );
 
-                                            if (rolesFilter?.length > 0) {
-                                                filteredData =
-                                                    filteredData.filter(
-                                                        (item) => {
-                                                            let results = [];
-                                                            if (
-                                                                rolesFilter.includes(
-                                                                    EVERYONE
-                                                                )
-                                                            ) {
-                                                                results.push(
-                                                                    item?.groups ===
+                                                if (rolesFilter?.length > 0) {
+                                                    filteredData =
+                                                        filteredData.filter(
+                                                            (item) => {
+                                                                let results =
+                                                                    [];
+                                                                if (
+                                                                    rolesFilter.includes(
                                                                         EVERYONE
-                                                                );
-                                                            }
-
-                                                            if (
-                                                                Array.isArray(
-                                                                    item.groups
-                                                                )
-                                                            ) {
-                                                                results.push(
-                                                                    item?.groups?.some(
-                                                                        (i) =>
-                                                                            rolesFilter?.includes(
-                                                                                i
-                                                                            )
                                                                     )
+                                                                ) {
+                                                                    results.push(
+                                                                        item?.groups ===
+                                                                            EVERYONE
+                                                                    );
+                                                                }
+
+                                                                if (
+                                                                    Array.isArray(
+                                                                        item.groups
+                                                                    )
+                                                                ) {
+                                                                    results.push(
+                                                                        item?.groups?.some(
+                                                                            (
+                                                                                i
+                                                                            ) =>
+                                                                                rolesFilter?.includes(
+                                                                                    i
+                                                                                )
+                                                                        )
+                                                                    );
+                                                                }
+                                                                return results.includes(
+                                                                    true
                                                                 );
                                                             }
-                                                            return results.includes(
-                                                                true
-                                                            );
-                                                        }
-                                                    );
-                                            }
-                                            if (
-                                                filters?.includes(
-                                                    groupTypes.ASCENDING
-                                                )
-                                            ) {
-                                                filteredData = filteredData
-                                                    .slice()
-                                                    .sort((a, b) =>
-                                                        a.account.localeCompare(
-                                                            b.account
-                                                        )
-                                                    );
-                                            }
+                                                        );
+                                                }
+                                                if (
+                                                    filters?.includes(
+                                                        groupTypes.ASCENDING
+                                                    )
+                                                ) {
+                                                    filteredData = filteredData
+                                                        .slice()
+                                                        .sort((a, b) =>
+                                                            a.account.localeCompare(
+                                                                b.account
+                                                            )
+                                                        );
+                                                }
 
-                                            if (
-                                                filters?.includes(
-                                                    groupTypes.DESCENDING
-                                                )
-                                            ) {
-                                                filteredData = filteredData
-                                                    .slice()
-                                                    .sort((a, b) =>
-                                                        b.account.localeCompare(
-                                                            a.account
-                                                        )
-                                                    );
-                                            }
+                                                if (
+                                                    filters?.includes(
+                                                        groupTypes.DESCENDING
+                                                    )
+                                                ) {
+                                                    filteredData = filteredData
+                                                        .slice()
+                                                        .sort((a, b) =>
+                                                            b.account.localeCompare(
+                                                                a.account
+                                                            )
+                                                        );
+                                                }
 
-                                            State.update({
-                                                ...state,
-                                                filters: filters,
-                                                filteredData: filteredData
-                                            });
-                                        },
-                                        filterlist: filterlist
-                                    }}
-                                />
-                            )
-                        }}
-                    />
+                                                State.update({
+                                                    ...state,
+                                                    filters: filters,
+                                                    filteredData: filteredData
+                                                });
+                                            },
+                                            filterlist: filterlist
+                                        }}
+                                    />
+                                )
+                            }}
+                        />
+                    </div>
                 </div>
                 {state.isLoading ? (
                     <div>

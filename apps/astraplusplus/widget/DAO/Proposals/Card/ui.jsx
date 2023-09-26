@@ -585,7 +585,7 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
     };
 
     return (
-        <div className="d-flex gap-3 justify-content-between mt-2 border-top pt-4">
+        <div className="d-flex gap-3 justify-content-between mt-2 border-top pt-4 flex-wrap">
             {items.map(renderModal)}
         </div>
     );

@@ -1,6 +1,10 @@
 const daoId = props.daoId;
 const proposalId = props.proposalId;
 
+State.init({
+    isProposalModalOpen: false
+});
+
 if (proposalId) {
     return (
         <div>
@@ -18,8 +22,14 @@ return (
             <div className="d-flex justify-content-between flex-wrap mb-3 align-items-center gap-3 pb-3">
                 <h2 className="my-auto">Proposals</h2>
                 <Widget
-                    src="nearui.near/widget/Layout.Modal"
+                    src="/*__@appAccount__*//widget/Common.Layout.CardModal"
                     props={{
+                        title: "Create Proposal",
+                        onToggle: () =>
+                            State.update({
+                                isProposalModalOpen: !state.isProposalModalOpen
+                            }),
+                        isOpen: state.isProposalModalOpen,
                         toggle: (
                             <Widget
                                 src="nearui.near/widget/Input.Button"

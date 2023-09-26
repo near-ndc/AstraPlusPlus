@@ -8,11 +8,14 @@ State.init({
     selectedFilters: selectedFilters
 });
 
-const setFilters = (f) => {
+const setFilters = (f, close) => {
     State.update({
         selectedFilters: f
     });
     applyFilters(state.selectedFilters);
+    if (close) {
+        cancel();
+    }
 };
 
 const Wrapper = styled.div`
@@ -75,6 +78,10 @@ return (
                             event?.target?.id === groupTypes.DESCENDING;
                         const isAscendingSelected =
                             event?.target?.id === groupTypes.ASCENDING;
+                        const isEarliest =
+                            event?.target?.id === groupTypes.EARLIEST;
+                        const isLatest =
+                            event?.target?.id === groupTypes.LATEST;
                         if (
                             (isDescendingSelected &&
                                 data?.includes(groupTypes.ASCENDING)) ||
@@ -85,6 +92,19 @@ return (
                                 return isDescendingSelected
                                     ? item !== groupTypes.ASCENDING
                                     : item !== groupTypes.DESCENDING;
+                            });
+                            data.push(event.target.id);
+                            setFilters(data);
+                        }
+                        // treat latest and earliest as radio button
+                        else if (
+                            (isEarliest && data?.includes(groupTypes.LATEST)) ||
+                            (isLatest && data?.includes(groupTypes.EARLIEST))
+                        ) {
+                            data = data.filter((item) => {
+                                return isEarliest
+                                    ? item !== groupTypes.LATEST
+                                    : item !== groupTypes.EARLIEST;
                             });
                             data.push(event.target.id);
                             setFilters(data);
@@ -112,7 +132,7 @@ return (
                 </div>
             ))}
         </div>
-        <button className="outline-btn" onClick={() => setFilters([])}>
+        <button className="outline-btn" onClick={() => setFilters([], true)}>
             Clear Filter
         </button>
     </Wrapper>

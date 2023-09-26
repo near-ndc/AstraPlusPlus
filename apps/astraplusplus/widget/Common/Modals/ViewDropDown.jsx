@@ -67,9 +67,5 @@ return (
                 </div>
             ))}
         </div>
-
-        <button className="outline-btn" onClick={cancel}>
-            Clear Filter
-        </button>
     </Wrapper>
 );
