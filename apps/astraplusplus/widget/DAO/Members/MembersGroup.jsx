@@ -2,10 +2,15 @@ const data = props.data;
 const policy = props.policy;
 const currentPage = props.page ?? 1;
 const resPerPage = props.resPerPage ?? 20;
+const isCongressDaoID = props.isCongressDaoID ?? false;
 
 const EVERYONE = "Everyone";
 
-const rolesArray = Object.keys(policy?.roles ?? {}).concat(EVERYONE);
+const rolesArray = Object.keys(policy?.roles ?? {});
+
+if (policy?.everyone?.permissions) {
+    rolesArray = rolesArray.concat(EVERYONE);
+}
 
 const colorsArray = ["blue", "green", "pink", "red"];
 
@@ -131,17 +136,27 @@ const Wrapper = styled.div`
     }
 
     table {
-        display: block;
         overflow-x: auto;
         font-size: 13px;
         width: 100%;
         box-sizing: border-box;
     }
 
+    @media screen and (max-width: 1000px) {
+        table {
+            display: block;
+        }
+    }
+
     th,
     td {
         padding: 15px;
         text-align: left;
+    }
+
+    .role-tag-td {
+        display: block;
+        width: max-content;
     }
 
     tr {
@@ -375,7 +390,7 @@ const Table = ({ title, tableData, showExpand }) => {
                                         />
                                     </td>
                                     {state.selectedView === viewTypes.LIST && (
-                                        <td>
+                                        <td className="role-tag-td">
                                             <RoleTag
                                                 showIcon={false}
                                                 roles={item?.groups}
@@ -403,8 +418,17 @@ const Table = ({ title, tableData, showExpand }) => {
                                                 onClick: () => {}
                                             }}
                                         />
-                                        <ProposeToMintSBT itemDetails={item} />
-                                        <ProposeToRemove user={item.account} />
+                                        {/* we don't show propose to mint and remove for congress dao */}
+                                        {!isCongressDaoID && (
+                                            <div className="d-flex gap-2 align-items-center">
+                                                <ProposeToMintSBT
+                                                    itemDetails={item}
+                                                />
+                                                <ProposeToRemove
+                                                    user={item.account}
+                                                />
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
                             );
@@ -964,14 +988,20 @@ return (
                                                             height: "4rem"
                                                         }}
                                                     ></div>
-                                                    <div className="d-flex justify-content-between">
-                                                        <ProposeToMintSBT
-                                                            itemDetails={item}
-                                                        />
-                                                        <ProposeToRemove
-                                                            user={item.account}
-                                                        />
-                                                    </div>
+                                                    {!isCongressDaoID && (
+                                                        <div className="d-flex justify-content-between">
+                                                            <ProposeToMintSBT
+                                                                itemDetails={
+                                                                    item
+                                                                }
+                                                            />
+                                                            <ProposeToRemove
+                                                                user={
+                                                                    item.account
+                                                                }
+                                                            />
+                                                        </div>
+                                                    )}
                                                     <Widget
                                                         src="nearui.near/widget/Input.Button"
                                                         props={{
