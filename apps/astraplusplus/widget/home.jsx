@@ -1,7 +1,7 @@
-const CoADaoId = "/*__@replace:CoADaoId*/";
-const VotingBodyDaoId = "/*__@replace:VotingBodyDaoId*/";
-const TCDaoId = "/*__@replace:TCDaoId*/";
-const HoMDaoId = "/*__@replace:HoMDaoId*/";
+const CoADaoId = "/*__@replace:CoADaoId__*/";
+const VotingBodyDaoId = "/*__@replace:VotingBodyDaoId__*/";
+const TCDaoId = "/*__@replace:TCDaoId__*/";
+const HoMDaoId = "/*__@replace:HoMDaoId__*/";
 
 let { page, tab, daoId } = props;
 if (!page) {
