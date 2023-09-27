@@ -75,7 +75,7 @@ const proposalTypes = [
         value: "Transfer"
     },
     {
-        text: "Call Smart Contract",
+        text: "Function Call",
         value: "FunctionCall"
     },
     {

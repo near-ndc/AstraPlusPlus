@@ -1,3 +1,7 @@
+const CoADaoId = "/*__@replace:CoADaoId__*/";
+const VotingBodyDaoId = "/*__@replace:VotingBodyDaoId__*/";
+const TCDaoId = "/*__@replace:TCDaoId__*/";
+const HoMDaoId = "/*__@replace:HoMDaoId__*/";
 const widgetOwner = props.widgetOwner ?? "/*__@appAccount__*/";
 
 State.init({
@@ -20,16 +24,22 @@ const constructURL = (paramObj, base) => {
     return `${baseURL}?${params}`;
 };
 
+const isCongressDaoID =
+    props.daoId === HoMDaoId ||
+    props.daoId === VotingBodyDaoId ||
+    props.daoId === CoADaoId ||
+    props.daoId === TCDaoId;
+
 const tabs = {
-    home: {
-        name: "Discussion",
-        widget: "DAO.Discussion",
-        href: constructURL({ tab: "home", daoId: state.daoId })
-    },
     proposals: {
         name: "Proposals",
         widget: "DAO.Proposals.index",
         href: constructURL({ tab: "proposals", daoId: state.daoId })
+    },
+    home: {
+        name: "Discussion",
+        widget: "DAO.Discussion",
+        href: constructURL({ tab: "home", daoId: state.daoId })
     },
     funds: {
         name: "Fund Flows",
@@ -57,6 +67,12 @@ const tabs = {
         href: constructURL({ tab: "bounties", daoId: state.daoId })
     }
 };
+
+if (isCongressDaoID) {
+    delete tabs["funds"];
+    delete tabs["projects"];
+    delete tabs["bounties"];
+}
 
 if (!props.daoId) {
     // TODO: add a proper error screen

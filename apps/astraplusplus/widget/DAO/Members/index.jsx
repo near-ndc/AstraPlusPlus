@@ -3,6 +3,17 @@ const publicApiKey = "/*__@replace:pikespeakApiKey__*/";
 const baseApi = "https://api.pikespeak.ai";
 let voters = [];
 
+const CoADaoId = "/*__@replace:CoADaoId__*/";
+const VotingBodyDaoId = "/*__@replace:VotingBodyDaoId__*/";
+const TCDaoId = "/*__@replace:TCDaoId__*/";
+const HoMDaoId = "/*__@replace:HoMDaoId__*/";
+
+const isCongressDaoID =
+    daoId === HoMDaoId ||
+    daoId === VotingBodyDaoId ||
+    daoId === CoADaoId ||
+    daoId === TCDaoId;
+
 function fetchIsHuman(account) {
     const userSBTs = Near.view("registry.i-am-human.near", "is_human", {
         account: account
@@ -108,14 +119,52 @@ const processPolicy = (policy) => {
     return obj;
 };
 
-const policy = useCache(
-    () =>
-        Near.asyncView(daoId, "get_policy").then((policy) =>
-            processPolicy(policy)
-        ),
-    daoId + "-processed_policy",
-    { subscribe: false }
-);
+function processCongressMembers(members) {
+    let group = "";
+    switch (daoId) {
+        case HoMDaoId:
+            group = "HoM Member";
+        case CoADaoId:
+            group = "CoA Member";
+        case VotingBodyDaoId:
+            group = "Voting body Member";
+        case TCDaoId:
+            group = "Transparency Commission Member";
+    }
+    const obj = {
+        policy,
+        users: {},
+        roles: {
+            [group]: {
+                permissions: members?.permissions
+            }
+        },
+        everyone: {}
+    };
+
+    members?.members?.map((item) => {
+        obj.users[item] = [group];
+    });
+    return obj;
+}
+
+const policy = isCongressDaoID
+    ? useCache(
+          () =>
+              Near.asyncView(daoId, "get_members").then((members) =>
+                  processCongressMembers(members)
+              ),
+          daoId + "-processed_congress_policy",
+          { subscribe: false }
+      )
+    : useCache(
+          () =>
+              Near.asyncView(daoId, "get_policy").then((policy) =>
+                  processPolicy(policy)
+              ),
+          daoId + "-processed_policy",
+          { subscribe: false }
+      );
 
 if (policy === null) return "";
 
@@ -140,7 +189,8 @@ return (
                 src="/*__@appAccount__*//widget/DAO.Members.MembersGroup"
                 props={{
                     data: voters,
-                    policy: policy
+                    policy: policy,
+                    isCongressDaoID: isCongressDaoID
                 }}
             />
         </Wrapper>
