@@ -12,7 +12,7 @@ const VB_IMG =
 
 const Content = {
     hom: {
-        title: "House of merit",
+        title: "House of Merit",
         abbr: "HoM",
         color: "#5BC65F",
         description:
@@ -52,7 +52,7 @@ const Content = {
         }
     },
     coa: {
-        title: "Council of Advisor",
+        title: "Council of Advisors",
         abbr: "CoA",
         color: "#4498E0",
         description:
@@ -299,7 +299,8 @@ State.init({
     selectedHouse: house ?? "hom",
     selectedTab: "powers",
     copied: false,
-    proposals: []
+    proposals: [],
+    showChecksDescription: false
 });
 
 const ContentBlock = ({ title, abbr, address, description, metadata }) => (
@@ -540,14 +541,34 @@ const ChecksDescription = ({ house, text, description }) => (
             <small>{house}</small>
         </CircleLogoSmall>
         <Hr />
-        <Description>
-            <small>{text}</small>
-            <Description className="mt-2">
-                <small className="text-secondary">
-                    {description ?? "The vote needs a simple majority."}
-                </small>
+        <div className="d-flex justify-content-between gap-2">
+            <Description>
+                <small>{text}</small>
+                {state.showChecksDescription === house && (
+                    <Description className="mt-2">
+                        <small className="text-secondary">
+                            {description ?? "The vote needs a simple majority."}
+                        </small>
+                    </Description>
+                )}
             </Description>
-        </Description>
+            <i
+                class={
+                    state.showChecksDescription === house
+                        ? "bi bi-chevron-up"
+                        : "bi bi-chevron-down"
+                }
+                role="button"
+                onClick={() =>
+                    State.update({
+                        showChecksDescription:
+                            state.showChecksDescription === house
+                                ? false
+                                : house
+                    })
+                }
+            ></i>
+        </div>
     </div>
 );
 
