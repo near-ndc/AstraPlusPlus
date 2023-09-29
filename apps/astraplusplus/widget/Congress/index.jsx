@@ -2,13 +2,15 @@ const { router, house } = props;
 const accountId = props.accountId ?? context.accountId ?? "";
 
 const HOM_IMG =
-    "https://ipfs.near.social/ipfs/bafkreifli7bprs5zpjh4bwuqtci5xaxjxqf3vfibqw7mxesdgetstkscla";
+    "https://ipfs.near.social/ipfs/bafkreiafbuabus4klh5kdlfef3hhi5baqcoc4ltomg2uzgu4vydgc7oj5u";
 const COA_IMG =
-    "https://ipfs.near.social/ipfs/bafkreigdst4dvxqn5dgwb2ey76lgljxpvahuoaxej5ivvdbiarliaj5u2a";
+    "https://ipfs.near.social/ipfs/bafkreig3y6dsilf5kfftvwys3rsczam2ntcaub3bx4solf5k7ay63iewwa";
 const TC_IMG =
-    "https://ipfs.near.social/ipfs/bafkreibkeijjgzhqwd5nxgiy35gp3kmj2hopyjthzeul65gtv2dlc3z33u";
+    "https://ipfs.near.social/ipfs/bafkreiaca64a4dapymnwzbe3qminrc3ggwteqwmolligibbvmp6zvw5ghu";
 const VB_IMG =
-    "https://ipfs.near.social/ipfs/bafkreidu5mlr6wsgkkziflt5cqamxwfmvofqrlzqtm3grxy535oaqlzlga";
+    "https://ipfs.near.social/ipfs/bafkreigkbdfbaz73srswvv7p4rys5pqosesyxxlbr6htcrghmunktdrqu4";
+const VB_TRUST_IMG =
+    "https://ipfs.near.social/ipfs/bafkreiegx5ygl7vpp5fblgyapnhgevqdpyh3lrucw6d5boqi7bikt4q7iq";
 
 const Content = {
     hom: {
@@ -23,10 +25,14 @@ const Content = {
             proposals: { active: 1, total: 4 },
             powers: [
                 {
-                    text: "The House of Merit can propose budget (Setup Package) provided that the budget is not vetoed by the Voting Body."
+                    text: "The House of Merit can propose setup package, budget, large budget items, and recurring budget items.",
+                    description:
+                        "The vote needs 8 approvals to pass the HoM. The Voting Body can veto during the cooldown period."
                 },
                 {
-                    text: "The House of Merit can propose any motions provided that these motions are not vetoed by the Council of Advisors."
+                    text: "The House of Merit can propose motions, including motions to amend the governance framework and to hire, provided that these motions are not vetoed by the Council of Advisors.",
+                    description:
+                        "The vote needs 8 approvals to pass the HoM. The Council of Advisors can veto during the proposal cooldown period, or create a text proposal to veto a House of Merit proposal that is past the cooldown period. "
                 }
             ],
             checks: [
@@ -63,10 +69,12 @@ const Content = {
             proposals: { active: 1, total: 4 },
             powers: [
                 {
-                    text: "All proposals originated from the House of Merit (except the Setup Package) can be vetoed by the Council of Advisors."
+                    text: "All proposals originated from the House of Merit (except the Setup Package and Budget) can be vetoed by the Council of Advisors.",
+                    description: "The vote needs 4 approvals to pass the CoA."
                 },
                 {
-                    text: "Council of Advisors could reinstate banned members by the Transparency Commission."
+                    text: "Council of Advisors could reinstate and unban a member previously dismissed and banned by the Transparency Commission.",
+                    description: "The vote needs 4 approvals to pass the CoA."
                 }
             ],
             checks: [
@@ -96,16 +104,20 @@ const Content = {
             proposals: { active: 1, total: 4 },
             powers: [
                 {
-                    text: "The Transparency Commission can conduct investigations and make decisions on removal or retention of Congressional members."
+                    text: "The Transparency Commission can conduct investigations on Congressional members.",
+                    description: "The vote needs 4 approvals to pass TC."
                 },
                 {
-                    text: "The Transparency Commission has the power to investigate, remove, and ban members of House of Merit. (Checks & Balances)."
+                    text: "The Transparency Commission has the power to investigate, dismiss, and ban members of House of Merit.",
+                    description: "The vote needs 4 approvals to pass TC."
                 },
                 {
-                    text: "The Transparency Commission  has the power to investigate, remove, and ban members of Council of Advisors. (Checks & Balances)."
+                    text: "The Transparency Commission has the power to investigate, dismiss, and ban members of Council of Advisors.",
+                    description: "The vote needs 4 approvals to pass TC."
                 },
                 {
-                    text: "The TC has the power to investigate, remove, and ban members of Transparency Commission. (Checks & Balances) "
+                    text: "The Transparency Commission has the power to investigate, dismiss, and ban members of Transparency Commission.",
+                    description: "The vote needs 4 approvals to pass TC."
                 }
             ],
             checks: [
@@ -139,22 +151,34 @@ const Content = {
             proposals: { active: 1, total: 4 },
             powers: [
                 {
-                    text: "The Voting Body must ratify Set Up Package. (Checks  & Balances)"
+                    text: "The Voting Body must ratify Set Up Package.",
+                    description:
+                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
                 },
                 {
-                    text: "The Voting Body may veto large budget items and recurring budget items. (Checks  & Balances)"
+                    text: "The Voting Body may veto large budget items and recurring budget items.",
+                    description:
+                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
                 },
                 {
-                    text: "The Voting Body may report activities to be investigated by the Transparency Commission."
+                    text: "The Voting Body may report activities to be investigated by the Transparency Commission.",
+                    description:
+                        "The Voting Body may bring issues to the Transparency Commission."
                 },
                 {
-                    text: "The Voting Body may vote to dissolve the House of Merit. (Checks  & Balances)"
+                    text: "The Voting Body may vote to dissolve the House of Merit, Council of Advisors, and the Transparency Commission.",
+                    description:
+                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
                 },
                 {
-                    text: "The Voting Body may vote to dissolve the Council of Advisors. (Checks  & Balances)"
+                    text: "The Voting Body may motion to amend the governance framework.",
+                    description:
+                        "The vote needs a NEAR Supermajority Consent, which is 12% of voting body participating with a supermajority of 60% approval."
                 },
                 {
-                    text: "The Voting Body may vote to dissolve the Transparency Commission. (Checks  & Balances)"
+                    text: "The Voting Body may motion to amend the legal framework of the Trust Instrument.",
+                    description:
+                        "The vote needs a NEAR Supermajority Consent, which is 12% of voting body participating with a supermajority of 60% approval."
                 }
             ],
             checks: []
@@ -175,7 +199,7 @@ const Container = styled.div`
 `;
 
 const HousePanel = styled.div`
-    width: 800px;
+    width: 700px;
     background-color: #fff;
 `;
 
@@ -300,8 +324,17 @@ State.init({
     selectedTab: "powers",
     copied: false,
     proposals: [],
-    showChecksDescription: false
+    showPowerChecksDescription: false,
+    vbWithTrust: false
 });
+
+const changeHouse = (house) =>
+    State.update({
+        selectedHouse: house,
+        selectedTab: "powers",
+        showPowerChecksDescription: false,
+        vbWithTrust: false
+    });
 
 const ContentBlock = ({ title, abbr, address, description, metadata }) => (
     <Section className="d-flex flex-column justify-content-between h-100">
@@ -334,33 +367,25 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                         <i className="bi bi-caret-down-fill" />
                         <div class="flex-column dropdown-content shadow">
                             <a
-                                onClick={() =>
-                                    State.update({ selectedHouse: "hom" })
-                                }
+                                onClick={() => changeHouse("hom")}
                                 href="#//*__@appAccount__*//widget/home?page=congress&house=hom"
                             >
                                 {Content.hom.title}
                             </a>
                             <a
-                                onClick={() =>
-                                    State.update({ selectedHouse: "coa" })
-                                }
+                                onClick={() => changeHouse("coa")}
                                 href="#//*__@appAccount__*//widget/home?page=congress&house=coa"
                             >
                                 {Content.coa.title}
                             </a>
                             <a
-                                onClick={() =>
-                                    State.update({ selectedHouse: "tc" })
-                                }
+                                onClick={() => changeHouse("tc")}
                                 href="#//*__@appAccount__*//widget/home?page=congress&house=tc"
                             >
                                 {Content.tc.title}
                             </a>
                             <a
-                                onClick={() =>
-                                    State.update({ selectedHouse: "vb" })
-                                }
+                                onClick={() => changeHouse("vb")}
                                 href="#//*__@appAccount__*//widget/home?page=congress&house=vb"
                             >
                                 {Content.vb.title}
@@ -441,15 +466,19 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                 </div>
                 <div className="d-flex flex-column gap-4 p-3">
                     {state.selectedTab === "powers" &&
-                        metadata.powers.map((r) => (
-                            <PowerDescription
-                                color={Content[state.selectedHouse].color}
+                        metadata.powers.map((r, i) => (
+                            <PowerChecksDescription
+                                index={i + 1}
+                                house={state.selectedHouse}
                                 text={r.text}
+                                description={r.description}
+                                type={"power"}
                             />
                         ))}
                     {state.selectedTab === "checks" &&
-                        metadata.checks.map((c) => (
-                            <ChecksDescription
+                        metadata.checks.map((c, i) => (
+                            <PowerChecksDescription
+                                index={i + 1}
                                 house={c.house}
                                 text={c.text}
                                 description={c.description}
@@ -517,34 +546,28 @@ const getProposals = (house) => {
     State.update({ proposals });
 };
 
-const PowerDescription = ({ color, text }) => (
+const PowerChecksDescription = ({ house, index, text, description, type }) => (
     <div className="d-flex gap-3">
-        <UserIcon color={color}>
-            <img
-                width={11}
-                src="https://ipfs.near.social/ipfs/bafkreig7hd3ysbcb7dkvgzhaavltjvaw5pjtaqyj4qdbamwxhhh4yqp4su"
-            />
-        </UserIcon>
-        <Hr />
-        <Description>
-            <small>{text}</small>
-        </Description>
-    </div>
-);
-
-const ChecksDescription = ({ house, text, description }) => (
-    <div className="d-flex gap-3">
-        <CircleLogoSmall
-            house={house}
-            className="d-flex justify-content-center align-items-center"
-        >
-            <small>{house}</small>
-        </CircleLogoSmall>
+        {type === "power" ? (
+            <UserIcon color={Content[house].color}>
+                <img
+                    width={11}
+                    src="https://ipfs.near.social/ipfs/bafkreig7hd3ysbcb7dkvgzhaavltjvaw5pjtaqyj4qdbamwxhhh4yqp4su"
+                />
+            </UserIcon>
+        ) : (
+            <CircleLogoSmall
+                house={house}
+                className="d-flex justify-content-center align-items-center"
+            >
+                <small>{house}</small>
+            </CircleLogoSmall>
+        )}
         <Hr />
         <div className="d-flex justify-content-between gap-2">
             <Description>
                 <small>{text}</small>
-                {state.showChecksDescription === house && (
+                {state.showPowerChecksDescription === index && (
                     <Description className="mt-2">
                         <small className="text-secondary">
                             {description ?? "The vote needs a simple majority."}
@@ -554,17 +577,17 @@ const ChecksDescription = ({ house, text, description }) => (
             </Description>
             <i
                 class={
-                    state.showChecksDescription === house
+                    state.showPowerChecksDescription === index
                         ? "bi bi-chevron-up"
                         : "bi bi-chevron-down"
                 }
                 role="button"
                 onClick={() =>
                     State.update({
-                        showChecksDescription:
-                            state.showChecksDescription === house
+                        showPowerChecksDescription:
+                            state.showPowerChecksDescription === index
                                 ? false
-                                : house
+                                : index
                     })
                 }
             ></i>
@@ -581,8 +604,15 @@ return (
                     <span className="text-white">Interhouse relations</span>
                 </h6>
             </div>
-            <div className="w-100 d-flex justify-content-center align-items-center p-5">
+            <div
+                className={`w-100 d-flex justify-content-center align-items-center py-5 position-relative ${
+                    state.vbWithTrust ? "px-1" : "px-5"
+                }`}
+            >
                 <Img
+                    onClick={() =>
+                        State.update({ vbWithTrust: !state.vbWithTrust })
+                    }
                     src={
                         state.selectedHouse === "hom"
                             ? HOM_IMG
@@ -591,7 +621,9 @@ return (
                             : state.selectedHouse === "tc"
                             ? TC_IMG
                             : state.selectedHouse === "vb"
-                            ? VB_IMG
+                            ? state.vbWithTrust
+                                ? VB_TRUST_IMG
+                                : VB_IMG
                             : HOM_IMG
                     }
                 />
