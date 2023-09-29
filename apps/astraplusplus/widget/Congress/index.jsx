@@ -199,7 +199,6 @@ const Container = styled.div`
 `;
 
 const HousePanel = styled.div`
-    width: 700px;
     background-color: #fff;
 `;
 
@@ -252,7 +251,10 @@ const Tab = styled.div`
 
 const Section = styled.div`
     padding: 35px;
-    padding-right: 0;
+
+    @media (max-width: 768px) {
+        padding: 25px 5px;
+    }
 `;
 
 const UserIcon = styled.div`
@@ -287,6 +289,13 @@ const Tabs = styled.div`
 
 const Img = styled.img`
     width: 90%;
+`;
+
+const ImgContainer = styled.div`
+    @media (max-width: 768px) {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
 `;
 
 const Dropdown = styled.div`
@@ -596,15 +605,15 @@ const PowerChecksDescription = ({ house, index, text, description, type }) => (
 );
 
 return (
-    <Container className="d-flex w-100">
-        <div id="main" className="w-100">
-            <div className="px-5 py-3 bg-dark">
+    <Container className="row p-0">
+        <div id="main" className="col-lg-7 p-0">
+            <div className="py-3 bg-dark d-flex justify-content-center">
                 <h6>
-                    <span className="text-secondary">NDC Governance: </span>
+                    <span className="text-secondary">NDC Governance | </span>
                     <span className="text-white">Interhouse relations</span>
                 </h6>
             </div>
-            <div
+            <ImgContainer
                 className={`w-100 d-flex justify-content-center align-items-center py-5 position-relative ${
                     state.vbWithTrust ? "px-1" : "px-5"
                 }`}
@@ -627,19 +636,17 @@ return (
                             : HOM_IMG
                     }
                 />
-            </div>
+            </ImgContainer>
         </div>
 
-        {state.selectedHouse && (
-            <HousePanel className="shadow-sm">
-                <ContentBlock
-                    title={Content[state.selectedHouse].title}
-                    description={Content[state.selectedHouse].description}
-                    abbr={state.selectedHouse}
-                    address={`${state.selectedHouse}@sputnik-dao.near`}
-                    metadata={Content[state.selectedHouse].metadata}
-                />
-            </HousePanel>
-        )}
+        <HousePanel className="shadow-sm col-lg-5">
+            <ContentBlock
+                title={Content[state.selectedHouse].title}
+                description={Content[state.selectedHouse].description}
+                abbr={state.selectedHouse}
+                address={`${state.selectedHouse}@sputnik-dao.near`}
+                metadata={Content[state.selectedHouse].metadata}
+            />
+        </HousePanel>
     </Container>
 );
