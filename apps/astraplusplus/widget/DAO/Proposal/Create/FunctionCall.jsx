@@ -1,6 +1,7 @@
 const accountId = props.accountId ?? context.accountId;
 const contractId = props.contractId;
 const onClose = props.onClose;
+const daoId = props.daoId;
 const isCongressDaoID = props.isCongressDaoID;
 
 if (!accountId) {
@@ -12,7 +13,7 @@ State.init({
     method_name: state.method_name,
     args: state.args || "{}",
     deposit: state.deposit || "0",
-    gas: null,
+    gas: "200000000000000",
     error: undefined,
     receiver_id: null,
     description: null
@@ -95,7 +96,20 @@ const handleFunctionCall = () => {
                 contractName: daoId,
                 methodName: "create_proposal",
                 args: {
-                    kind: `'{"FunctionCall": {"receiver_id": ${state.receiver_id}, "actions": [{"method_name": ${state.methodName}, "args": ${fc_args}, "deposit": ${deposit}, "gas": ${state.gas}}]}}, "description": ${state.description}}`
+                    kind: {
+                        FunctionCall: {
+                            receiver_id: state.receiver_id,
+                            actions: [
+                                {
+                                    method_name: state.method_name,
+                                    args: fc_args,
+                                    deposit: deposit,
+                                    gas: state.gas
+                                }
+                            ]
+                        }
+                    },
+                    description: state.description
                 },
                 deposit: 100000000000000000000000,
                 gas: 200000000000000

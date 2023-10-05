@@ -1,9 +1,8 @@
 const daoId = props.daoId;
-const proposalsPerPage = props.proposalsPerPage ?? 20; // Number of proposals to fetch at a time
 
 const apiUrl = `https://api.pikespeak.ai/daos/proposals`;
 const publicApiKey = "/*__@replace:pikespeakApiKey__*/";
-const resPerPage = 20;
+const resPerPage = 20; // Number of proposals to fetch at a time
 
 const defaultMultiSelectMode = Storage.privateGet("multiSelectMode");
 const defaultTableView = Storage.privateGet("tableView");
@@ -80,17 +79,23 @@ const forgeUrl = (apiUrl, params) =>
         .sort()
         .reduce((paramString, p) => paramString + `${p}=${params[p]}&`, "?");
 
+function fetchCongressDaoProposals() {
+    const data = [];
+    const resp = Near.view(daoId, "get_proposals", {
+        from_index:
+            state.page === 0
+                ? proposalsCount
+                : proposalsCount - state.page * resPerPage,
+        limit: resPerPage,
+        reverse: true
+    });
+    if (resp) {
+        data = processProposals(resp);
+    }
+    return data;
+}
 const res = isCongressDaoID
-    ? useCache(
-          () =>
-              Near.asyncView(daoId, "get_proposals", {
-                  from_index: proposalsCount,
-                  limit: resPerPage,
-                  reverse: true
-              }).then((proposals) => processProposals(proposals)),
-          daoId + "-proposals-pikespeak",
-          { subscribe: false }
-      )
+    ? fetchCongressDaoProposals()
     : fetch(
           forgeUrl(apiUrl, {
               offset: state.page * resPerPage,
@@ -108,38 +113,6 @@ const res = isCongressDaoID
               }
           }
       );
-
-const preloadNextPage = () => {
-    isCongressDaoID
-        ? useCache(
-              () =>
-                  Near.asyncView(daoId, "get_proposals", {
-                      from_index:
-                          proposalsCount - (state.page + 1) * resPerPage,
-                      limit: resPerPage,
-                      reverse: true
-                  }).then((proposals) => processProposals(proposals)),
-              daoId + "-proposals-pikespea-next",
-              { subscribe: false }
-          )
-        : fetch(
-              forgeUrl(apiUrl, {
-                  offset: (state.page + 1) * resPerPage,
-                  limit: resPerPage,
-                  daos: state.daos,
-                  proposal_types: state.filters.proposal_types,
-                  status: state.filters.status,
-                  time_start: state.filters.time_start,
-                  time_end: state.filters.time_end
-              }),
-              {
-                  mode: "cors",
-                  headers: {
-                      "x-api-key": publicApiKey
-                  }
-              }
-          );
-};
 
 // filtering for congress daos
 if (isCongressDaoID) {
@@ -320,7 +293,10 @@ return (
                     src="nearui.near/widget/Navigation.PrevNext"
                     props={{
                         hasPrev: state.page > 0,
-                        hasNext: proposalsCount == resPerPage,
+                        hasNext:
+                            state.page === 0
+                                ? proposalsCount !== resPerPage
+                                : proposalsCount === state.page * resPerPage,
                         onPrev: () => {
                             update({
                                 page: state.page - 1
@@ -330,9 +306,6 @@ return (
                             update({
                                 page: state.page + 1
                             });
-                        },
-                        nextProps: {
-                            onMouseEnter: preloadNextPage
                         },
                         nextHref: `#proposals-top`
                     }}
