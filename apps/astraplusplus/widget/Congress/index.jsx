@@ -2,13 +2,13 @@ const { router, house } = props;
 const accountId = props.accountId ?? context.accountId ?? "";
 
 const HOM_IMG =
-    "https://ipfs.near.social/ipfs/bafkreiafbuabus4klh5kdlfef3hhi5baqcoc4ltomg2uzgu4vydgc7oj5u";
+    "https://ipfs.near.social/ipfs/bafkreidqibol2yjcaja7hdivezfumbb323niqz6csntmeyrscl2iym5vrm";
 const COA_IMG =
-    "https://ipfs.near.social/ipfs/bafkreig3y6dsilf5kfftvwys3rsczam2ntcaub3bx4solf5k7ay63iewwa";
+    "https://ipfs.near.social/ipfs/bafkreifh4j3tc5klc3mjkfx7prced4rbxm2xel2qoz2sr3ekoxez53ik2m";
 const TC_IMG =
-    "https://ipfs.near.social/ipfs/bafkreiaca64a4dapymnwzbe3qminrc3ggwteqwmolligibbvmp6zvw5ghu";
+    "https://ipfs.near.social/ipfs/bafkreif3aql3iceqrmbkyvoxnvh3elo3sodbvxsaok6qzpjxaqnzuejwni";
 const VB_IMG =
-    "https://ipfs.near.social/ipfs/bafkreigkbdfbaz73srswvv7p4rys5pqosesyxxlbr6htcrghmunktdrqu4";
+    "https://ipfs.near.social/ipfs/bafkreigbn55gk57jzzuvae3rbdeoqzvhy2ikggjhwc6dcfwlbx74s4u5v4";
 const VB_TRUST_IMG =
     "https://ipfs.near.social/ipfs/bafkreiegx5ygl7vpp5fblgyapnhgevqdpyh3lrucw6d5boqi7bikt4q7iq";
 
@@ -138,6 +138,7 @@ const Content = {
     vb: {
         title: "Voting Body",
         abbr: "VB",
+        address: "vb.gwg-testing.near",
         color: "#F29BC0",
         description:
             "The Voting Body consists all fair voters who participated in the inaugural NDC elections and received a “I Voted” Soul Bound Token. ",
@@ -361,8 +362,6 @@ const getProposalsCount = () => {
     State.update({ proposalsCount });
 };
 
-getProposalsCount();
-
 const changeHouse = (house) => {
     State.update({
         selectedHouse: house,
@@ -374,9 +373,9 @@ const changeHouse = (house) => {
 
 const getProposals = () => {
     const proposals = Near.view(
-        `${state.selectedHouse}.gwg-testing.near`,
+        Content[state.selectedHouse].address,
         "get_proposals",
-        { from_index: 0, limit: 100000 }
+        { from_index: 0, limit: 20 }
     );
 
     State.update({ proposals: proposals ?? [] });
@@ -384,7 +383,7 @@ const getProposals = () => {
 
 const getMembers = () => {
     const resp = Near.view(
-        `${state.selectedHouse}.gwg-testing.near`,
+        Content[state.selectedHouse].address,
         "get_members",
         {}
     );
@@ -392,6 +391,7 @@ const getMembers = () => {
     State.update({ members: resp?.members ?? [], hideProposalBtn: !isMember });
 };
 
+getProposalsCount();
 getProposals();
 getMembers();
 
@@ -570,7 +570,7 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                         <Widget
                             src="/*__@appAccount__*//widget/DAO.Proposals.Congress.index"
                             props={{
-                                daoId: `${state.selectedHouse}.gwg-testing.near`
+                                daoId: Content[state.selectedHouse].address
                             }}
                         />
                     )}

@@ -1,6 +1,5 @@
 const daoId = props.daoId;
 const proposalsPerPage = props.proposalsPerPage ?? 20; // Number of proposals to fetch at a time
-
 const resPerPage = 20;
 
 const constructURL = (paramObj, base) => {
@@ -71,9 +70,7 @@ function processProposals(proposals) {
 const update = (newState) => State.update(newState);
 const proposalsCount = Near.view(daoId, "number_of_proposals");
 
-if (proposalsCount === null) {
-    return;
-}
+if (!proposalsCount) return;
 
 const res = useCache(
     () =>
@@ -125,7 +122,7 @@ function renderHeader({ id, statusName }) {
     }
 
     return (
-        <div className="d-flex flex-wrap gap-3">
+        <div className="d-flex flex-wrap gap-2">
             <Widget
                 src="/*__@replace:nui__*//widget/Element.Badge"
                 props={{
@@ -182,9 +179,9 @@ return (
                                     id: proposal.proposal_id,
                                     statusName: proposal.status
                                 })}
-                                <h6 className="text-wrap">
+                                <div className="text-wrap">
                                     {proposal.proposal.description}
-                                </h6>
+                                </div>
                             </div>
                             <div>
                                 <Widget
