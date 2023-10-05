@@ -41,6 +41,9 @@ function fetchIsUserFollowed(account) {
 }
 
 function addNonVotedMembers() {
+    if (!policy?.users) {
+        return;
+    }
     Object.keys(policy.users)?.map((item) => {
         const index = voters.findIndex((d) => d.account === item);
         if (index === -1) {
