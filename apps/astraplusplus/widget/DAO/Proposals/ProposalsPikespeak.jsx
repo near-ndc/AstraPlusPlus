@@ -295,8 +295,8 @@ return (
                         hasPrev: state.page > 0,
                         hasNext:
                             state.page === 0
-                                ? proposalsCount !== resPerPage
-                                : proposalsCount === state.page * resPerPage,
+                                ? proposalsCount > resPerPage
+                                : proposalsCount > state.page * resPerPage,
                         onPrev: () => {
                             update({
                                 page: state.page - 1
