@@ -35,6 +35,10 @@ const Wrapper = styled.div`
     .text-center {
         text-align: center;
     }
+
+    .text-wrap {
+        text-wrap: wrap;
+    }
 `;
 
 function processProposals(proposals) {
@@ -178,7 +182,9 @@ return (
                                     id: proposal.proposal_id,
                                     statusName: proposal.status
                                 })}
-                                <h6>{kindName}</h6>
+                                <h6 className="text-wrap">
+                                    {proposal.proposal.description}
+                                </h6>
                             </div>
                             <div>
                                 <Widget
@@ -229,10 +235,7 @@ return (
                     props={{
                         variant: "info outline",
                         children: "View All",
-                        href: constructURL({
-                            tab: "proposals",
-                            daoId: daoId
-                        })
+                        href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${daoId}`
                     }}
                 />
             </div>
