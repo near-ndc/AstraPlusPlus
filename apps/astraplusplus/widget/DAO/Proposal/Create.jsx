@@ -2,13 +2,79 @@ const daoId = props.daoId;
 const accountId = props.accountId ?? context.accountId;
 const onClose = props.onClose;
 
-State.init({
-    daoId,
-    proposalType: {
-        text: "Vote",
+const CoADaoId = "/*__@replace:CoADaoId__*/";
+const VotingBodyDaoId = "/*__@replace:VotingBodyDaoId__*/";
+const TCDaoId = "/*__@replace:TCDaoId__*/";
+const HoMDaoId = "/*__@replace:HoMDaoId__*/";
+
+const isCongressDaoID =
+    props.daoId === HoMDaoId ||
+    props.daoId === VotingBodyDaoId ||
+    props.daoId === CoADaoId ||
+    props.daoId === TCDaoId;
+
+let permissions = [];
+
+const proposalTypes = [
+    {
+        text: "Text",
         value: "Vote"
+    },
+    {
+        text: "Transfer",
+        value: "Transfer"
+    },
+    {
+        text: "Function Call",
+        value: "FunctionCall"
+    },
+    {
+        text: "Add Member To Role",
+        value: "AddMemberToRole"
+    },
+    {
+        text: "Remove Member From Role",
+        value: "RemoveMemberFromRole"
     }
+];
+
+State.init({
+    members: [],
+    proposalTypes: proposalTypes,
+    daoId
 });
+
+function convertCapitalLetterToSpace(inputString) {
+    var resultString = inputString.replace(/([A-Z])/g, " $1");
+    // Remove leading space if present
+    if (resultString.charAt(0) === " ") {
+        resultString = resultString.slice(1);
+    }
+    return resultString;
+}
+
+// fetch proposal types for congress dao
+if (isCongressDaoID) {
+    const policy = useCache(
+        () => Near.asyncView(daoId, "get_members").then((members) => members),
+        daoId + "-processed_congress_members",
+        { subscribe: false }
+    );
+    if (policy === null) {
+        return;
+    }
+    const type = policy?.permissions?.map((item) => {
+        return {
+            text: convertCapitalLetterToSpace(item),
+            value: item
+        };
+    });
+    State.update({
+        members: policy?.members,
+        proposalTypes: type,
+        showCreateProposal: policy?.members?.includes(accountId)
+    });
+}
 
 const Wrapper = styled.div`
     margin: 16px auto;
@@ -65,29 +131,6 @@ const CloseButton = styled.button`
     }
 `;
 
-const proposalTypes = [
-    {
-        text: "Text",
-        value: "Vote"
-    },
-    {
-        text: "Transfer",
-        value: "Transfer"
-    },
-    {
-        text: "Function Call",
-        value: "FunctionCall"
-    },
-    {
-        text: "Add Member To Role",
-        value: "AddMemberToRole"
-    },
-    {
-        text: "Remove Member From Role",
-        value: "RemoveMemberFromRole"
-    }
-];
-
 return (
     <Wrapper>
         <Widget
@@ -96,7 +139,7 @@ return (
                 label: "Proposal Type",
                 noLabel: false,
                 placeholder: "Select a Proposal Type",
-                options: proposalTypes,
+                options: state.proposalTypes,
                 value: state.proposalType,
                 onChange: (proposalType) =>
                     State.update({ ...state, proposalType }),
@@ -137,10 +180,11 @@ return (
             </div>
         </div>
         <div className="d-flex flex-column gap-2">
-            {state.proposalType.value === "Vote" && (
+            {(state.proposalType.value === "Vote" ||
+                state.proposalType.value === "Text") && (
                 <Widget
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.Text"
-                    props={{ daoId, onClose }}
+                    props={{ daoId, onClose, isCongressDaoID }}
                 />
             )}
             {state.proposalType.value === "Transfer" && (
@@ -164,7 +208,18 @@ return (
             {state.proposalType.value === "FunctionCall" && (
                 <Widget
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.FunctionCall"
-                    props={{ daoId, onClose }}
+                    props={{ daoId, onClose, isCongressDaoID }}
+                />
+            )}
+            {(state.proposalType.value === "FundingRequest" ||
+                state.proposalType.value === "RecurrentFundingRequest") && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.FundingRequest"
+                    props={{
+                        daoId,
+                        onClose,
+                        proposalType: state.proposalType.value
+                    }}
                 />
             )}
         </div>

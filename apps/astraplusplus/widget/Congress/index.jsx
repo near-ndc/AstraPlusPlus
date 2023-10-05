@@ -334,16 +334,34 @@ State.init({
     copied: false,
     proposals: [],
     showPowerChecksDescription: false,
-    vbWithTrust: false
+    vbWithTrust: false,
+    proposalsCount: 0,
+    hideProposalBtn: true
 });
 
-const changeHouse = (house) =>
+const getProposalsCount = (house) => {
+    const proposalsCount = Near.view(
+        `${house}.gwg-testing.near`,
+        "number_of_proposals",
+        {}
+    );
+    // hide create proposal btn for non members
+    const policy = Near.view(`${house}.gwg-testing.near`, "get_members");
+    const isMember = policy?.members?.includes(accountId);
+    State.update({ proposalsCount, hideProposalBtn: !isMember });
+};
+
+getProposalsCount(state.selectedHouse);
+
+const changeHouse = (house) => {
+    getProposalsCount(house);
     State.update({
         selectedHouse: house,
         selectedTab: "powers",
         showPowerChecksDescription: false,
         vbWithTrust: false
     });
+};
 
 const ContentBlock = ({ title, abbr, address, description, metadata }) => (
     <Section className="d-flex flex-column justify-content-between h-100">
@@ -469,7 +487,7 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                     >
                         <div>Proposals</div>
                         <div className="circle d-flex justify-content-center align-items-center">
-                            <div>{state.proposals.length}</div>
+                            <div>{state.proposalsCount}</div>
                         </div>
                     </Tab>
                 </div>
@@ -493,67 +511,67 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                 description={c.description}
                             />
                         ))}
+                    {state.selectedTab === "proposals" && (
+                        <Widget
+                            src="/*__@appAccount__*//widget/DAO.Proposals.Congress.index"
+                            props={{
+                                daoId: `${state.selectedHouse}.gwg-testing.near`
+                            }}
+                        />
+                    )}
                 </div>
             </Tabs>
         </div>
 
-        <div className="d-flex justify-content-end">
-            <Widget
-                src="/*__@appAccount__*//widget/Common.Layout.CardModal"
-                props={{
-                    title: "Create Proposal",
-                    onToggle: () =>
-                        State.update({
-                            isProposalModalOpen: !state.isProposalModalOpen
-                        }),
-                    isOpen: state.isProposalModalOpen,
-                    toggle: (
-                        <Widget
-                            src="nearui.near/widget/Input.Button"
-                            props={{
-                                children: (
-                                    <>
-                                        Create Proposal
-                                        <i className="bi bi-16 bi-plus-lg"></i>
-                                    </>
-                                ),
-                                variant: "info"
-                            }}
-                        />
-                    ),
-                    content: (
-                        <div
-                            className="d-flex flex-column align-items-stretch"
-                            style={{
-                                width: "800px",
-                                maxWidth: "100vw"
-                            }}
-                        >
+        {!state.hideProposalBtn && (
+            <div className="d-flex justify-content-end">
+                <Widget
+                    src="/*__@appAccount__*//widget/Common.Layout.CardModal"
+                    props={{
+                        title: "Create Proposal",
+                        onToggle: () =>
+                            State.update({
+                                isProposalModalOpen: !state.isProposalModalOpen
+                            }),
+                        isOpen: state.isProposalModalOpen,
+                        toggle: (
                             <Widget
-                                src={
-                                    "/*__@appAccount__*//widget/DAO.Proposal.Create"
-                                }
+                                src="nearui.near/widget/Input.Button"
                                 props={{
-                                    daoId: daoId
+                                    children: (
+                                        <>
+                                            Create Proposal
+                                            <i className="bi bi-16 bi-plus-lg"></i>
+                                        </>
+                                    ),
+                                    variant: "info"
                                 }}
                             />
-                        </div>
-                    )
-                }}
-            />
-        </div>
+                        ),
+                        content: (
+                            <div
+                                className="d-flex flex-column align-items-stretch"
+                                style={{
+                                    width: "800px",
+                                    maxWidth: "100vw"
+                                }}
+                            >
+                                <Widget
+                                    src={
+                                        "/*__@appAccount__*//widget/DAO.Proposal.Create"
+                                    }
+                                    props={{
+                                        daoId: `${state.selectedHouse}.gwg-testing.near`
+                                    }}
+                                />
+                            </div>
+                        )
+                    }}
+                />
+            </div>
+        )}
     </Section>
 );
-
-const getProposals = (house) => {
-    const proposals = Near.view(
-        "registry.i-am-human.near",
-        "get_proposals",
-        {}
-    );
-
-    State.update({ proposals });
-};
 
 const PowerChecksDescription = ({ house, index, text, description, type }) => (
     <div className="d-flex gap-3">
