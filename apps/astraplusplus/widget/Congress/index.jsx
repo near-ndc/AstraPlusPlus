@@ -579,7 +579,14 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
         </div>
 
         {!state.hideProposalBtn && (
-            <div className="d-flex justify-content-end">
+            <div className="d-flex justify-content-end gap-2">
+                <Widget
+                    src="nearui.near/widget/Social.FollowButton"
+                    props={{
+                        variant: "info outline",
+                        accountId: state.selectedHouse
+                    }}
+                />
                 <Widget
                     src="/*__@appAccount__*//widget/Common.Layout.CardModal"
                     props={{
@@ -631,7 +638,7 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
 const PowerChecksDescription = ({ house, index, text, description, type }) => (
     <div className="d-flex gap-3">
         {type === "power" ? (
-            <UserIcon color={Content[house].color}>
+            <UserIcon color={Content[state.selectedHouse].color}>
                 <img
                     width={11}
                     src="https://ipfs.near.social/ipfs/bafkreig7hd3ysbcb7dkvgzhaavltjvaw5pjtaqyj4qdbamwxhhh4yqp4su"
@@ -706,7 +713,7 @@ return (
             >
                 {state.members.find((m) => m === context.accountId) && (
                     <Info className="mb-4 py-2 px-3 gap-2 d-flex justify-content-center align-items-center">
-                        <UserIcon color={Content[house].color}>
+                        <UserIcon color={Content[state.selectedHouse].color}>
                             <img
                                 width={11}
                                 src="https://ipfs.near.social/ipfs/bafkreig7hd3ysbcb7dkvgzhaavltjvaw5pjtaqyj4qdbamwxhhh4yqp4su"
