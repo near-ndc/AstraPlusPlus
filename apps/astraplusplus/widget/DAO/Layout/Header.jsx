@@ -118,6 +118,7 @@ const Root = styled.div`
     }
 
     .profile__metadata {
+        width: 99%;
         display: grid;
         grid-template-columns: 140px 1fr 240px;
         grid-gap: 2rem;

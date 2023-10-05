@@ -40,6 +40,22 @@ function fetchIsUserFollowed(account) {
     return Object.keys(followEdge || {}).length > 0;
 }
 
+function addNonVotedMembers() {
+    Object.keys(policy.users)?.map((item) => {
+        const index = voters.findIndex((d) => d.account === item);
+        if (index === -1) {
+            voters.push({
+                account: item,
+                groups: policy.users?.[item],
+                approve: 0,
+                rejected: 0,
+                isHuman: fetchIsHuman(item),
+                isUserFollowed: fetchIsUserFollowed(item)
+            });
+        }
+    });
+}
+
 function fetchVotes() {
     const res = fetch(`${baseApi}/daos/votes/${daoId}`, {
         method: "GET",
@@ -49,6 +65,7 @@ function fetchVotes() {
             "x-api-key": publicApiKey
         }
     });
+
     if (res?.body?.length) {
         res?.body?.map((item) => {
             item.voters?.map((voterData) => {
@@ -74,20 +91,10 @@ function fetchVotes() {
         });
         // if any member have not voted on any proposal their data is not their in voters API
         if (policy?.users) {
-            Object.keys(policy.users)?.map((item) => {
-                const index = voters.findIndex((d) => d.account === item);
-                if (index === -1) {
-                    voters.push({
-                        account: item,
-                        groups: policy.users?.[item],
-                        approve: 0,
-                        rejected: 0,
-                        isHuman: fetchIsHuman(item),
-                        isUserFollowed: fetchIsUserFollowed(item)
-                    });
-                }
-            });
+            addNonVotedMembers();
         }
+    } else {
+        addNonVotedMembers();
     }
 }
 
@@ -124,12 +131,16 @@ function processCongressMembers(members) {
     switch (daoId) {
         case HoMDaoId:
             group = "HoM Member";
+            break;
         case CoADaoId:
             group = "CoA Member";
+            break;
         case VotingBodyDaoId:
             group = "Voting body Member";
+            break;
         case TCDaoId:
             group = "Transparency Commission Member";
+            break;
     }
     const obj = {
         policy,

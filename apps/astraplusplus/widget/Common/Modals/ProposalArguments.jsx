@@ -113,6 +113,25 @@ if (proposal_type === "Transfer")
         </>
     );
 
+if (
+    proposal_type === "RecurrentFundingRequest" ||
+    proposal_type === "FundingRequest"
+)
+    content = (
+        <>
+            <div>
+                <h5>Amount</h5>
+                <Widget
+                    src="sking.near/widget/Common.TokenAmount"
+                    props={{
+                        amountWithoutDecimals: kind[proposal_type],
+                        address: kind.Transfer.token_id
+                    }}
+                />
+            </div>
+        </>
+    );
+
 if (proposal_type === "FunctionCall") {
     content = (
         <>

@@ -347,16 +347,30 @@ State.init({
     proposals: [],
     members: [],
     showPowerChecksDescription: false,
-    vbWithTrust: false
+    vbWithTrust: false,
+    proposalsCount: 0,
+    hideProposalBtn: true
 });
 
-const changeHouse = (house) =>
+const getProposalsCount = () => {
+    const proposalsCount = Near.view(
+        Content[state.selectedHouse].address,
+        "number_of_proposals",
+        {}
+    );
+    State.update({ proposalsCount });
+};
+
+getProposalsCount();
+
+const changeHouse = (house) => {
     State.update({
         selectedHouse: house,
         selectedTab: "powers",
         showPowerChecksDescription: false,
         vbWithTrust: false
     });
+};
 
 const getProposals = () => {
     const proposals = Near.view(
@@ -374,8 +388,8 @@ const getMembers = () => {
         "get_members",
         {}
     );
-
-    State.update({ members: resp?.members ?? [] });
+    const isMember = resp?.members?.includes(accountId);
+    State.update({ members: resp?.members ?? [], hideProposalBtn: !isMember });
 };
 
 getProposals();
@@ -395,10 +409,19 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                     <i class="bi bi-three-dots-vertical" />
                     <div className="container">
                         <div class="d-flex flex-column dropdown-content shadow">
-                            <a href="#//*__@appAccount__*//widget/home?page=proposals">
+                            <a
+                                href={`#//*__@appAccount__*//widget/home?page=dao&daoId=${
+                                    Content[state.selectedHouse].address
+                                }`}
+                            >
                                 Proposals
                             </a>
-                            <a href="#//*__@appAccount__*//widget/home?page=members">
+
+                            <a
+                                href={`#//*__@appAccount__*//widget/home?page=dao&daoId=${
+                                    Content[state.selectedHouse].address
+                                }&tab=members`}
+                            >
                                 Members
                             </a>
                         </div>
@@ -477,7 +500,7 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                     (p) => p.status === "InProgress"
                                 ).length
                             }
-                            /{state.proposals.length}
+                            /{state.proposalsCount}
                         </b>
                     </h5>
                     <span className="text-secondary">
@@ -517,7 +540,7 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                     >
                         <div>Proposals</div>
                         <div className="circle d-flex justify-content-center align-items-center">
-                            <div>{state.proposals.length}</div>
+                            <div>{state.proposalsCount}</div>
                         </div>
                     </Tab>
                 </div>
@@ -543,59 +566,65 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                 description={c.description}
                             />
                         ))}
-                    {state.selectedTab === "proposals" &&
-                        state.proposals.map((p, i) => (
-                            <Proposal key={i} proposal={p} />
-                        ))}
+                    {state.selectedTab === "proposals" && (
+                        <Widget
+                            src="/*__@appAccount__*//widget/DAO.Proposals.Congress.index"
+                            props={{
+                                daoId: `${state.selectedHouse}.gwg-testing.near`
+                            }}
+                        />
+                    )}
                 </div>
             </Tabs>
         </div>
 
-        <div className="d-flex justify-content-end">
-            <Widget
-                src="/*__@appAccount__*//widget/Common.Layout.CardModal"
-                props={{
-                    title: "Create Proposal",
-                    onToggle: () =>
-                        State.update({
-                            isProposalModalOpen: !state.isProposalModalOpen
-                        }),
-                    isOpen: state.isProposalModalOpen,
-                    toggle: (
-                        <Widget
-                            src="nearui.near/widget/Input.Button"
-                            props={{
-                                children: (
-                                    <>
-                                        Create Proposal
-                                        <i className="bi bi-16 bi-plus-lg"></i>
-                                    </>
-                                ),
-                                variant: "info"
-                            }}
-                        />
-                    ),
-                    content: (
-                        <div
-                            className="d-flex flex-column align-items-stretch"
-                            style={{
-                                width: "800px",
-                                maxWidth: "100vw"
-                            }}
-                        >
+        {!state.hideProposalBtn && (
+            <div className="d-flex justify-content-end">
+                <Widget
+                    src="/*__@appAccount__*//widget/Common.Layout.CardModal"
+                    props={{
+                        title: "Create Proposal",
+                        onToggle: () =>
+                            State.update({
+                                isProposalModalOpen: !state.isProposalModalOpen
+                            }),
+                        isOpen: state.isProposalModalOpen,
+                        toggle: (
                             <Widget
-                                src={
-                                    "/*__@appAccount__*//widget/DAO.Proposal.Create"
-                                }
+                                src="nearui.near/widget/Input.Button"
                                 props={{
-                                    daoId: daoId
+                                    children: (
+                                        <>
+                                            Create Proposal
+                                            <i className="bi bi-16 bi-plus-lg"></i>
+                                        </>
+                                    ),
+                                    variant: "info"
                                 }}
                             />
-                        </div>
-                    )
-                }}
-            />
-        </div>
+                        ),
+                        content: (
+                            <div
+                                className="d-flex flex-column align-items-stretch"
+                                style={{
+                                    width: "800px",
+                                    maxWidth: "100vw"
+                                }}
+                            >
+                                <Widget
+                                    src={
+                                        "/*__@appAccount__*//widget/DAO.Proposal.Create"
+                                    }
+                                    props={{
+                                        daoId: `${state.selectedHouse}.gwg-testing.near`
+                                    }}
+                                />
+                            </div>
+                        )
+                    }}
+                />
+            </div>
+        )}
     </Section>
 );
 
@@ -660,52 +689,6 @@ const statusMap = {
     Vetoed: { text: "Vetoed", color: "danger", icon: "bi bi-ban" },
     Executed: { text: "Executed", color: "info", icon: "bi bi-circle" }
 };
-
-const Proposal = ({ proposal }) => (
-    <div className="d-flex justify-content-between align-items-center gap-2">
-        <div className="d-flex gap-1 flex-column">
-            <div className="d-flex gap-1">
-                <Widget
-                    src="nearui.near/widget/Element.Badge"
-                    props={{
-                        children: `#${proposal.id}`,
-                        variant: "info outline"
-                    }}
-                />
-                <Widget
-                    src="nearui.near/widget/Element.Badge"
-                    props={{
-                        children: (
-                            <div>
-                                <i
-                                    className={`mr-1 ${
-                                        statusMap[proposal.status].icon
-                                    }`}
-                                />
-                                {statusMap[proposal.status].text}
-                            </div>
-                        ),
-                        variant: statusMap[proposal.status].color
-                    }}
-                />
-            </div>
-            <div>{proposal.description}</div>
-        </div>
-        <div>
-            <Widget
-                src="nearui.near/widget/Input.Button"
-                props={{
-                    children: <i className="bi bi-eye" />,
-                    variant: "icon info outline",
-                    size: "sm",
-                    href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
-                        Content[state.selectedHouse].address
-                    }`
-                }}
-            />
-        </div>
-    </div>
-);
 
 return (
     <Container className="row p-0">

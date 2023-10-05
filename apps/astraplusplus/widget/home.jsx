@@ -116,14 +116,6 @@ const pages = [
             onClick: () => router.navigate({ page: "dao" }),
             widgetName: "DAO.index",
             defaultProps: { daoId: VotingBodyDaoId }
-        },
-        {
-            title: "Govt Proposals",
-            active: page === "proposals",
-            href: currentLink + "?page=proposals",
-            onClick: () => router.navigate({ page: "proposals" }),
-            widgetName: "Congress.Proposals",
-            defaultProps: {}
         }
     ],
     [

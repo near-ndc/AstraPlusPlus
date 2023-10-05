@@ -17,7 +17,8 @@ const {
     proposal,
     policy,
     handleVote,
-    comments
+    comments,
+    isCongressDaoID
 } = props;
 const accountId = context.accountId;
 
@@ -205,9 +206,13 @@ function renderData({
                     <div>
                         <h5 className="text-muted h6">Submission date</h5>
                         <p className="text-muted">
-                            {new Date(
-                                parseInt(Big(submission_time).div(1000000))
-                            ).toLocaleString()}
+                            {isCongressDaoID
+                                ? new Date(submission_time).toLocaleString()
+                                : new Date(
+                                      parseInt(
+                                          Big(submission_time).div(1000000)
+                                      )
+                                  ).toLocaleString()}
                         </p>
                     </div>
                 )}
@@ -287,11 +292,7 @@ function renderVoteButtons({
       transition: all 0.4s ease-in-out;
       z-index: 0;
       background-color: rgb(var(--vote-button-bg));
-      min-width: 120px;
-
-      ${({ finsihed, percentage }) =>
-          finsihed &&
-          `
+      ${({ percentage }) => `
         min-width: ${percentage ? `${percentage}%` : "120px"};
       `}
     }
@@ -305,7 +306,7 @@ function renderVoteButtons({
       border-radius: 12px;
       transition: all 0.4s ease-in-out;
       z-index: 1;
-      background-color: rgba(var(--vote-button-bg), 0.2);
+      background-color: var(--vote-button-bg);
 
       min-width: ${({ percentage }) =>
           percentage ? `${percentage}%` : "120px"};
@@ -346,9 +347,9 @@ function renderVoteButtons({
   `;
 
     const percentages = {
-        yes: Math.round((totalVotes.yes / totalVotes.total) * 100) || 0,
-        no: Math.round((totalVotes.no / totalVotes.total) * 100) || 0,
-        spam: Math.round((totalVotes.spam / totalVotes.total) * 100) || 0
+        yes: Math.round((totalVotes.yes / totalVotesNeeded) * 100) || 0,
+        no: Math.round((totalVotes.no / totalVotesNeeded) * 100) || 0,
+        spam: Math.round((totalVotes.spam / totalVotesNeeded) * 100) || 0
     };
 
     const wins = {
@@ -371,7 +372,9 @@ function renderVoteButtons({
         <div
             className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
             style={{
-                gridTemplateColumns: "1fr 1fr 120px"
+                gridTemplateColumns: isCongressDaoID
+                    ? "1fr 1fr"
+                    : "1fr 1fr 120px"
             }}
         >
             <div className="w-100">
@@ -452,33 +455,38 @@ function renderVoteButtons({
                     </div>
                 </VoteButton>
             </div>
-            <div className="w-100">
-                {voted.spam && (
-                    <Widget
-                        src="/*__@replace:nui__*//widget/Element.Badge"
-                        props={{
-                            size: "sm",
-                            variant: "info outline mb-1",
-                            children: "You voted"
-                        }}
-                    />
-                )}
-                <VoteButton
-                    className="spam"
-                    percentage={percentages.spam}
-                    finsihed={finsihed}
-                    wins={wins.spam}
-                    myVote={voted.spam}
-                    onClick={() => handleVote("VoteRemove")}
-                    disabled={alreadyVoted || finsihed || !isAllowedToVote[2]}
-                >
-                    <div>
-                        <span>Spam</span>
-                        <i className="bi bi-exclamation-circle"></i>
-                    </div>
-                    <div></div>
-                </VoteButton>
-            </div>
+            {!isCongressDaoID && (
+                <div className="w-100">
+                    {voted.spam && (
+                        <Widget
+                            src="/*__@replace:nui__*//widget/Element.Badge"
+                            props={{
+                                size: "sm",
+                                variant: "info outline mb-1",
+                                children: "You voted"
+                            }}
+                        />
+                    )}
+
+                    <VoteButton
+                        className="spam"
+                        percentage={percentages.spam}
+                        finsihed={finsihed}
+                        wins={wins.spam}
+                        myVote={voted.spam}
+                        onClick={() => handleVote("VoteRemove")}
+                        disabled={
+                            alreadyVoted || finsihed || !isAllowedToVote[2]
+                        }
+                    >
+                        <div>
+                            <span>Spam</span>
+                            <i className="bi bi-exclamation-circle"></i>
+                        </div>
+                        <div></div>
+                    </VoteButton>
+                </div>
+            )}
         </div>
     );
 }
