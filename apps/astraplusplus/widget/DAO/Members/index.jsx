@@ -131,12 +131,16 @@ function processCongressMembers(members) {
     switch (daoId) {
         case HoMDaoId:
             group = "HoM Member";
+            break;
         case CoADaoId:
             group = "CoA Member";
+            break;
         case VotingBodyDaoId:
             group = "Voting body Member";
+            break;
         case TCDaoId:
             group = "Transparency Commission Member";
+            break;
     }
     const obj = {
         policy,
