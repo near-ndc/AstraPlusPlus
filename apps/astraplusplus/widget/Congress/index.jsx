@@ -31,21 +31,25 @@ const Content = {
                 {
                     text: "The House of Merit can propose motions, including motions to amend the governance framework and to hire, provided that these motions are not vetoed by the Council of Advisors.",
                     description:
-                        "The vote needs 8 approvals to pass the HoM. The Council of Advisors can veto during the proposal cooldown period, or create a text proposal to veto a House of Merit proposal that is past the cooldown period. "
+                        "The vote needs 8 approvals to pass the HoM. The Council of Advisors can veto during the proposal cooldown period, or create a text proposal to veto a House of Merit proposal that is past the cooldown period."
                 }
             ],
             checks: [
                 {
                     house: "coa",
-                    text: "The Council of Advisors can veto any HoM proposals, except setup package, large budget items, and recurring budget items"
+                    text: "The Council of Advisors can veto any HoM proposals, except setup package, budget, large budget items, and recurring budget items."
                 },
                 {
                     house: "vb",
-                    text: "The Voting Body must rectify setup package, and can veto large budget items and recurring budget items."
+                    text: "The Voting Body must rectify setup package and budget, and can veto large budget items and recurring budget items.",
+                    description:
+                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
                 },
                 {
                     house: "vb",
-                    text: "The Voting Body can vote to dissolve the House of Merit."
+                    text: "The Voting Body can vote to dissolve the House of Merit.",
+                    description:
+                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
                 },
                 {
                     house: "tc",
@@ -78,13 +82,15 @@ const Content = {
             checks: [
                 {
                     house: "vb",
-                    text: "The Voting Body can vote to dissolve the Council of Advisors."
+                    text: "The Voting Body can vote to dissolve the Council of Advisors.",
+                    description:
+                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
                 },
                 {
                     house: "tc",
                     text: "The Transparency Commission can remove members of the Council of Advisors.",
                     description:
-                        "The vote needs a simple majority. When 4 members from the Council of Advisors are removed, the house is dissolved and a new Council of Advisor is elected."
+                        "The vote needs 4 approvals to pass the TC. When 4 members from the Council of Advisors are removed, the house is dissolved and a new Council of Advisor is elected."
                 }
             ]
         }
@@ -120,17 +126,19 @@ const Content = {
             checks: [
                 {
                     house: "coa",
-                    text: "The Council of Advisors can reinstate members removed by the Transparency Commission."
+                    text: "Council of Advisors could reinstate and unban a member previously dismissed and banned by the Transparency Commission."
                 },
                 {
                     house: "vb",
-                    text: "The Voting Body can vote to dissolve the Transparency Commission."
+                    text: "The Voting Body can vote to dissolve the Transparency Commission.",
+                    description:
+                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
                 },
                 {
                     house: "tc",
-                    text: "The Transparency Commission can remove members of the Transparency Commission.",
+                    text: "The Transparency Commission can dismiss and ban members of the Transparency Commission.",
                     description:
-                        "The vote needs a simple majority. When 4 members from the Transparency Commission are removed, the house is dissolved and a Transparency Commission is elected."
+                        "The vote needs 4 votes to pass the TC. When 4 members from the Transparency Commission are removed, the house is dissolved and a Transparency Commission is elected."
                 }
             ]
         }
@@ -237,6 +245,8 @@ const Tab = styled.div`
     align-items: center;
     border-radius: 50px;
     background: ${(props) => (props.selected ? "#F4F4F4" : "transparent")};
+    border: 1px solid;
+    border-color: ${(props) => (props.selected ? "#d9d9d9" : "transparent")};
     color: ${(props) => (props.selected ? "#000" : "inherit")};
 
     &:hover {
@@ -406,7 +416,13 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                 </CircleLogo>
 
                 <Dropdown className="mt-1 px-2">
-                    <i class="bi bi-three-dots-vertical" />
+                    <Widget
+                        src="nearui.near/widget/Input.Button"
+                        props={{
+                            children: <i className="bi bi-three-dots"></i>,
+                            variant: "icon rounded"
+                        }}
+                    />
                     <div className="container">
                         <div class="d-flex flex-column dropdown-content shadow">
                             <a
