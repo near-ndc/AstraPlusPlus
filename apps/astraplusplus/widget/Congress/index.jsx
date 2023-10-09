@@ -263,7 +263,7 @@ const Tab = styled.div`
 `;
 
 const Section = styled.div`
-    padding: 35px;
+    padding: 25px;
 
     @media (max-width: 768px) {
         padding: 25px 5px;
@@ -311,28 +311,14 @@ const ImgContainer = styled.div`
     }
 `;
 
-const Dropdown = styled.div`
-    position: relative;
-    display: inline-block;
-
-    .container {
-        display: none;
-        position: absolute;
-        right: -25px;
-        top: 15px;
-        z-index: 1;
-        padding: 15px;
-        min-width: 265px;
-    }
-
-    &:hover .container {
-        display: flex;
-    }
-
-    &:hover,
-    i:hover {
-        cursor: pointer;
-    }
+const DropdownContainer = styled.div`
+    display: flex;
+    position: absolute;
+    right: -25px;
+    top: 15px;
+    z-index: 1;
+    padding: 15px;
+    min-width: 265px;
 
     .dropdown-content {
         border-radius: 4px;
@@ -360,7 +346,9 @@ State.init({
     showPowerChecksDescription: false,
     vbWithTrust: false,
     proposalsCount: 0,
-    hideProposalBtn: true
+    hideProposalBtn: true,
+    showOptions: false,
+    showHouses: false
 });
 
 const getProposalsCount = () => {
@@ -415,71 +403,76 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                     </h6>
                 </CircleLogo>
 
-                <Dropdown className="mt-1 px-2">
+                <div className="mt-1 px-2">
                     <Widget
-                        src="nearui.near/widget/Input.Button"
+                        src="near/widget/DIG.DropdownMenu"
                         props={{
-                            children: <i className="bi bi-three-dots"></i>,
-                            variant: "icon rounded"
+                            trigger: (
+                                <Widget
+                                    src="nearui.near/widget/Input.Button"
+                                    props={{
+                                        children: (
+                                            <i className="bi bi-three-dots"></i>
+                                        ),
+                                        variant: "icon rounded"
+                                    }}
+                                />
+                            ),
+                            items: [
+                                {
+                                    name: "Proposals",
+                                    href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
+                                        Content[state.selectedHouse].address
+                                    }`
+                                },
+                                {
+                                    name: "Members",
+                                    href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
+                                        Content[state.selectedHouse].address
+                                    }&tab=members`
+                                }
+                            ]
                         }}
                     />
-                    <div className="container">
-                        <div class="d-flex flex-column dropdown-content shadow">
-                            <a
-                                href={`#//*__@appAccount__*//widget/home?page=dao&daoId=${
-                                    Content[state.selectedHouse].address
-                                }`}
-                            >
-                                Proposals
-                            </a>
-
-                            <a
-                                href={`#//*__@appAccount__*//widget/home?page=dao&daoId=${
-                                    Content[state.selectedHouse].address
-                                }&tab=members`}
-                            >
-                                Members
-                            </a>
-                        </div>
-                    </div>
-                </Dropdown>
+                </div>
             </div>
             <div>
                 <div className="d-flex">
                     <h4>
                         <b>{title}</b>
                     </h4>
-                    <Dropdown className="mt-1 px-2">
-                        <i className="bi bi-caret-down-fill" />
-                        <div className="container">
-                            <div class="d-flex flex-column dropdown-content shadow">
-                                <a
-                                    onClick={() => changeHouse("hom")}
-                                    href="#//*__@appAccount__*//widget/home?page=congress&house=hom"
-                                >
-                                    {Content.hom.title}
-                                </a>
-                                <a
-                                    onClick={() => changeHouse("coa")}
-                                    href="#//*__@appAccount__*//widget/home?page=congress&house=coa"
-                                >
-                                    {Content.coa.title}
-                                </a>
-                                <a
-                                    onClick={() => changeHouse("tc")}
-                                    href="#//*__@appAccount__*//widget/home?page=congress&house=tc"
-                                >
-                                    {Content.tc.title}
-                                </a>
-                                <a
-                                    onClick={() => changeHouse("vb")}
-                                    href="#//*__@appAccount__*//widget/home?page=congress&house=vb"
-                                >
-                                    {Content.vb.title}
-                                </a>
-                            </div>
-                        </div>
-                    </Dropdown>
+                    <div className="mt-1 px-2">
+                        <Widget
+                            src="near/widget/DIG.DropdownMenu"
+                            props={{
+                                trigger: (
+                                    <i className="bi bi-caret-down-fill" />
+                                ),
+                                items: [
+                                    {
+                                        name: Content.hom.title,
+                                        onSelect: () => changeHouse("hom"),
+                                        href: "#//*__@appAccount__*//widget/home?page=congress&house=hom"
+                                    },
+                                    {
+                                        name: Content.coa.title,
+                                        onSelect: () => changeHouse("coa"),
+                                        href: "#//*__@appAccount__*//widget/home?page=congress&house=coa"
+                                    },
+                                    {
+                                        name: Content.tc.title,
+                                        onSelect: () => changeHouse("tc"),
+                                        href: "#//*__@appAccount__*//widget/home?page=congress&house=tc"
+                                    },
+                                    {
+                                        name: Content.vb.title,
+                                        onSelect: () => changeHouse("vb"),
+                                        href: "#//*__@appAccount__*//widget/home?page=congress&house=vb"
+                                    }
+                                ]
+                            }}
+                        />
+                    </div>
                 </div>
                 <span className="text-secondary">
                     <b id="address">{address}</b>
@@ -542,7 +535,9 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                             }
                             selected={state.selectedTab === "checks"}
                         >
-                            <div>Checks on {Content[house].abbr}</div>
+                            <div>
+                                Checks on {Content[state.selectedHouse].abbr}
+                            </div>
                             <div className="circle d-flex justify-content-center align-items-center">
                                 <div>{metadata.checks.length}</div>
                             </div>
