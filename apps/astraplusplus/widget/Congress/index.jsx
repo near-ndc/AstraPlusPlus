@@ -1,4 +1,4 @@
-const { router, house } = props;
+const { router } = props;
 const accountId = props.accountId ?? context.accountId ?? "";
 
 const HOM_IMG =
@@ -336,9 +336,8 @@ const DropdownContainer = styled.div`
         }
     }
 `;
-
 State.init({
-    selectedHouse: house ?? "hom",
+    selectedHouse: router.params.house ?? "hom",
     selectedTab: "powers",
     copied: false,
     proposals: [],
@@ -389,6 +388,10 @@ const getMembers = () => {
     State.update({ members: resp?.members ?? [], hideProposalBtn: !isMember });
 };
 
+const getHouseUrl = (house) =>
+    `#//*__@appAccount__*//widget/home?page=congress&house=${house}`;
+
+State.update({ selectedHouse: router.params.house ?? state.selectedHouse });
 getProposalsCount();
 getProposals();
 getMembers();
@@ -452,22 +455,22 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                     {
                                         name: Content.hom.title,
                                         onSelect: () => changeHouse("hom"),
-                                        href: "#//*__@appAccount__*//widget/home?page=congress&house=hom"
+                                        href: getHouseUrl("hom")
                                     },
                                     {
                                         name: Content.coa.title,
                                         onSelect: () => changeHouse("coa"),
-                                        href: "#//*__@appAccount__*//widget/home?page=congress&house=coa"
+                                        href: getHouseUrl("coa")
                                     },
                                     {
                                         name: Content.tc.title,
                                         onSelect: () => changeHouse("tc"),
-                                        href: "#//*__@appAccount__*//widget/home?page=congress&house=tc"
+                                        href: getHouseUrl("tc")
                                     },
                                     {
                                         name: Content.vb.title,
                                         onSelect: () => changeHouse("vb"),
-                                        href: "#//*__@appAccount__*//widget/home?page=congress&house=vb"
+                                        href: getHouseUrl("vb")
                                     }
                                 ]
                             }}

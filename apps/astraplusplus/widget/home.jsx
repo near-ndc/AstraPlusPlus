@@ -3,7 +3,7 @@ const VotingBodyDaoId = "/*__@replace:VotingBodyDaoId__*/";
 const TCDaoId = "/*__@replace:TCDaoId__*/";
 const HoMDaoId = "/*__@replace:HoMDaoId__*/";
 
-let { page, tab, daoId } = props;
+let { page, tab, daoId, house } = props;
 if (!page) {
     page = "home";
 }
@@ -30,11 +30,7 @@ if (
 page = state.activePage;
 
 const router = {
-    params: {
-        page: page,
-        tab: tab,
-        daoId: daoId
-    },
+    params: { page, tab, daoId, house },
     navigate: (newParams) => {
         router.params = {
             ...newParams
@@ -82,40 +78,35 @@ const pages = [
             active: page.split("-")[0] === "congress",
             href: currentLink + "?page=congress",
             onClick: () => router.navigate({ page: "congress" }),
-            widgetName: "Congress.index",
-            defaultProps: {}
+            widgetName: "Congress.index"
         },
         {
             title: "HoM",
-            active: page === "dao" && daoId === HoMDaoId,
-            href: currentLink + `?page=dao&daoId=${HoMDaoId}`,
-            onClick: () => router.navigate({ page: "dao" }),
-            widgetName: "DAO.index",
-            defaultProps: { daoId: HoMDaoId }
+            active: page === "congress" && router.params.house === "hom",
+            href: currentLink + `?page=congress&house=hom`,
+            onClick: () => router.navigate({ page: "congress", house: "hom" }),
+            widgetName: "DAO.index"
         },
         {
             title: "CoA",
-            active: page === "dao" && daoId === CoADaoId,
-            href: currentLink + `?page=dao&daoId=${CoADaoId}`,
-            onClick: () => router.navigate({ page: "dao" }),
-            widgetName: "DAO.index",
-            defaultProps: { daoId: CoADaoId }
+            active: page === "congress" && router.params.house === "coa",
+            href: currentLink + `?page=congress&house=coa`,
+            onClick: () => router.navigate({ page: "congress", house: "coa" }),
+            widgetName: "DAO.index"
         },
         {
             title: "TC",
-            active: page === "dao" && daoId === TCDaoId,
-            href: currentLink + `?page=dao&daoId=${TCDaoId}`,
-            onClick: () => router.navigate({ page: "dao" }),
-            widgetName: "DAO.index",
-            defaultProps: { daoId: TCDaoId }
+            active: page === "congress" && router.params.house === "tc",
+            href: currentLink + `?page=congress&house=tc`,
+            onClick: () => router.navigate({ page: "congress", house: "tc" }),
+            widgetName: "DAO.index"
         },
         {
             title: "Voting Body",
-            active: page === "dao" && daoId === VotingBodyDaoId,
-            href: currentLink + `?page=dao&daoId=${VotingBodyDaoId}`,
-            onClick: () => router.navigate({ page: "dao" }),
-            widgetName: "DAO.index",
-            defaultProps: { daoId: VotingBodyDaoId }
+            active: page === "congress" && router.params.house === "vb",
+            href: currentLink + `?page=congress&house=vb`,
+            onClick: () => router.navigate({ page: "congress", house: "vb" }),
+            widgetName: "DAO.index"
         }
     ],
     [
