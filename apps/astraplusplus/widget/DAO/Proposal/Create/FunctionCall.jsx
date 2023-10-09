@@ -3,9 +3,19 @@ const contractId = props.contractId;
 const onClose = props.onClose;
 const daoId = props.daoId;
 const isCongressDaoID = props.isCongressDaoID;
+const registry = "registry.i-am-human.near";
+
+const CoADaoId = "/*__@replace:CoADaoId__*/";
+const VotingBodyDaoId = "/*__@replace:VotingBodyDaoId__*/";
+const TCDaoId = "/*__@replace:TCDaoId__*/";
+const HoMDaoId = "/*__@replace:HoMDaoId__*/";
 
 if (!accountId) {
     return "Please connect your NEAR wallet :)";
+}
+
+function isEmpty(value) {
+    return !value || value === "";
 }
 
 State.init({
@@ -16,8 +26,41 @@ State.init({
     gas: "200000000000000",
     error: undefined,
     receiver_id: null,
-    description: null
+    description: null,
+    powerType: null,
+    member: null, // for dismiss and ban hook
+    house: null, // for dismiss and ban hook
+    accounts: null, // for unban hook
+    memo: null // for unban hook
 });
+
+// only for UI
+const powerTypes =
+    daoId === CoADaoId
+        ? [
+              {
+                  text: "Veto House of Merit motion",
+                  value: "Veto"
+              },
+              {
+                  text: "Unban member previously banned",
+                  value: "Unban"
+              }
+          ]
+        : daoId === TCDaoId
+        ? [
+              {
+                  text: "Dismiss member from an house",
+                  value: "Dismiss"
+              },
+              {
+                  text: "Ban member from an house",
+                  value: "DismissAndBan"
+              }
+          ]
+        : daoId === VotingBodyDaoId
+        ? [] // TODO :  after VB contract is ready
+        : [];
 
 const fc_args = Buffer.from(state.args, "utf-8").toString("base64");
 
@@ -32,70 +75,119 @@ function isNearAddress(address) {
 }
 
 const handleFunctionCall = () => {
-    if (
-        !state.contractId ||
-        state.contractId === "" ||
-        !isNearAddress(state.contractId)
-    ) {
-        State.update({
-            error: "Please enter a valid contract ID"
-        });
-        return;
-    }
-    if (!state.method_name || state.method_name === "") {
-        State.update({
-            error: "Please enter a valid method name"
-        });
-        return;
-    }
-    const is_valid_json = (str) => {
-        try {
-            JSON.parse(str);
-        } catch (e) {
-            return false;
+    if (!isCongressDaoID) {
+        if (isEmpty(state.contractId) || !isNearAddress(state.contractId)) {
+            State.update({
+                error: "Please enter a valid contract ID"
+            });
+            return;
         }
-        return true;
-    };
-    if (!state.args || state.args === "" || !is_valid_json(state.args)) {
-        State.update({
-            error: "Please enter a valid JSON arguments"
-        });
-        return;
     }
-    if (!state.deposit || state.deposit < 0) {
-        State.update({
-            error: "Please enter a valid deposit"
-        });
-        return;
-    }
-    if (state.gas && state.gas <= 0) {
-        State.update({
-            error: "Please enter a valid gas"
-        });
-        return;
+    if (state.powerType !== "Unban") {
+        if (isEmpty(state.method_name)) {
+            State.update({
+                error: "Please enter a valid method name"
+            });
+            return;
+        }
+
+        const is_valid_json = (str) => {
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        };
+
+        if (isEmpty(state.args) || !is_valid_json(state.args)) {
+            State.update({
+                error: "Please enter a valid JSON arguments"
+            });
+            return;
+        }
+        if (isEmpty(state.deposit) || state.deposit < 0) {
+            State.update({
+                error: "Please enter a valid deposit"
+            });
+            return;
+        }
+        if (isEmpty(state.gas) || state.gas <= 0) {
+            State.update({
+                error: "Please enter a valid gas"
+            });
+            return;
+        }
     }
 
     const deposit = Big(state.deposit).mul(Big(10).pow(24)).toFixed();
 
     if (isCongressDaoID) {
-        if (!state.receiver_id || !isNearAddress(state.receiver_id)) {
-            State.update({
-                error: "Please enter a valid recipient address"
-            });
+        if (state.powerType === "Unban") {
+            const accountsArray = state.accounts
+                ?.split(",")
+                .map((item) => item.trim());
+            if (
+                !accountsArray?.length ||
+                accountsArray?.some((item) => !isNearAddress(item))
+            ) {
+                State.update({
+                    error: "Please enter valid account IDs"
+                });
+                return;
+            }
+            Near.call([
+                {
+                    contractName: registry,
+                    methodName: "admin_unflag_accounts",
+                    args: { accounts: accountsArray, memo: state.memo },
+                    deposit: 0,
+                    gas: 200000000000000
+                }
+            ]);
             return;
-        }
-        if (!state.description) {
-            State.update({
-                error: "Please enter a description"
-            });
-            return;
-        }
+        } else {
+            let args = {};
+            if (state.powerType === "DismissAndBan") {
+                if (isEmpty(state.house) || !isNearAddress(state.house)) {
+                    State.update({
+                        error: "Please enter a valid house contract ID"
+                    });
+                    return;
+                }
+                if (isEmpty(state.member) || !isNearAddress(state.member)) {
+                    State.update({
+                        error: "Please enter a valid member ID"
+                    });
+                    return;
+                }
+                args = {
+                    kind: {
+                        DismissAndBan: {
+                            member: state.member,
+                            house: state.house
+                        }
+                    },
+                    description: state.description
+                };
+            } else {
+                if (
+                    isEmpty(state.receiver_id) ||
+                    !isNearAddress(state.receiver_id)
+                ) {
+                    State.update({
+                        error: "Please enter a valid recipient address"
+                    });
+                    return;
+                }
+                if (isEmpty(state.description)) {
+                    State.update({
+                        error: "Please enter a description"
+                    });
+                    return;
+                }
 
-        Near.call([
-            {
-                contractName: daoId,
-                methodName: "create_proposal",
-                args: {
+                args = {
                     kind: {
                         FunctionCall: {
                             receiver_id: state.receiver_id,
@@ -110,11 +202,19 @@ const handleFunctionCall = () => {
                         }
                     },
                     description: state.description
-                },
-                deposit: 100000000000000000000000,
-                gas: 200000000000000
+                };
             }
-        ]);
+
+            Near.call([
+                {
+                    contractName: daoId,
+                    methodName: "create_proposal",
+                    args: args,
+                    deposit: 100000000000000000000000,
+                    gas: 200000000000000
+                }
+            ]);
+        }
     } else {
         Near.call([
             {
@@ -174,9 +274,80 @@ const onChangeDescription = (description) => {
 
 const onChangeRecipient = (receiver_id) => {
     State.update({
-        receiver_id: receiver_id,
+        receiver_id,
         error: undefined
     });
+};
+
+const onChangeHouse = (house) => {
+    State.update({
+        house,
+        error: undefined
+    });
+};
+
+const onChangeMember = (member) => {
+    State.update({
+        member,
+        error: undefined
+    });
+};
+
+const onChangeAccounts = (accounts) => {
+    State.update({
+        accounts,
+        error: undefined
+    });
+};
+
+const onChangeMemo = (memo) => {
+    State.update({
+        memo,
+        error: undefined
+    });
+};
+
+const onChangePowerType = (power) => {
+    switch (power?.value) {
+        case "Dismiss": {
+            State.update({
+                method_name: "dismiss_hook",
+                args: JSON.stringify({
+                    member: ""
+                })
+            });
+            break;
+        }
+        case "Veto": {
+            State.update({
+                method_name: "veto_hook",
+                args: JSON.stringify({
+                    id: ""
+                })
+            });
+            break;
+        }
+        case "Ban": {
+            break;
+        }
+        case "Unban": {
+            State.update({
+                accounts: null,
+                memo: null
+            });
+            break;
+        }
+        case "DismissAndBan": {
+            State.update({
+                house: null,
+                member: null
+            });
+            break;
+        }
+        default: {
+            break;
+        }
+    }
 };
 
 const defaultDescription =
@@ -184,67 +355,156 @@ const defaultDescription =
 
 return (
     <>
-        <div className="mb-3">
-            <h5>Contract</h5>
-            <input
-                type="text"
-                onChange={(e) => onChangeContract(e.target.value)}
-            />
-        </div>
-        <div className="mb-3">
-            <h5>Method</h5>
-            <input
-                type="text"
-                onChange={(e) => onChangeMethod(e.target.value)}
-            />
-        </div>
-        <div className="mb-3">
-            <h5>Deposit</h5>
-            <input
-                type="number"
-                onChange={(e) => onChangeDeposit(e.target.value)}
-                defaultValue="0"
-            />
-        </div>
-        <div className="mb-3">
-            <h5>Gas</h5>
-            <input
-                type="number"
-                onChange={(e) => onChangeGas(e.target.value)}
-                defaultValue="200000000000000"
-            />
-        </div>
-        <div className="mb-3">
-            <h5>Arguments (JSON)</h5>
-            <textarea
-                type="text"
-                onChange={(e) => onChangeArgs(e.target.value)}
-                className="form-control"
-                defaultValue={state.args}
-            />
-        </div>
-        {isCongressDaoID && (
-            <div>
+        {(daoId === CoADaoId || daoId === TCDaoId) && (
+            <div className="mb-3">
+                <Widget
+                    src={`sking.near/widget/Common.Inputs.Select`}
+                    props={{
+                        label: "Power",
+                        noLabel: false,
+                        placeholder: "Can propose motion",
+                        options: powerTypes,
+                        value: state.powerType,
+                        onChange: (powerType) => {
+                            State.update({
+                                ...state,
+                                powerType: powerType.value
+                            });
+                            onChangePowerType(powerType);
+                        },
+
+                        error: undefined
+                    }}
+                />
+            </div>
+        )}
+
+        {state.powerType === "DismissAndBan" ? (
+            <>
                 <div className="mb-3">
-                    <h5>Recipient</h5>
+                    <h5>Member</h5>
                     <input
                         type="text"
-                        onChange={(e) => onChangeRecipient(e.target.value)}
-                        placeholder="Specify target account"
+                        value={state.member}
+                        onChange={(e) => onChangeMember(e.target.value)}
+                        placeholder="Specify member account"
                     />
                 </div>
                 <div className="mb-3">
-                    <h5>Description</h5>
-
-                    <Widget
-                        src="sking.near/widget/Common.Inputs.Markdown"
-                        props={{
-                            onChange: (value) => onChangeDescription(value),
-                            height: "270px",
-                            initialText: defaultDescription
-                        }}
+                    <h5>House</h5>
+                    <input
+                        type="text"
+                        value={state.house}
+                        onChange={(e) => onChangeHouse(e.target.value)}
+                        placeholder="Specify house account"
                     />
                 </div>
+            </>
+        ) : (
+            <>
+                {state.powerType === "Unban" ? (
+                    <>
+                        <div className="mb-3">
+                            <h5>Accounts List (separated by comma)</h5>
+                            <input
+                                type="text"
+                                value={state.accounts}
+                                onChange={(e) =>
+                                    onChangeAccounts(e.target.value)
+                                }
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <h5>Memo</h5>
+                            <input
+                                type="text"
+                                value={state.memo}
+                                onChange={(e) => onChangeMemo(e.target.value)}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        {!isCongressDaoID && (
+                            <div className="mb-3">
+                                <h5>Contract</h5>
+                                <input
+                                    type="text"
+                                    value={state.contractId}
+                                    onChange={(e) =>
+                                        onChangeContract(e.target.value)
+                                    }
+                                />
+                            </div>
+                        )}
+                        <div className="mb-3">
+                            <h5>Method</h5>
+                            <input
+                                disabled={state.powerType && state.method_name}
+                                type="text"
+                                value={state.method_name}
+                                onChange={(e) => onChangeMethod(e.target.value)}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <h5>Deposit</h5>
+                            <input
+                                type="number"
+                                value={state.deposit}
+                                onChange={(e) =>
+                                    onChangeDeposit(e.target.value)
+                                }
+                                defaultValue={0}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <h5>Gas</h5>
+                            <input
+                                type="number"
+                                value={state.gas}
+                                onChange={(e) => onChangeGas(e.target.value)}
+                                defaultValue="200000000000000"
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <h5>Arguments (JSON)</h5>
+                            <textarea
+                                type="text"
+                                value={state.args}
+                                onChange={(e) => onChangeArgs(e.target.value)}
+                                className="form-control"
+                                defaultValue={state.args}
+                            />
+                        </div>
+                        {isCongressDaoID && (
+                            <div className="mb-3">
+                                <h5>Recipient</h5>
+                                <input
+                                    type="text"
+                                    value={state.receiver_id}
+                                    onChange={(e) =>
+                                        onChangeRecipient(e.target.value)
+                                    }
+                                    placeholder="Specify target account"
+                                />
+                            </div>
+                        )}
+                    </>
+                )}
+            </>
+        )}
+        {isCongressDaoID && state.powerType !== "Unban" && (
+            <div className="mb-3">
+                <h5>Description</h5>
+                <Widget
+                    src="sking.near/widget/Common.Inputs.Markdown"
+                    props={{
+                        value: state.description,
+                        onChange: (value) => onChangeDescription(value),
+                        height: "270px",
+                        initialText: defaultDescription
+                    }}
+                />
             </div>
         )}
         {state.error && <div className="text-danger">{state.error}</div>}

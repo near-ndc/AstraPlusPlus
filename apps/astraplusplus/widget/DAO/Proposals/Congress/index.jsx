@@ -1,6 +1,5 @@
 const daoId = props.daoId;
-const proposalsPerPage = props.proposalsPerPage ?? 20; // Number of proposals to fetch at a time
-const resPerPage = 20;
+const resPerPage = 5;
 
 const constructURL = (paramObj, base) => {
     paramObj = { ...paramObj, page: "dao" };
@@ -231,8 +230,16 @@ return (
                     src="/*__@replace:nui__*//widget/Input.Button"
                     props={{
                         variant: "info outline",
-                        children: "View All",
-                        href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${daoId}`
+                        children: (
+                            <a
+                                href={`#//*__@appAccount__*//widget/home?page=dao&daoId=${daoId}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: "rgb(68, 152, 224)" }}
+                            >
+                                View All
+                            </a>
+                        )
                     }}
                 />
             </div>
