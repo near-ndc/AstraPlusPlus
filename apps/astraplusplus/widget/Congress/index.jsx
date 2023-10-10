@@ -592,60 +592,59 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
             </Tabs>
         </div>
 
-        {!state.hideProposalBtn && (
-            <div className="d-flex justify-content-end gap-2">
-                <Widget
-                    src="nearui.near/widget/Social.FollowButton"
-                    props={{
-                        variant: "info outline",
-                        accountId: state.selectedHouse
-                    }}
-                />
-                <Widget
-                    src="/*__@appAccount__*//widget/Common.Layout.CardModal"
-                    props={{
-                        title: "Create Proposal",
-                        onToggle: () =>
-                            State.update({
-                                isProposalModalOpen: !state.isProposalModalOpen
-                            }),
-                        isOpen: state.isProposalModalOpen,
-                        toggle: (
+        <div className="d-flex justify-content-end gap-2">
+            <Widget
+                src="nearui.near/widget/Social.FollowButton"
+                props={{
+                    variant: "info outline",
+                    accountId: state.selectedHouse
+                }}
+            />
+            <Widget
+                src="/*__@appAccount__*//widget/Common.Layout.CardModal"
+                props={{
+                    title: "Create Proposal",
+                    onToggle: () =>
+                        State.update({
+                            isProposalModalOpen: !state.isProposalModalOpen
+                        }),
+                    isOpen: state.isProposalModalOpen,
+                    toggle: (
+                        <Widget
+                            src="nearui.near/widget/Input.Button"
+                            props={{
+                                children: (
+                                    <>
+                                        Create Proposal
+                                        <i className="bi bi-16 bi-plus-lg"></i>
+                                    </>
+                                ),
+                                disabled: state.hideProposalBtn,
+                                variant: "info"
+                            }}
+                        />
+                    ),
+                    content: (
+                        <div
+                            className="d-flex flex-column align-items-stretch"
+                            style={{
+                                width: "800px",
+                                maxWidth: "100vw"
+                            }}
+                        >
                             <Widget
-                                src="nearui.near/widget/Input.Button"
+                                src={
+                                    "/*__@appAccount__*//widget/DAO.Proposal.Create"
+                                }
                                 props={{
-                                    children: (
-                                        <>
-                                            Create Proposal
-                                            <i className="bi bi-16 bi-plus-lg"></i>
-                                        </>
-                                    ),
-                                    variant: "info"
+                                    daoId: Content[state.selectedHouse].address
                                 }}
                             />
-                        ),
-                        content: (
-                            <div
-                                className="d-flex flex-column align-items-stretch"
-                                style={{
-                                    width: "800px",
-                                    maxWidth: "100vw"
-                                }}
-                            >
-                                <Widget
-                                    src={
-                                        "/*__@appAccount__*//widget/DAO.Proposal.Create"
-                                    }
-                                    props={{
-                                        daoId: `${state.selectedHouse}.gwg-testing.near`
-                                    }}
-                                />
-                            </div>
-                        )
-                    }}
-                />
-            </div>
-        )}
+                        </div>
+                    )
+                }}
+            />
+        </div>
     </Section>
 );
 
