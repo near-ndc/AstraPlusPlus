@@ -622,53 +622,67 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                 src="nearui.near/widget/Social.FollowButton"
                 props={{
                     variant: "info outline",
-                    accountId: state.selectedHouse
+                    accountId: state.selectedHouse,
+                    size: "sm"
                 }}
             />
             <Widget
-                src="/*__@appAccount__*//widget/Common.Layout.CardModal"
+                src="nearui.near/widget/Input.Button"
                 props={{
-                    title: "Create Proposal",
-                    onToggle: () =>
-                        State.update({
-                            isProposalModalOpen: !state.isProposalModalOpen
-                        }),
-                    isOpen: state.isProposalModalOpen,
-                    toggle: (
-                        <Widget
-                            src="nearui.near/widget/Input.Button"
-                            props={{
-                                children: (
-                                    <>
-                                        Create Proposal
-                                        <i className="bi bi-16 bi-plus-lg"></i>
-                                    </>
-                                ),
-                                disabled: state.hideProposalBtn,
-                                variant: "info"
-                            }}
-                        />
-                    ),
-                    content: (
-                        <div
-                            className="d-flex flex-column align-items-stretch"
-                            style={{
-                                width: "800px",
-                                maxWidth: "100vw"
-                            }}
-                        >
-                            <Widget
-                                src={
-                                    "/*__@appAccount__*//widget/DAO.Proposal.Create"
-                                }
-                                props={{
-                                    daoId: Content[state.selectedHouse].address
-                                }}
-                            />
-                        </div>
-                    )
+                    children: <>See Proposals</>,
+                    variant: "info outline",
+                    href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
+                        Content[state.selectedHouse].address
+                    }`,
+                    size: "sm"
                 }}
             />
+            {!state.hideProposalBtn && (
+                <Widget
+                    src="/*__@appAccount__*//widget/Common.Layout.CardModal"
+                    props={{
+                        title: "Create Proposal",
+                        onToggle: () =>
+                            State.update({
+                                isProposalModalOpen: !state.isProposalModalOpen
+                            }),
+                        isOpen: state.isProposalModalOpen,
+                        toggle: (
+                            <Widget
+                                src="nearui.near/widget/Input.Button"
+                                props={{
+                                    children: (
+                                        <>
+                                            Create Proposal
+                                            <i className="bi bi-16 bi-plus-lg"></i>
+                                        </>
+                                    ),
+                                    variant: "info",
+                                    size: "sm"
+                                }}
+                            />
+                        ),
+                        content: (
+                            <div
+                                className="d-flex flex-column align-items-stretch"
+                                style={{
+                                    width: "800px",
+                                    maxWidth: "100vw"
+                                }}
+                            >
+                                <Widget
+                                    src={
+                                        "/*__@appAccount__*//widget/DAO.Proposal.Create"
+                                    }
+                                    props={{
+                                        daoId: `${state.selectedHouse}.gwg-testing.near`
+                                    }}
+                                />
+                            </div>
+                        )
+                    }}
+                />
+            )}
         </div>
     </Section>
 );

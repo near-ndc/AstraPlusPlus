@@ -31,7 +31,9 @@ State.init({
     member: null, // for dismiss and ban hook
     house: null, // for dismiss and ban hook
     accounts: null, // for unban hook
-    memo: null // for unban hook
+    memo: null, // for unban hook
+    showReceiverAsOptions: false,
+    disableReceiverField: false
 });
 
 // only for UI
@@ -83,7 +85,7 @@ const handleFunctionCall = () => {
             return;
         }
     }
-    if (state.powerType !== "Unban") {
+    if (state.powerType !== "Unban" || state.powerType !== "Ban") {
         if (isEmpty(state.method_name)) {
             State.update({
                 error: "Please enter a valid method name"
@@ -123,6 +125,7 @@ const handleFunctionCall = () => {
     const deposit = Big(state.deposit).mul(Big(10).pow(24)).toFixed();
 
     if (isCongressDaoID) {
+        let args = {};
         if (state.powerType === "Unban") {
             const accountsArray = state.accounts
                 ?.split(",")
@@ -136,18 +139,26 @@ const handleFunctionCall = () => {
                 });
                 return;
             }
-            Near.call([
-                {
-                    contractName: registry,
-                    methodName: "admin_unflag_accounts",
-                    args: { accounts: accountsArray, memo: state.memo },
-                    deposit: 0,
-                    gas: 200000000000000
-                }
-            ]);
-            return;
+            args = {
+                kind: {
+                    FunctionCall: {
+                        receiver_id: registry,
+                        actions: [
+                            {
+                                method_name: "admin_unflag_accounts",
+                                args: {
+                                    accounts: accountsArray,
+                                    memo: state.memo
+                                },
+                                deposit: deposit,
+                                gas: state.gas
+                            }
+                        ]
+                    }
+                },
+                description: state.description
+            };
         } else {
-            let args = {};
             if (state.powerType === "DismissAndBan") {
                 if (isEmpty(state.house) || !isNearAddress(state.house)) {
                     State.update({
@@ -314,7 +325,8 @@ const onChangePowerType = (power) => {
                 method_name: "dismiss_hook",
                 args: JSON.stringify({
                     member: ""
-                })
+                }),
+                showReceiverAsOptions: true
             });
             break;
         }
@@ -323,7 +335,9 @@ const onChangePowerType = (power) => {
                 method_name: "veto_hook",
                 args: JSON.stringify({
                     id: ""
-                })
+                }),
+                receiver_id: HoMDaoId,
+                disableReceiverField: true
             });
             break;
         }
@@ -391,12 +405,27 @@ return (
                     />
                 </div>
                 <div className="mb-3">
-                    <h5>House</h5>
-                    <input
-                        type="text"
-                        value={state.house}
-                        onChange={(e) => onChangeHouse(e.target.value)}
-                        placeholder="Specify house account"
+                    <Widget
+                        src={`sking.near/widget/Common.Inputs.Select`}
+                        props={{
+                            label: "House",
+                            noLabel: false,
+                            placeholder: "Select house account",
+                            options: [
+                                { text: CoADaoId, value: CoADaoId },
+                                { text: HoMDaoId, value: HoMDaoId },
+                                { text: TCDaoId, value: TCDaoId }
+                            ],
+                            value: state.house,
+                            onChange: (house) => {
+                                State.update({
+                                    house: house.value,
+                                    error: undefined
+                                });
+                            },
+
+                            error: undefined
+                        }}
                     />
                 </div>
             </>
@@ -416,10 +445,14 @@ return (
                         </div>
                         <div className="mb-3">
                             <h5>Memo</h5>
-                            <input
-                                type="text"
-                                value={state.memo}
-                                onChange={(e) => onChangeMemo(e.target.value)}
+                            <Widget
+                                src="sking.near/widget/Common.Inputs.Markdown"
+                                props={{
+                                    value: state.memo,
+                                    onChange: (value) => onChangeMemo(value),
+                                    height: "270px",
+                                    initialText: defaultDescription
+                                }}
                             />
                         </div>
                     </>
@@ -446,26 +479,7 @@ return (
                                 onChange={(e) => onChangeMethod(e.target.value)}
                             />
                         </div>
-                        <div className="mb-3">
-                            <h5>Deposit</h5>
-                            <input
-                                type="number"
-                                value={state.deposit}
-                                onChange={(e) =>
-                                    onChangeDeposit(e.target.value)
-                                }
-                                defaultValue={0}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <h5>Gas</h5>
-                            <input
-                                type="number"
-                                value={state.gas}
-                                onChange={(e) => onChangeGas(e.target.value)}
-                                defaultValue="200000000000000"
-                            />
-                        </div>
+
                         <div className="mb-3">
                             <h5>Arguments (JSON)</h5>
                             <textarea
@@ -476,10 +490,37 @@ return (
                                 defaultValue={state.args}
                             />
                         </div>
-                        {isCongressDaoID && (
+                        {state.showReceiverAsOptions && (
+                            <div className="mb-3">
+                                <Widget
+                                    src={`sking.near/widget/Common.Inputs.Select`}
+                                    props={{
+                                        label: "Recipient",
+                                        noLabel: false,
+                                        placeholder: "Select Recipient account",
+                                        options: [
+                                            { text: CoADaoId, value: CoADaoId },
+                                            { text: HoMDaoId, value: HoMDaoId },
+                                            { text: TCDaoId, value: TCDaoId }
+                                        ],
+                                        value: state.receiver_id,
+                                        onChange: (house) => {
+                                            State.update({
+                                                receiver_id: house.value,
+                                                error: undefined
+                                            });
+                                        },
+
+                                        error: undefined
+                                    }}
+                                />
+                            </div>
+                        )}
+                        {isCongressDaoID && !state.showReceiverAsOptions && (
                             <div className="mb-3">
                                 <h5>Recipient</h5>
                                 <input
+                                    disabled={state.disableReceiverField}
                                     type="text"
                                     value={state.receiver_id}
                                     onChange={(e) =>
@@ -491,6 +532,24 @@ return (
                         )}
                     </>
                 )}
+                <div className="mb-3">
+                    <h5>Deposit</h5>
+                    <input
+                        type="number"
+                        value={state.deposit}
+                        onChange={(e) => onChangeDeposit(e.target.value)}
+                        defaultValue={0}
+                    />
+                </div>
+                <div className="mb-3">
+                    <h5>Gas</h5>
+                    <input
+                        type="number"
+                        value={state.gas}
+                        onChange={(e) => onChangeGas(e.target.value)}
+                        defaultValue="200000000000000"
+                    />
+                </div>
             </>
         )}
         {isCongressDaoID && state.powerType !== "Unban" && (

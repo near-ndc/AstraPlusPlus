@@ -179,8 +179,9 @@ return (
         </td>
         <td className="text-center">{kindName}</td>
         <td className="text-center">{renderStatus(proposal.status)}</td>
-        <td className="text-center" style={{ width: 200 }}>
-            {showMultiVote && (
+
+        {multiSelectMode && (
+            <td className="text-center" style={{ width: 200 }}>
                 <Widget
                     src="/*__@appAccount__*//widget/DAO.Proposals.MultiVote"
                     props={{
@@ -190,8 +191,8 @@ return (
                         view: "multiVote"
                     }}
                 />
-            )}
-        </td>
+            </td>
+        )}
         <td style={{ width: 150 }}>
             <div className="d-flex justify-content-end">
                 <Widget
