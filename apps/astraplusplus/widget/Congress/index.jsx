@@ -37,7 +37,8 @@ const Content = {
             checks: [
                 {
                     house: "coa",
-                    text: "The Council of Advisors can veto any HoM proposals, except setup package, budget, large budget items, and recurring budget items."
+                    text: "The Council of Advisors can veto any HoM proposals, except setup package, budget, large budget items, and recurring budget items.",
+                    description: "The vote needs 4 approvals to pass the CoA."
                 },
                 {
                     house: "vb",
@@ -55,7 +56,7 @@ const Content = {
                     house: "tc",
                     text: "The Transparency Commission can remove members of the House of Merit.",
                     description:
-                        "The vote needs a simple majority. When 8 members from the House of Merit are removed, the house is dissolved and a new House of Merit is elected."
+                        "The vote needs 4 approvals to pass the TC. When 8 members from the House of Merit are removed, the house is dissolved and a new House of Merit is elected."
                 }
             ]
         }
@@ -126,7 +127,8 @@ const Content = {
             checks: [
                 {
                     house: "coa",
-                    text: "Council of Advisors could reinstate and unban a member previously dismissed and banned by the Transparency Commission."
+                    text: "Council of Advisors could reinstate and unban a member previously dismissed and banned by the Transparency Commission.",
+                    description: "The vote needs 4 approvals to pass the CoA."
                 },
                 {
                     house: "vb",
@@ -195,15 +197,38 @@ const Container = styled.div`
     color: #464c50;
     font-size: 14px;
     line-height: 24px;
+    display: flex;
+    padding: 0;
+    margin: 0 -12px;
+    flex-direction: row;
 
     h5,
     h6 {
         margin: 0;
     }
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+    }
+`;
+
+const ImgPanel = styled.div`
+    width: 60%;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 `;
 
 const HousePanel = styled.div`
     background-color: #fff;
+    width: 40%;
+    min-width: 500px;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        min-width: auto;
+    }
 `;
 
 const CircleLogo = styled.div`
@@ -263,7 +288,7 @@ const Tab = styled.div`
 `;
 
 const Section = styled.div`
-    padding: 25px;
+    padding: 35px;
 
     @media (max-width: 768px) {
         padding: 25px 5px;
@@ -711,8 +736,8 @@ const statusMap = {
 };
 
 return (
-    <Container className="row p-0">
-        <div id="main" className="col-lg-7 p-0">
+    <Container>
+        <ImgPanel className="p-0">
             <div className="py-3 bg-dark d-flex justify-content-center">
                 <h6>
                     <span className="text-secondary">NDC Governance | </span>
@@ -757,9 +782,9 @@ return (
                     }
                 />
             </ImgContainer>
-        </div>
+        </ImgPanel>
 
-        <HousePanel className="shadow-sm col-lg-5">
+        <HousePanel className="shadow-sm">
             <ContentBlock
                 title={Content[state.selectedHouse].title}
                 description={Content[state.selectedHouse].description}
