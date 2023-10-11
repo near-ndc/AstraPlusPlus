@@ -85,7 +85,7 @@ const handleFunctionCall = () => {
             return;
         }
     }
-    if (state.powerType !== "Unban" || state.powerType !== "Ban") {
+    if (state.powerType !== "Unban" && state.powerType !== "Ban") {
         if (isEmpty(state.method_name)) {
             State.update({
                 error: "Please enter a valid method name"
@@ -125,6 +125,12 @@ const handleFunctionCall = () => {
     const deposit = Big(state.deposit).mul(Big(10).pow(24)).toFixed();
 
     if (isCongressDaoID) {
+        if (isEmpty(state.description)) {
+            State.update({
+                error: "Please enter a description"
+            });
+            return;
+        }
         let args = {};
         if (state.powerType === "Unban") {
             const accountsArray = state.accounts
@@ -139,6 +145,13 @@ const handleFunctionCall = () => {
                 });
                 return;
             }
+            if (isEmpty(state.memo)) {
+                State.update({
+                    error: "Please enter a valid memo"
+                });
+                return;
+            }
+
             args = {
                 kind: {
                     FunctionCall: {
@@ -146,10 +159,13 @@ const handleFunctionCall = () => {
                         actions: [
                             {
                                 method_name: "admin_unflag_accounts",
-                                args: {
-                                    accounts: accountsArray,
-                                    memo: state.memo
-                                },
+                                args: Buffer.from(
+                                    JSON.stringify({
+                                        accounts: accountsArray,
+                                        memo: state.memo
+                                    }),
+                                    "utf-8"
+                                ).toString("base64"),
                                 deposit: deposit,
                                 gas: state.gas
                             }
@@ -166,6 +182,7 @@ const handleFunctionCall = () => {
                     });
                     return;
                 }
+
                 if (isEmpty(state.member) || !isNearAddress(state.member)) {
                     State.update({
                         error: "Please enter a valid member ID"
@@ -191,13 +208,6 @@ const handleFunctionCall = () => {
                     });
                     return;
                 }
-                if (isEmpty(state.description)) {
-                    State.update({
-                        error: "Please enter a description"
-                    });
-                    return;
-                }
-
                 args = {
                     kind: {
                         FunctionCall: {
@@ -215,17 +225,16 @@ const handleFunctionCall = () => {
                     description: state.description
                 };
             }
-
-            Near.call([
-                {
-                    contractName: daoId,
-                    methodName: "create_proposal",
-                    args: args,
-                    deposit: 100000000000000000000000,
-                    gas: 20000000000000
-                }
-            ]);
         }
+        Near.call([
+            {
+                contractName: daoId,
+                methodName: "create_proposal",
+                args: args,
+                deposit: 100000000000000000000000,
+                gas: 20000000000000
+            }
+        ]);
     } else {
         Near.call([
             {
@@ -552,7 +561,7 @@ return (
                 </div>
             </>
         )}
-        {isCongressDaoID && state.powerType !== "Unban" && (
+        {isCongressDaoID && (
             <div className="mb-3">
                 <h5>Description</h5>
                 <Widget
