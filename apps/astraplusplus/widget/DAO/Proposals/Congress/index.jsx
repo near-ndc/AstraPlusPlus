@@ -39,6 +39,16 @@ const Wrapper = styled.div`
     }
 `;
 
+const ProposalCard = styled.div`
+    .type {
+        line-height: 18px;
+    }
+
+    .created_at {
+        font-size: 11px;
+    }
+`;
+
 function processProposals(proposals) {
     const parsedResp = [];
     proposals?.map((item) => {
@@ -124,7 +134,7 @@ function renderHeader({ id, statusName }) {
     }
 
     return (
-        <div className="d-flex flex-wrap gap-2">
+        <div className="d-flex flex-wrap gap-2 mb-2">
             <Widget
                 src="/*__@replace:nui__*//widget/Element.Badge"
                 props={{
@@ -174,15 +184,50 @@ return (
                             : Object.keys(proposal.proposal_type)[0];
 
                     if (proposal.status === "Removed") return <></>;
+
                     return (
-                        <div className="d-flex py-3 justify-content-between border-bottom align-items-center">
-                            <div className="d-flex flex-column gap-2">
+                        <ProposalCard className="d-flex py-3 justify-content-between border-bottom align-items-center">
+                            <div className="d-flex flex-column">
                                 {renderHeader({
                                     id: proposal.proposal_id,
                                     statusName: proposal.status
                                 })}
-                                <div className="text-wrap">
-                                    {proposal.proposal.description}
+                                <div class="type">
+                                    {proposal.proposal.kind.FunctionCall ? (
+                                        <>
+                                            <b>Function Call: </b>
+                                            <span className="font-monospace">
+                                                {proposal.proposal.kind.FunctionCall.actions
+                                                    .map((a) => a.method_name)
+                                                    .join(",")}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <b>{kindName}</b> proposal
+                                        </>
+                                    )}
+                                </div>
+                                <div className="created_at text-secondary d-flex gap-2">
+                                    <div className="gap-1 d-flex">
+                                        <i className="bi bi-clock" />
+                                        <span>
+                                            {new Date(
+                                                proposal.submission_time
+                                            ).toLocaleString()}
+                                        </span>
+                                    </div>
+                                    <div>|</div>
+                                    <div>
+                                        {
+                                            Object.keys(proposal.proposal.votes)
+                                                .length
+                                        }{" "}
+                                        {Object.keys(proposal.proposal.votes)
+                                            .length === 1
+                                            ? "vote"
+                                            : "votes"}
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -196,7 +241,7 @@ return (
                                                     variant:
                                                         "info outline icon",
                                                     children: (
-                                                        <i class="bi bi-eye"></i>
+                                                        <i class="bi bi-eye" />
                                                     )
                                                 }}
                                             />
@@ -225,7 +270,7 @@ return (
                                     }}
                                 />
                             </div>
-                        </div>
+                        </ProposalCard>
                     );
                 })}
             <div className="mt-4 d-flex justify-content-center">
