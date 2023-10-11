@@ -80,6 +80,9 @@ function renderPermission({ isAllowedToVote }) {
     );
 }
 
+const execProposal = ({ daoId, id }) =>
+    Near.call(daoId, "execute", { id }, 300000000000000);
+
 function renderHeader({ typeName, id, daoId, statusName }) {
     let statusicon;
     let statustext;
@@ -117,20 +120,34 @@ function renderHeader({ typeName, id, daoId, statusName }) {
     }
     return (
         <div className="card__header">
-            <div className="d-flex flex-wrap justify-content-between gap-3">
+            <div className="d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
-                    <h3 className="d-flex align-items-center gap-2">
-                        {typeName}
-                        <Widget
-                            src="/*__@replace:nui__*//widget/Element.Badge"
-                            props={{
-                                children: `Proposal ID #${id}`,
-                                variant: `outline info round`,
-                                size: "md"
-                            }}
-                        />
-                    </h3>
-                    <h5 className="text-muted h6">{daoId}</h5>
+                    <div className="d-flex gap-2">
+                        <h4 className="h4 d-flex align-items-center gap-2">
+                            {typeName}
+                            <Widget
+                                src="/*__@replace:nui__*//widget/Element.Badge"
+                                props={{
+                                    children: `Proposal ID #${id}`,
+                                    variant: `outline info round`,
+                                    size: "md"
+                                }}
+                            />
+                            {statusName === "Approved" && (
+                                <Widget
+                                    src="nearui.near/widget/Input.Button"
+                                    props={{
+                                        variant: "primary icon",
+                                        children: (
+                                            <i class="bi bi-caret-right-fill" />
+                                        ),
+                                        onClick: () =>
+                                            execProposal({ daoId, id })
+                                    }}
+                                />
+                            )}
+                        </h4>
+                    </div>
                 </div>
                 <div>
                     <Widget
@@ -156,6 +173,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                     />
                 </div>
             </div>
+            <h6 className="text-secondary">{daoId}</h6>
         </div>
     );
 }
@@ -171,7 +189,9 @@ function renderData({
         <div className="d-flex gap-3 flex-column">
             <div className="d-flex gap-3">
                 <div className="w-50">
-                    <h5 className="text-muted h6">Proposer</h5>
+                    <div className="mb-2">
+                        <b>Proposer</b>
+                    </div>
                     <Widget
                         src="/*__@replace:nui__*//widget/Element.User"
                         props={{ accountId: proposer }}
@@ -192,7 +212,7 @@ function renderData({
                 )}
             </div>
             <div className="mt-4 word-wrap">
-                <h5 className="text-muted h6">Description</h5>
+                <b>Description</b>
                 <Markdown text={description} />
             </div>
             <div>
@@ -207,22 +227,26 @@ function renderData({
             <div className="d-flex gap-5 flex-wrap">
                 {submission_time && (
                     <div>
-                        <h5 className="text-muted h6">Submission date</h5>
-                        <p className="text-muted">
-                            {isCongressDaoID
-                                ? new Date(submission_time).toLocaleString()
-                                : new Date(
-                                      parseInt(
-                                          Big(submission_time).div(1000000)
-                                      )
-                                  ).toLocaleString()}
+                        <b>Submission date</b>
+                        <p>
+                            <small className="">
+                                {isCongressDaoID
+                                    ? new Date(submission_time).toLocaleString()
+                                    : new Date(
+                                          parseInt(
+                                              Big(submission_time).div(1000000)
+                                          )
+                                      ).toLocaleString()}
+                            </small>
                         </p>
                     </div>
                 )}
                 {totalVotesNeeded && (
                     <div>
-                        <h5 className="text-muted h6">Total Votes Required</h5>
-                        <p className="text-muted">{totalVotesNeeded}</p>
+                        <b>Total Votes Required</b>
+                        <p>
+                            <small>{totalVotesNeeded}</small>
+                        </p>
                     </div>
                 )}
             </div>

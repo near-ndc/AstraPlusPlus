@@ -25,6 +25,14 @@ State.init({
     filtersOpen: false
 });
 
+const execProposal = (proposal) =>
+    Near.call(
+        proposal.dao_id,
+        "execute",
+        { id: proposal.proposal_id },
+        300000000000000
+    );
+
 const Wrapper = styled.div`
     .border-bottom {
         border-bottom: 2px solid lightgray;
@@ -230,7 +238,20 @@ return (
                                     </div>
                                 </div>
                             </div>
-                            <div>
+                            <div className="d-flex gap-2">
+                                {proposal.status === "Approved" && (
+                                    <Widget
+                                        src="nearui.near/widget/Input.Button"
+                                        props={{
+                                            variant: "primary icon",
+                                            children: (
+                                                <i class="bi bi-caret-right-fill" />
+                                            ),
+                                            onClick: () =>
+                                                execProposal(proposal)
+                                        }}
+                                    />
+                                )}
                                 <Widget
                                     src="nearui.near/widget/Layout.Modal"
                                     props={{
