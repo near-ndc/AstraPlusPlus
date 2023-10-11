@@ -100,14 +100,14 @@ const pages = [
             href: currentLink + `?page=congress&house=tc`,
             onClick: () => router.navigate({ page: "congress", house: "tc" }),
             widgetName: "DAO.index"
-        },
-        {
-            title: "Voting Body",
-            active: page === "congress" && router.params.house === "vb",
-            href: currentLink + `?page=congress&house=vb`,
-            onClick: () => router.navigate({ page: "congress", house: "vb" }),
-            widgetName: "DAO.index"
         }
+        // {
+        //     title: "Voting Body",
+        //     active: page === "congress" && router.params.house === "vb",
+        //     href: currentLink + `?page=congress&house=vb`,
+        //     onClick: () => router.navigate({ page: "congress", house: "vb" }),
+        //     widgetName: "DAO.index"
+        // }
     ],
     [
         {
@@ -163,7 +163,7 @@ const pages = [
         active: page === "actions",
         href: currentLink + "?page=actions",
         onClick: () => router.navigate({ page: "actions" }),
-        widgetName: "actions"
+        widgetName: "Actions.index"
     },
     {
         title: "Create DAO",
@@ -179,6 +179,14 @@ const pages = [
         href: currentLink + "?page=dao",
         onClick: (daoId, tab) => router.navigate({ page: "dao", daoId, tab }),
         widgetName: "DAO.index",
+        hidden: true
+    },
+    {
+        title: "Voting History",
+        active: page === "votinghistory",
+        href: currentLink + "?page=votinghistory",
+        onClick: (daoId, tab) => router.navigate({ page: "votinghistory" }),
+        widgetName: "VotingHistory.index",
         hidden: true
     }
 ];
