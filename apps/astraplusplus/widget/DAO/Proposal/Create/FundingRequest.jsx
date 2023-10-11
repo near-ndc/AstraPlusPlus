@@ -27,7 +27,7 @@ const handleProposal = () => {
         return;
     }
 
-    const gas = 200000000000000;
+    const gas = 20000000000000;
     const deposit = 100000000000000000000000;
     const amount = Big(state.fundingAmt).mul(Big(10).pow(24)).toFixed();
     Near.call([
@@ -64,7 +64,7 @@ const defaultDescription =
 return (
     <>
         <div className="mb-3">
-            <h5>Amount</h5>
+            <h5>Amount (NEAR)</h5>
             <input
                 type="number"
                 onChange={(e) => onChangeAmount(e.target.value)}
