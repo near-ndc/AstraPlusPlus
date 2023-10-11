@@ -87,8 +87,11 @@ function renderHeader({ typeName, id, daoId, statusName }) {
 
     switch (statusName) {
         case "Approved":
+        case "Vetoed":
+        case "Executed":
+        case "Accepted":
             statusicon = "bi bi-check-circle";
-            statustext = "Proposal Approved";
+            statustext = "Proposal " + statusName;
             statusvariant = "success";
             break;
         case "In Progress":

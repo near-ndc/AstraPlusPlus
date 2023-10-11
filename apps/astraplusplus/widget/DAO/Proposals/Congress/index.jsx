@@ -94,8 +94,11 @@ function renderHeader({ id, statusName }) {
 
     switch (statusName) {
         case "Approved":
+        case "Vetoed":
+        case "Executed":
+        case "Accepted":
             statusicon = "bi bi-check-circle";
-            statustext = "Approved";
+            statustext = statusName;
             statusvariant = "success";
             break;
         case "In Progress":
