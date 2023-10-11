@@ -174,7 +174,6 @@ return (
                     accountId: proposal.proposer,
                     options: {
                         showImage: false,
-                        shortenLength: 12,
                         fontSize: 13
                     }
                 }}
