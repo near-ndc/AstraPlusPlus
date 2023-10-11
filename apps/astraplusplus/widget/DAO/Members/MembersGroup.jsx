@@ -411,11 +411,19 @@ const Table = ({ title, tableData, showExpand }) => {
                                             src="nearui.near/widget/Input.Button"
                                             props={{
                                                 children: (
-                                                    <i class="bi bi-clock-history"></i>
+                                                    <a
+                                                        href={`#//*__@appAccount__*//widget/home?page=votinghistory`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style={{
+                                                            color: "rgb(68, 152, 224)"
+                                                        }}
+                                                    >
+                                                        <i class="bi bi-clock-history"></i>
+                                                    </a>
                                                 ),
                                                 size: "sm",
-                                                variant: "icon info outline",
-                                                onClick: () => {}
+                                                variant: "icon info outline"
                                             }}
                                         />
                                         {/* we don't show propose to mint and remove for congress dao */}
@@ -1010,12 +1018,22 @@ return (
                                                                     width: "inherit"
                                                                 }
                                                             },
-                                                            children:
-                                                                "View Voting History",
+                                                            children: (
+                                                                <a
+                                                                    href={`#//*__@appAccount__*//widget/home?page=votinghistory`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{
+                                                                        color: "rgb(68, 152, 224)"
+                                                                    }}
+                                                                >
+                                                                    View Voting
+                                                                    History
+                                                                </a>
+                                                            ),
                                                             variant:
                                                                 "info outline",
-                                                            size: "sm",
-                                                            onClick: () => {}
+                                                            size: "sm"
                                                         }}
                                                     />
                                                 </div>
