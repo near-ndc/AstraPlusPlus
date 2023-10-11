@@ -191,7 +191,8 @@ return (
                         daoId,
                         canVote,
                         proposal,
-                        view: "multiVote"
+                        view: "multiVote",
+                        isCongressDaoID
                     }}
                 />
             </td>
