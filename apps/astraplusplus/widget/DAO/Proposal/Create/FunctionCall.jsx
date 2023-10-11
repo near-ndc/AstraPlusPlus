@@ -324,7 +324,7 @@ const onChangePowerType = (power) => {
             State.update({
                 method_name: "dismiss_hook",
                 args: JSON.stringify({
-                    member: ""
+                    member: null
                 }),
                 showReceiverAsOptions: true
             });
@@ -334,7 +334,7 @@ const onChangePowerType = (power) => {
             State.update({
                 method_name: "veto_hook",
                 args: JSON.stringify({
-                    id: ""
+                    id: null
                 }),
                 receiver_id: HoMDaoId,
                 disableReceiverField: true
