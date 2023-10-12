@@ -279,9 +279,9 @@ const Tab = styled.div`
     }
 
     .circle {
-        width: 20px;
+        min-width: 20px;
         height: 20px;
-        border-radius: 50%;
+        border-radius: 20px;
         background: #d4d4d4;
         padding: 4px;
     }
