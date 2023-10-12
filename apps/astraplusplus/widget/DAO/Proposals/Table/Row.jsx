@@ -6,7 +6,8 @@ const {
     proposal_id,
     i,
     isAllowedTo,
-    isCongressDaoID
+    isCongressDaoID,
+    daoConfig
 } = props;
 const accountId = context.accountId;
 
@@ -112,13 +113,14 @@ function renderStatus(statusName) {
             statusvariant = "success";
             break;
         case "In Progress":
+        case "InProgress":
             statusicon = "spinner-border spinner-border-sm";
             statustext = "In Progress";
             statusvariant = "primary";
             break;
         case "Vetoed":
             statusicon = "bi bi-x-circle";
-            statustext = "Expired";
+            statustext = "Vetoed";
             statusvariant = "black";
             break;
         case "Expired":
@@ -161,6 +163,9 @@ function renderStatus(statusName) {
         />
     );
 }
+
+const execProposal = ({ daoId, proposal_id }) =>
+    Near.call(daoId, "execute", { id: proposal_id }, 300000000000000);
 
 return (
     <tr
@@ -206,7 +211,23 @@ return (
             </td>
         )}
         <td style={{ width: 150 }}>
-            <div className="d-flex justify-content-end">
+            <div className="d-flex justify-content-end gap-2">
+                {isCongressDaoID &&
+                    proposal.status === "Approved" &&
+                    proposal?.submission_time +
+                        daoConfig?.voting_duration +
+                        daoConfig?.cooldown <
+                        Date.now() && (
+                        <Widget
+                            src="nearui.near/widget/Input.Button"
+                            props={{
+                                variant: "primary icon",
+                                children: <i class="bi bi-caret-right-fill" />,
+                                onClick: () =>
+                                    execProposal({ daoId, proposal_id })
+                            }}
+                        />
+                    )}
                 <Widget
                     src="nearui.near/widget/Layout.Modal"
                     props={{
@@ -237,7 +258,8 @@ return (
                                         proposalString:
                                             JSON.stringify(proposal),
                                         multiSelectMode: state.multiSelectMode,
-                                        isCongressDaoID
+                                        isCongressDaoID,
+                                        daoConfig
                                     }}
                                 />
                             </div>

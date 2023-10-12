@@ -18,7 +18,8 @@ const {
     policy,
     handleVote,
     comments,
-    isCongressDaoID
+    isCongressDaoID,
+    daoConfig
 } = props;
 const accountId = context.accountId;
 
@@ -101,13 +102,14 @@ function renderHeader({ typeName, id, daoId, statusName }) {
             statusvariant = "success";
             break;
         case "In Progress":
+        case "InProgress":
             statusicon = "spinner-border spinner-border-sm";
             statustext = "Proposal In Progress";
             statusvariant = "primary";
             break;
         case "Vetoed":
             statusicon = "bi bi-x-circle";
-            statustext = "Proposal Expired";
+            statustext = "Proposal Vetoed";
             statusvariant = "black";
             break;
         case "Expired":
@@ -126,6 +128,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
             statusvariant = "danger";
             break;
     }
+
     return (
         <div className="card__header">
             <div className="d-flex flex-wrap justify-content-between align-items-center gap-3">
@@ -141,19 +144,24 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                     size: "md"
                                 }}
                             />
-                            {statusName === "Approved" && (
-                                <Widget
-                                    src="nearui.near/widget/Input.Button"
-                                    props={{
-                                        variant: "primary icon",
-                                        children: (
-                                            <i class="bi bi-caret-right-fill" />
-                                        ),
-                                        onClick: () =>
-                                            execProposal({ daoId, id })
-                                    }}
-                                />
-                            )}
+                            {isCongressDaoID &&
+                                statusName === "Approved" &&
+                                proposal?.submission_time +
+                                    daoConfig?.voting_duration +
+                                    daoConfig?.cooldown <
+                                    Date.now() && (
+                                    <Widget
+                                        src="nearui.near/widget/Input.Button"
+                                        props={{
+                                            variant: "primary icon",
+                                            children: (
+                                                <i class="bi bi-caret-right-fill" />
+                                            ),
+                                            onClick: () =>
+                                                execProposal({ daoId, id })
+                                        }}
+                                    />
+                                )}
                         </h4>
                     </div>
                 </div>

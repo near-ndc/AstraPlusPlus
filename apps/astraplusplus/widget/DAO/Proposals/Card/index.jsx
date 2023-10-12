@@ -1,5 +1,5 @@
 const multiSelectMode = props.multiSelectMode ?? false;
-const { proposalString, proposalId, daoId, isCongressDaoID } = props;
+const { proposalString, proposalId, daoId, isCongressDaoID, daoConfig } = props;
 const accountId = context.accountId;
 
 const proposal = proposalString ? JSON.parse(proposalString) : null;
@@ -197,7 +197,7 @@ const expensiveWork = () => {
     }
 
     if (isCongressDaoID) {
-        totalVotesNeeded = Math.ceil(roles?.members?.length / 2 + 1);
+        totalVotesNeeded = daoConfig?.threshold;
     }
 
     let totalVotes = {
@@ -292,7 +292,8 @@ return (
             policy,
             comments: comments,
             handleVote,
-            isCongressDaoID
+            isCongressDaoID,
+            daoConfig
         }}
     />
 );

@@ -24,7 +24,8 @@ State.init({
     },
     filtersOpen: false,
     proposals: [],
-    proposalsCount: 0
+    proposalsCount: 0,
+    daoConfig
 });
 
 const execProposal = (proposal) =>
@@ -73,13 +74,14 @@ function renderHeader({ id, statusName }) {
             statusvariant = "success";
             break;
         case "In Progress":
+        case "InProgress":
             statusicon = "spinner-border spinner-border-sm";
             statustext = "In Progress";
             statusvariant = "primary";
             break;
         case "Vetoed":
             statusicon = "bi bi-x-circle";
-            statustext = "Expired";
+            statustext = "Vetoed";
             statusvariant = "black";
             break;
         case "Expired":
@@ -146,6 +148,13 @@ State.update({
     proposalsCount: proposalsCount ?? 0
 });
 
+function getDaoConfig() {
+    const daoConfig = Near.view(daoId, "config", {});
+    State.update({ daoConfig });
+}
+
+getDaoConfig();
+
 return (
     <Wrapper>
         <div>
@@ -199,16 +208,23 @@ return (
                             </div>
                         </div>
                         <div className="d-flex gap-2">
-                            {proposal.status === "Approved" && (
-                                <Widget
-                                    src="nearui.near/widget/Input.Button"
-                                    props={{
-                                        variant: "primary icon",
-                                        children: <i class="bi bi-play-fill" />,
-                                        onClick: () => execProposal(proposal)
-                                    }}
-                                />
-                            )}
+                            {proposal.status === "Approved" &&
+                                proposal?.submission_time +
+                                    state.daoConfig?.voting_duration +
+                                    state.daoConfig?.cooldown <
+                                    Date.now() && (
+                                    <Widget
+                                        src="nearui.near/widget/Input.Button"
+                                        props={{
+                                            variant: "primary icon",
+                                            children: (
+                                                <i class="bi bi-play-fill" />
+                                            ),
+                                            onClick: () =>
+                                                execProposal(proposal)
+                                        }}
+                                    />
+                                )}
                             <Widget
                                 src="nearui.near/widget/Layout.Modal"
                                 props={{

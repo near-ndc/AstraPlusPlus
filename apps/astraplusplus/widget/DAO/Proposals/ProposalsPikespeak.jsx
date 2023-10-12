@@ -39,7 +39,8 @@ State.init({
     },
     filtersOpen: false,
     multiSelectMode: defaultMultiSelectMode ?? false,
-    tableView: defaultTableView ?? false
+    tableView: defaultTableView ?? false,
+    daoConfig: null
 });
 
 // convert to the data structure required by proposals component (similar to pikespeak API)
@@ -145,6 +146,15 @@ function hasNextHandler() {
 
     return hasNext;
 }
+
+function getDaoConfig() {
+    if (isCongressDaoID) {
+        const daoConfig = Near.view(daoId, "config", {});
+        State.update({ daoConfig });
+    }
+}
+
+getDaoConfig();
 
 return (
     <>
@@ -287,7 +297,8 @@ return (
                         state,
                         resPerPage,
                         proposals: res === null ? null : res.body,
-                        isCongressDaoID
+                        isCongressDaoID,
+                        daoConfig: state.daoConfig
                     }}
                 />
             ) : (
@@ -297,7 +308,8 @@ return (
                         state,
                         resPerPage,
                         proposals: res === null ? null : res.body,
-                        isCongressDaoID
+                        isCongressDaoID,
+                        daoConfig: state.daoConfig
                     }}
                 />
             )}
