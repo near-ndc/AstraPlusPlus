@@ -1,5 +1,5 @@
 const multiSelectMode = props.multiSelectMode ?? false;
-const { proposalString, proposalId, daoId, isCongressDaoID } = props;
+const { proposalString, proposalId, daoId, isCongressDaoID, daoConfig } = props;
 const accountId = context.accountId;
 
 const proposal = proposalString ? JSON.parse(proposalString) : null;
@@ -292,7 +292,8 @@ return (
             policy,
             comments: comments,
             handleVote,
-            isCongressDaoID
+            isCongressDaoID,
+            daoConfig
         }}
     />
 );

@@ -6,7 +6,8 @@ const {
     proposal_id,
     i,
     isAllowedTo,
-    isCongressDaoID
+    isCongressDaoID,
+    daoConfig
 } = props;
 const accountId = context.accountId;
 
@@ -118,7 +119,7 @@ function renderStatus(statusName) {
             break;
         case "Vetoed":
             statusicon = "bi bi-x-circle";
-            statustext = "Expired";
+            statustext = "Vetoed";
             statusvariant = "black";
             break;
         case "Expired":
@@ -210,16 +211,22 @@ return (
         )}
         <td style={{ width: 150 }}>
             <div className="d-flex justify-content-end gap-2">
-                {proposal.status === "Approved" && (
-                    <Widget
-                        src="nearui.near/widget/Input.Button"
-                        props={{
-                            variant: "primary icon",
-                            children: <i class="bi bi-caret-right-fill" />,
-                            onClick: () => execProposal({ daoId, proposal_id })
-                        }}
-                    />
-                )}
+                {isCongressDaoID &&
+                    proposal.status === "Approved" &&
+                    proposal?.submission_time +
+                        daoConfig?.voting_duration +
+                        daoConfig?.cooldown >
+                        Date.now() && (
+                        <Widget
+                            src="nearui.near/widget/Input.Button"
+                            props={{
+                                variant: "primary icon",
+                                children: <i class="bi bi-caret-right-fill" />,
+                                onClick: () =>
+                                    execProposal({ daoId, proposal_id })
+                            }}
+                        />
+                    )}
                 <Widget
                     src="nearui.near/widget/Layout.Modal"
                     props={{
