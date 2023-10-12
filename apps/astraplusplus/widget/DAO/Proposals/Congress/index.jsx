@@ -114,6 +114,7 @@ function renderHeader({ id, statusName }) {
         case "Approved":
         case "Executed":
         case "Accepted":
+        case "Vetoed":
             statusicon = "bi bi-check-circle";
             statustext = statusName;
             statusvariant = "success";
@@ -123,9 +124,9 @@ function renderHeader({ id, statusName }) {
             statustext = "In Progress";
             statusvariant = "primary";
             break;
-        case "Vetoed":
+        case "Expired":
             statusicon = "bi bi-x-circle";
-            statustext = "Vetoed";
+            statustext = "Expired";
             statusvariant = "black";
             break;
         case "Failed":

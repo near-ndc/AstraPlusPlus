@@ -123,7 +123,7 @@ function renderStatus(statusName) {
             statusvariant = "black";
             break;
         case "Rejected":
-            statusicon = "bi bi-x-circle";
+            statusicon = "bi bi-ban";
             statustext = "Rejected";
             statusvariant = "danger";
             break;
