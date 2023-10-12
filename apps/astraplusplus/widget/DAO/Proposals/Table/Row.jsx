@@ -101,20 +101,28 @@ function renderStatus(statusName) {
 
     switch (statusName) {
         case "Approved":
-        case "Vetoed":
-        case "Executed":
         case "Accepted":
             statusicon = "bi bi-check-circle";
             statustext = statusName;
             statusvariant = "success";
             break;
-        case "InProgress":
+        case "Executed":
+            statusicon = "bi bi-play-fill";
+            statustext = statusName;
+            statusvariant = "success";
+            break;
+        case "In Progress":
             statusicon = "spinner-border spinner-border-sm";
-            statustext = "Progress";
+            statustext = "In Progress";
             statusvariant = "primary";
             break;
-        case "Expired":
+        case "Vetoed":
             statusicon = "bi bi-x-circle";
+            statustext = "Expired";
+            statusvariant = "black";
+            break;
+        case "Expired":
+            statusicon = "bi bi-clock";
             statustext = "Expired";
             statusvariant = "black";
             break;

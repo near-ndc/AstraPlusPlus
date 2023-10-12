@@ -22,16 +22,13 @@ State.init({
         time_start: "",
         time_end: ""
     },
-    filtersOpen: false
+    filtersOpen: false,
+    proposals: [],
+    proposalsCount: 0
 });
 
 const execProposal = (proposal) =>
-    Near.call(
-        proposal.dao_id,
-        "execute",
-        { id: proposal.proposal_id },
-        300000000000000
-    );
+    Near.call(daoId, "execute", { id: proposal.id }, 300000000000000);
 
 const Wrapper = styled.div`
     .border-bottom {
@@ -57,53 +54,6 @@ const ProposalCard = styled.div`
     }
 `;
 
-function processProposals(proposals) {
-    const parsedResp = [];
-    proposals?.map((item) => {
-        parsedResp.push({
-            dao_id: daoId,
-            last_updated: "",
-            proposal: {
-                id: item.id,
-                kind: item.kind,
-                votes: item.votes,
-                status: item.status,
-                proposer: item?.proposer,
-                description: item.description,
-                vote_counts: {},
-                submission_time: item?.submission_time
-            },
-            proposal_type: item?.kind,
-            proposal_id: item.id,
-            proposer: item?.proposer,
-            status: item?.status,
-            submission_time: item?.submission_time,
-            transaction_id: ""
-        });
-    });
-    return { body: parsedResp };
-}
-
-const update = (newState) => State.update(newState);
-const proposalsCount = Near.view(daoId, "number_of_proposals");
-
-if (!proposalsCount) return;
-
-const res = useCache(
-    () =>
-        Near.asyncView(daoId, "get_proposals", {
-            from_index: proposalsCount,
-            limit: resPerPage,
-            reverse: true
-        }).then((proposals) => processProposals(proposals)),
-    daoId + "-proposals-congress",
-    { subscribe: false }
-);
-
-if (res === null) {
-    return <></>;
-}
-
 function renderHeader({ id, statusName }) {
     statusName = statusName.replace(/([A-Z])/g, " $1").trim();
     let statusicon;
@@ -112,10 +62,13 @@ function renderHeader({ id, statusName }) {
 
     switch (statusName) {
         case "Approved":
-        case "Executed":
         case "Accepted":
-        case "Vetoed":
             statusicon = "bi bi-check-circle";
+            statustext = statusName;
+            statusvariant = "success";
+            break;
+        case "Executed":
+            statusicon = "bi bi-play-fill";
             statustext = statusName;
             statusvariant = "success";
             break;
@@ -124,15 +77,20 @@ function renderHeader({ id, statusName }) {
             statustext = "In Progress";
             statusvariant = "primary";
             break;
-        case "Expired":
+        case "Vetoed":
             statusicon = "bi bi-x-circle";
+            statustext = "Expired";
+            statusvariant = "black";
+            break;
+        case "Expired":
+            statusicon = "bi bi-clock";
             statustext = "Expired";
             statusvariant = "black";
             break;
         case "Failed":
             statusicon = "bi bi-x-circle";
             statustext = "Failed";
-            statusvariant = "danger";
+            statusvariant = "black";
             break;
         case "Rejected":
             statusicon = "bi bi-ban";
@@ -176,124 +134,123 @@ function renderHeader({ id, statusName }) {
     );
 }
 
+const proposalsCount = Near.view(daoId, "number_of_proposals");
+const proposals = Near.view(daoId, "get_proposals", {
+    from_index: proposalsCount,
+    limit: resPerPage,
+    reverse: true
+});
+
+State.update({
+    proposals: proposals ?? [],
+    proposalsCount: proposalsCount ?? 0
+});
+
 return (
     <Wrapper>
-        {res !== null && !res.body && (
-            <div className="alert alert-danger" role="alert">
-                Couldn't fetch proposals from API. Please try again later.
-            </div>
-        )}
         <div>
-            {res?.body?.length > 0 &&
-                res?.body?.map((proposal) => {
-                    const kindName =
-                        typeof proposal.proposal_type === "string"
-                            ? proposal.proposal_type
-                            : Object.keys(proposal.proposal_type)[0];
+            {state.proposals.map((proposal) => {
+                const kindName =
+                    typeof proposal.kind === "string"
+                        ? proposal.kind
+                        : Object.keys(proposal.kind)[0];
 
-                    if (proposal.status === "Removed") return <></>;
+                if (proposal.status === "Removed") return <></>;
 
-                    return (
-                        <ProposalCard className="d-flex py-3 justify-content-between border-bottom align-items-center">
-                            <div className="d-flex flex-column">
-                                {renderHeader({
-                                    id: proposal.proposal_id,
-                                    statusName: proposal.status
-                                })}
-                                <div class="type">
-                                    {proposal.proposal.kind.FunctionCall ? (
-                                        <>
-                                            <b>Function Call: </b>
-                                            <span className="font-monospace">
-                                                {proposal.proposal.kind.FunctionCall.actions
-                                                    .map((a) => a.method_name)
-                                                    .join(",")}
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <b>{kindName}</b> proposal
-                                        </>
-                                    )}
-                                </div>
-                                <div className="created_at text-secondary d-flex gap-2">
-                                    <div className="gap-1 d-flex">
-                                        <i className="bi bi-clock" />
-                                        <span>
-                                            {new Date(
-                                                proposal.submission_time
-                                            ).toLocaleString()}
+                return (
+                    <ProposalCard className="d-flex py-3 justify-content-between border-bottom align-items-center">
+                        <div className="d-flex flex-column">
+                            {renderHeader({
+                                id: proposal.id,
+                                statusName: proposal.status
+                            })}
+                            <div class="type">
+                                {proposal.kind.FunctionCall ? (
+                                    <>
+                                        <b>Function Call: </b>
+                                        <span className="font-monospace">
+                                            {proposal.kind.FunctionCall.actions
+                                                .map((a) => a.method_name)
+                                                .join(",")}
                                         </span>
-                                    </div>
-                                    <div>|</div>
-                                    <div>
-                                        {
-                                            Object.keys(proposal.proposal.votes)
-                                                .length
-                                        }{" "}
-                                        {Object.keys(proposal.proposal.votes)
-                                            .length === 1
-                                            ? "vote"
-                                            : "votes"}
-                                    </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <b>{kindName}</b> proposal
+                                    </>
+                                )}
+                            </div>
+                            <div className="created_at text-secondary d-flex gap-2">
+                                <div className="gap-1 d-flex">
+                                    <i className="bi bi-clock" />
+                                    <span>
+                                        {new Date(
+                                            proposal.submission_time
+                                        ).toLocaleString()}
+                                    </span>
+                                </div>
+                                <div>|</div>
+                                <div>
+                                    {Object.keys(proposal.votes).length}{" "}
+                                    {Object.keys(proposal.votes).length === 1
+                                        ? "vote"
+                                        : "votes"}
                                 </div>
                             </div>
-                            <div className="d-flex gap-2">
-                                {proposal.status === "Approved" && (
-                                    <Widget
-                                        src="nearui.near/widget/Input.Button"
-                                        props={{
-                                            variant: "primary icon",
-                                            children: (
-                                                <i class="bi bi-caret-right-fill" />
-                                            ),
-                                            onClick: () =>
-                                                execProposal(proposal)
-                                        }}
-                                    />
-                                )}
+                        </div>
+                        <div className="d-flex gap-2">
+                            {proposal.status === "Approved" && (
                                 <Widget
-                                    src="nearui.near/widget/Layout.Modal"
+                                    src="nearui.near/widget/Input.Button"
                                     props={{
-                                        toggle: (
-                                            <Widget
-                                                src="/*__@replace:nui__*//widget/Input.Button"
-                                                props={{
-                                                    variant:
-                                                        "info outline icon",
-                                                    children: (
-                                                        <i class="bi bi-eye" />
-                                                    )
-                                                }}
-                                            />
-                                        ),
-                                        content: (
-                                            <div
-                                                style={{
-                                                    width: 700,
-                                                    maxWidth: "100%"
-                                                }}
-                                            >
-                                                <Widget
-                                                    src="astraplusplus.ndctools.near/widget/DAO.Proposals.Card.index"
-                                                    props={{
-                                                        daoId: daoId,
-                                                        proposalString:
-                                                            JSON.stringify(
-                                                                proposal.proposal
-                                                            ),
-                                                        multiSelectMode: false,
-                                                        isCongressDaoID: true
-                                                    }}
-                                                />
-                                            </div>
-                                        )
+                                        variant: "primary icon",
+                                        children: <i class="bi bi-play-fill" />,
+                                        onClick: () => execProposal(proposal)
                                     }}
                                 />
-                            </div>
-                        </ProposalCard>
-                    );
-                })}
+                            )}
+                            <Widget
+                                src="nearui.near/widget/Layout.Modal"
+                                props={{
+                                    toggle: (
+                                        <Widget
+                                            src="/*__@replace:nui__*//widget/Input.Button"
+                                            props={{
+                                                variant: "info outline icon",
+                                                children: (
+                                                    <i class="bi bi-eye" />
+                                                )
+                                            }}
+                                        />
+                                    ),
+                                    content: (
+                                        <div
+                                            style={{
+                                                width: 700,
+                                                maxWidth: "100%"
+                                            }}
+                                        >
+                                            <Widget
+                                                src="astraplusplus.ndctools.near/widget/DAO.Proposals.Card.index"
+                                                props={{
+                                                    daoId: daoId,
+                                                    proposalString:
+                                                        JSON.stringify({
+                                                            ...proposal,
+                                                            vote_counts: {}
+                                                        }),
+                                                    multiSelectMode: false,
+                                                    isCongressDaoID: true
+                                                }}
+                                            />
+                                        </div>
+                                    )
+                                }}
+                            />
+                        </div>
+                    </ProposalCard>
+                );
+            })}
             <div className="mt-4 d-flex justify-content-center">
                 <Widget
                     src="/*__@replace:nui__*//widget/Input.Button"
