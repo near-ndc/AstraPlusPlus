@@ -162,6 +162,9 @@ function renderStatus(statusName) {
     );
 }
 
+const execProposal = ({ daoId, proposal_id }) =>
+    Near.call(daoId, "execute", { id: proposal_id }, 300000000000000);
+
 return (
     <tr
         style={
@@ -206,7 +209,17 @@ return (
             </td>
         )}
         <td style={{ width: 150 }}>
-            <div className="d-flex justify-content-end">
+            <div className="d-flex justify-content-end gap-2">
+                {proposal.status === "Approved" && (
+                    <Widget
+                        src="nearui.near/widget/Input.Button"
+                        props={{
+                            variant: "primary icon",
+                            children: <i class="bi bi-caret-right-fill" />,
+                            onClick: () => execProposal({ daoId, proposal_id })
+                        }}
+                    />
+                )}
                 <Widget
                     src="nearui.near/widget/Layout.Modal"
                     props={{
