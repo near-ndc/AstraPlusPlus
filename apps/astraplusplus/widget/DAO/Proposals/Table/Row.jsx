@@ -174,7 +174,6 @@ return (
                     accountId: proposal.proposer,
                     options: {
                         showImage: false,
-                        shortenLength: 12,
                         fontSize: 13
                     }
                 }}
@@ -191,7 +190,8 @@ return (
                         daoId,
                         canVote,
                         proposal,
-                        view: "multiVote"
+                        view: "multiVote",
+                        isCongressDaoID
                     }}
                 />
             </td>

@@ -1,5 +1,6 @@
 const { proposals, resPerPage, state, update, isCongressDaoID } = props;
 const { daoId, multiSelectMode } = state;
+const accountId = props.accountId ?? context.accountId ?? "";
 
 const Table = styled.div`
     font-size: 13px;

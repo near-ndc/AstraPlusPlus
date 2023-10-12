@@ -526,7 +526,8 @@ function renderMultiVoteButtons({ daoId, proposal, canVote }) {
                 daoId,
                 proposal,
                 canVote,
-                view: "multiVote"
+                view: "multiVote",
+                isCongressDaoID
             }}
         />
     );
