@@ -372,7 +372,8 @@ State.init({
     proposalsCount: 0,
     hideProposalBtn: true,
     showOptions: false,
-    showHouses: false
+    showHouses: false,
+    isDissolved: false
 });
 
 const getProposalsCount = () => {
@@ -391,6 +392,15 @@ const changeHouse = (house) => {
         showPowerChecksDescription: false,
         vbWithTrust: false
     });
+};
+
+const getDissolvedStatus = () => {
+    const isDissolved = Near.view(
+        Content[state.selectedHouse].address,
+        "is_dissolved",
+        {}
+    );
+    State.update({ isDissolved });
 };
 
 const getProposals = () => {
@@ -420,6 +430,7 @@ State.update({ selectedHouse: router.params.house ?? state.selectedHouse });
 getProposalsCount();
 getProposals();
 getMembers();
+getDissolvedStatus();
 
 const ContentBlock = ({ title, abbr, address, description, metadata }) => (
     <Section className="d-flex flex-column justify-content-between h-100">
@@ -430,38 +441,49 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                         <b>{abbr}</b>
                     </h6>
                 </CircleLogo>
-
-                <div className="mt-1 px-2">
-                    <Widget
-                        src="near/widget/DIG.DropdownMenu"
-                        props={{
-                            trigger: (
-                                <Widget
-                                    src="nearui.near/widget/Input.Button"
-                                    props={{
-                                        children: (
-                                            <i className="bi bi-three-dots"></i>
-                                        ),
-                                        variant: "icon rounded"
-                                    }}
-                                />
-                            ),
-                            items: [
-                                {
-                                    name: "Proposals",
-                                    href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
-                                        Content[state.selectedHouse].address
-                                    }`
-                                },
-                                {
-                                    name: "Members",
-                                    href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
-                                        Content[state.selectedHouse].address
-                                    }&tab=members`
-                                }
-                            ]
-                        }}
-                    />
+                <div className="d-flex gap-2 align-items-center">
+                    {isDissolved && (
+                        <Widget
+                            src="/*__@replace:nui__*//widget/Element.Badge"
+                            props={{
+                                children: <>Dissolved</>,
+                                variant: `disabled round`,
+                                size: "lg"
+                            }}
+                        />
+                    )}
+                    <div className="mt-1 px-2">
+                        <Widget
+                            src="near/widget/DIG.DropdownMenu"
+                            props={{
+                                trigger: (
+                                    <Widget
+                                        src="nearui.near/widget/Input.Button"
+                                        props={{
+                                            children: (
+                                                <i className="bi bi-three-dots"></i>
+                                            ),
+                                            variant: "icon rounded"
+                                        }}
+                                    />
+                                ),
+                                items: [
+                                    {
+                                        name: "Proposals",
+                                        href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
+                                            Content[state.selectedHouse].address
+                                        }`
+                                    },
+                                    {
+                                        name: "Members",
+                                        href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
+                                            Content[state.selectedHouse].address
+                                        }&tab=members`
+                                    }
+                                ]
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
             <div>
