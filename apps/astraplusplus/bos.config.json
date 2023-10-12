@@ -3,9 +3,9 @@
     "aliases": {
         "nui": "nearui.near",
         "pikespeakApiKey": "36f2b87a-7ee6-40d8-80b9-5e68e587a5b5",
-        "HoMDaoId": "hom.gwg-testing.near",
+        "HoMDaoId": "congress-hom-v1.ndc-gwg.near",
         "VotingBodyDaoId": "",
-        "TCDaoId": "tc.gwg-testing.near",
-        "CoADaoId": "coa.gwg-testing.near"
+        "TCDaoId": "congress-tc-v1.ndc-gwg.near",
+        "CoADaoId": "congress-coa-v1.ndc-gwg.near"
     }
 }

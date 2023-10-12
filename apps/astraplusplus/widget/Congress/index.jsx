@@ -16,7 +16,7 @@ const Content = {
     hom: {
         title: "House of Merit",
         abbr: "HoM",
-        address: "hom.gwg-testing.near",
+        address: "congress-hom-v1.ndc-gwg.near",
         color: "#5BC65F",
         description:
             "The House of Merit is in charge of allocating the treasury and deploying capital for the growth of the ecosystem.",
@@ -64,7 +64,7 @@ const Content = {
     coa: {
         title: "Council of Advisors",
         abbr: "CoA",
-        address: "coa.gwg-testing.near",
+        address: "congress-coa-v1.ndc-gwg.near",
         color: "#4498E0",
         description:
             "The Council of Advisors is in charge of vetoing proposals from the HoM and guiding the deployment of the treasury.",
@@ -99,7 +99,7 @@ const Content = {
     tc: {
         title: "Transparency Commission",
         abbr: "TC",
-        address: "tc.gwg-testing.near",
+        address: "congress-tc-v1.ndc-gwg.near",
         color: "#F19D38",
         description:
             "The Transparency Commission is In charge of keeping behavior of elected officials clean, and making sure cartels do not form in the ecosystem.",
@@ -144,52 +144,52 @@ const Content = {
                 }
             ]
         }
-    },
-    vb: {
-        title: "Voting Body",
-        abbr: "VB",
-        address: "vb.gwg-testing.near",
-        color: "#F29BC0",
-        description:
-            "The Voting Body consists all fair voters who participated in the inaugural NDC elections and received a “I Voted” Soul Bound Token. ",
-        metadata: {
-            funds: "10M",
-            groups: 1,
-            powers: [
-                {
-                    text: "The Voting Body must ratify Set Up Package.",
-                    description:
-                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
-                },
-                {
-                    text: "The Voting Body may veto large budget items and recurring budget items.",
-                    description:
-                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
-                },
-                {
-                    text: "The Voting Body may report activities to be investigated by the Transparency Commission.",
-                    description:
-                        "The Voting Body may bring issues to the Transparency Commission."
-                },
-                {
-                    text: "The Voting Body may vote to dissolve the House of Merit, Council of Advisors, and the Transparency Commission.",
-                    description:
-                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
-                },
-                {
-                    text: "The Voting Body may motion to amend the governance framework.",
-                    description:
-                        "The vote needs a NEAR Supermajority Consent, which is 12% of voting body participating with a supermajority of 60% approval."
-                },
-                {
-                    text: "The Voting Body may motion to amend the legal framework of the Trust Instrument.",
-                    description:
-                        "The vote needs a NEAR Supermajority Consent, which is 12% of voting body participating with a supermajority of 60% approval."
-                }
-            ],
-            checks: null
-        }
     }
+    // vb: {
+    //     title: "Voting Body",
+    //     abbr: "VB",
+    //     address: "vb.gwg-testing.near",
+    //     color: "#F29BC0",
+    //     description:
+    //         "The Voting Body consists all fair voters who participated in the inaugural NDC elections and received a “I Voted” Soul Bound Token. ",
+    //     metadata: {
+    //         funds: "10M",
+    //         groups: 1,
+    //         powers: [
+    //             {
+    //                 text: "The Voting Body must ratify Set Up Package.",
+    //                 description:
+    //                     "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
+    //             },
+    //             {
+    //                 text: "The Voting Body may veto large budget items and recurring budget items.",
+    //                 description:
+    //                     "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
+    //             },
+    //             {
+    //                 text: "The Voting Body may report activities to be investigated by the Transparency Commission.",
+    //                 description:
+    //                     "The Voting Body may bring issues to the Transparency Commission."
+    //             },
+    //             {
+    //                 text: "The Voting Body may vote to dissolve the House of Merit, Council of Advisors, and the Transparency Commission.",
+    //                 description:
+    //                     "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
+    //             },
+    //             {
+    //                 text: "The Voting Body may motion to amend the governance framework.",
+    //                 description:
+    //                     "The vote needs a NEAR Supermajority Consent, which is 12% of voting body participating with a supermajority of 60% approval."
+    //             },
+    //             {
+    //                 text: "The Voting Body may motion to amend the legal framework of the Trust Instrument.",
+    //                 description:
+    //                     "The vote needs a NEAR Supermajority Consent, which is 12% of voting body participating with a supermajority of 60% approval."
+    //             }
+    //         ],
+    //         checks: null
+    //     }
+    // }
 };
 
 const Container = styled.div`
@@ -491,12 +491,12 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                         name: Content.tc.title,
                                         onSelect: () => changeHouse("tc"),
                                         href: getHouseUrl("tc")
-                                    },
-                                    {
-                                        name: Content.vb.title,
-                                        onSelect: () => changeHouse("vb"),
-                                        href: getHouseUrl("vb")
                                     }
+                                    // {
+                                    //     name: Content.vb.title,
+                                    //     onSelect: () => changeHouse("vb"),
+                                    //     href: getHouseUrl("vb")
+                                    // }
                                 ]
                             }}
                         />
@@ -788,11 +788,12 @@ return (
                             ? COA_IMG
                             : state.selectedHouse === "tc"
                             ? TC_IMG
-                            : state.selectedHouse === "vb"
-                            ? state.vbWithTrust
-                                ? VB_TRUST_IMG
-                                : VB_IMG
-                            : HOM_IMG
+                            : null
+                        // : state.selectedHouse === "vb"
+                        // ? state.vbWithTrust
+                        //     ? VB_TRUST_IMG
+                        //     : VB_IMG
+                        // : HOM_IMG
                     }
                 />
             </ImgContainer>
