@@ -697,7 +697,8 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                         "/*__@appAccount__*//widget/DAO.Proposal.Create"
                                     }
                                     props={{
-                                        daoId: `${state.selectedHouse}.gwg-testing.near`
+                                        daoId: Content[state.selectedHouse]
+                                            .address
                                     }}
                                 />
                             </div>

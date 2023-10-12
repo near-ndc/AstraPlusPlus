@@ -5,7 +5,7 @@ const daoId = props.daoId;
 const isCongressDaoID = props.isCongressDaoID;
 const powerType = props.powerType;
 const showPowers = props.showPowers ?? true;
-const registry = "registry-v1.gwg-testing.near";
+const registry = "registry.i-am-human.near";
 
 const CoADaoId = "/*__@replace:CoADaoId__*/";
 const VotingBodyDaoId = "/*__@replace:VotingBodyDaoId__*/";
