@@ -90,7 +90,6 @@ function renderHeader({ typeName, id, daoId, statusName }) {
 
     switch (statusName) {
         case "Approved":
-        case "Vetoed":
         case "Executed":
         case "Accepted":
             statusicon = "bi bi-check-circle";
@@ -102,7 +101,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
             statustext = "Proposal In Progress";
             statusvariant = "primary";
             break;
-        case "Expired":
+        case "Vetoed":
             statusicon = "bi bi-x-circle";
             statustext = "Proposal Expired";
             statusvariant = "black";
@@ -113,7 +112,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
             statusvariant = "black";
             break;
         case "Rejected":
-            statusicon = "bi bi-x-circle";
+            statusicon = "bi bi-ban";
             statustext = "Proposal Rejected";
             statusvariant = "danger";
             break;
