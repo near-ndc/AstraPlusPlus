@@ -197,7 +197,7 @@ const expensiveWork = () => {
     }
 
     if (isCongressDaoID) {
-        totalVotesNeeded = Math.ceil(roles?.members?.length / 2 + 1);
+        totalVotesNeeded = daoConfig?.threshold;
     }
 
     let totalVotes = {
