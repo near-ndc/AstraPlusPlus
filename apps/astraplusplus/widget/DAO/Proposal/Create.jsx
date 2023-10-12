@@ -222,6 +222,17 @@ return (
                     }}
                 />
             )}
+            {state.proposalType.value === "DismissAndBan" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.FunctionCall"
+                    props={{
+                        daoId,
+                        onClose,
+                        powerType: "DismissAndBan",
+                        showPowers: false
+                    }}
+                />
+            )}
         </div>
     </Wrapper>
 );

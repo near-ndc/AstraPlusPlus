@@ -3,7 +3,9 @@ const contractId = props.contractId;
 const onClose = props.onClose;
 const daoId = props.daoId;
 const isCongressDaoID = props.isCongressDaoID;
-const registry = "registry.i-am-human.near";
+const powerType = props.powerType;
+const showPowers = props.showPowers ?? true;
+const registry = "registry-v1.gwg-testing.near";
 
 const CoADaoId = "/*__@replace:CoADaoId__*/";
 const VotingBodyDaoId = "/*__@replace:VotingBodyDaoId__*/";
@@ -27,7 +29,7 @@ State.init({
     error: undefined,
     receiver_id: null,
     description: null,
-    powerType: null,
+    powerType: powerType,
     member: null, // for dismiss and ban hook
     house: null, // for dismiss and ban hook
     accounts: null, // for unban hook
@@ -54,10 +56,6 @@ const powerTypes =
               {
                   text: "Dismiss member from an house",
                   value: "Dismiss"
-              },
-              {
-                  text: "Ban member from an house",
-                  value: "DismissAndBan"
               }
           ]
         : daoId === VotingBodyDaoId
@@ -85,7 +83,7 @@ const handleFunctionCall = () => {
             return;
         }
     }
-    if (state.powerType !== "Unban" && state.powerType !== "Ban") {
+    if (state.powerType !== "Unban" && state.powerType !== "DismissAndBan") {
         if (isEmpty(state.method_name)) {
             State.update({
                 error: "Please enter a valid method name"
@@ -167,7 +165,7 @@ const handleFunctionCall = () => {
                                     "utf-8"
                                 ).toString("base64"),
                                 deposit: deposit,
-                                gas: state.gas
+                                gas: "20000000000000"
                             }
                         ]
                     }
@@ -378,7 +376,7 @@ const defaultDescription =
 
 return (
     <>
-        {(daoId === CoADaoId || daoId === TCDaoId) && (
+        {(daoId === CoADaoId || daoId === TCDaoId) && showPowers && (
             <div className="mb-3">
                 <Widget
                     src={`sking.near/widget/Common.Inputs.Select`}
@@ -539,6 +537,15 @@ return (
                                 />
                             </div>
                         )}
+                        <div className="mb-3">
+                            <h5>Gas</h5>
+                            <input
+                                type="number"
+                                value={state.gas}
+                                onChange={(e) => onChangeGas(e.target.value)}
+                                defaultValue="200000000000000"
+                            />
+                        </div>
                     </>
                 )}
                 <div className="mb-3">
@@ -548,15 +555,6 @@ return (
                         value={state.deposit}
                         onChange={(e) => onChangeDeposit(e.target.value)}
                         defaultValue={0}
-                    />
-                </div>
-                <div className="mb-3">
-                    <h5>Gas</h5>
-                    <input
-                        type="number"
-                        value={state.gas}
-                        onChange={(e) => onChangeGas(e.target.value)}
-                        defaultValue="200000000000000"
                     />
                 </div>
             </>

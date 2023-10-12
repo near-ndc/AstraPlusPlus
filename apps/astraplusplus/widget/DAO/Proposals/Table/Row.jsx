@@ -31,7 +31,8 @@ const proposalKinds = {
     ChangePolicyUpdateParameters: "policy_update_parameters",
     Text: "Text",
     FundingRequest: "FundingRequest",
-    RecurrentFundingRequest: "RecurrentFundingRequest"
+    RecurrentFundingRequest: "RecurrentFundingRequest",
+    DismissAndBan: "DismissAndBan"
 };
 
 const actions = {

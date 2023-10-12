@@ -54,6 +54,10 @@ const type = {
         {
             title: "Recurrent Funding Request",
             value: "RecurrentFundingRequest"
+        },
+        {
+            title: "Dismiss And Ban",
+            value: "DismissAndBan"
         }
     ],
     policy: [

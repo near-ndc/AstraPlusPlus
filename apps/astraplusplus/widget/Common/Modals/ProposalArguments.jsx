@@ -87,6 +87,33 @@ if (proposal_type === "Vote") {
     content = "";
 }
 
+if (proposal_type === "DismissAndBan") {
+    content = (
+        <>
+            <div>
+                <h5>Member</h5>
+                <Widget
+                    src="mob.near/widget/Profile.ShortInlineBlock"
+                    props={{
+                        accountId: kind.DismissAndBan.member,
+                        tooltip: true
+                    }}
+                />
+            </div>
+            <div>
+                <h5>House</h5>
+                <Widget
+                    src="mob.near/widget/Profile.ShortInlineBlock"
+                    props={{
+                        accountId: kind.DismissAndBan.house,
+                        tooltip: true
+                    }}
+                />
+            </div>
+        </>
+    );
+}
+
 if (proposal_type === "Transfer")
     content = (
         <>
