@@ -102,6 +102,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
             statusvariant = "success";
             break;
         case "In Progress":
+        case "InProgress":
             statusicon = "spinner-border spinner-border-sm";
             statustext = "Proposal In Progress";
             statusvariant = "primary";

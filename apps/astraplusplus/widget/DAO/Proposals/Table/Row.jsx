@@ -99,6 +99,7 @@ function renderStatus(statusName) {
     let statusicon;
     let statustext;
     let statusvariant;
+    console.log(statusName);
 
     switch (statusName) {
         case "Approved":
@@ -113,6 +114,7 @@ function renderStatus(statusName) {
             statusvariant = "success";
             break;
         case "In Progress":
+        case "InProgress":
             statusicon = "spinner-border spinner-border-sm";
             statustext = "In Progress";
             statusvariant = "primary";
