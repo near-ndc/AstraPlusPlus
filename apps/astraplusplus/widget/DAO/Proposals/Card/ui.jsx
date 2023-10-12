@@ -148,7 +148,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                 statusName === "Approved" &&
                                 proposal?.submission_time +
                                     daoConfig?.voting_duration +
-                                    daoConfig?.cooldown >
+                                    daoConfig?.cooldown <
                                     Date.now() && (
                                     <Widget
                                         src="nearui.near/widget/Input.Button"

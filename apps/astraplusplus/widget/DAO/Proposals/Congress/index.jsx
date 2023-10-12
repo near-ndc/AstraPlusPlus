@@ -211,7 +211,7 @@ return (
                             {proposal.status === "Approved" &&
                                 proposal?.submission_time +
                                     state.daoConfig?.voting_duration +
-                                    state.daoConfig?.cooldown >
+                                    state.daoConfig?.cooldown <
                                     Date.now() && (
                                     <Widget
                                         src="nearui.near/widget/Input.Button"

@@ -99,7 +99,6 @@ function renderStatus(statusName) {
     let statusicon;
     let statustext;
     let statusvariant;
-    console.log(statusName);
 
     switch (statusName) {
         case "Approved":
@@ -217,7 +216,7 @@ return (
                     proposal.status === "Approved" &&
                     proposal?.submission_time +
                         daoConfig?.voting_duration +
-                        daoConfig?.cooldown >
+                        daoConfig?.cooldown <
                         Date.now() && (
                         <Widget
                             src="nearui.near/widget/Input.Button"
@@ -259,7 +258,8 @@ return (
                                         proposalString:
                                             JSON.stringify(proposal),
                                         multiSelectMode: state.multiSelectMode,
-                                        isCongressDaoID
+                                        isCongressDaoID,
+                                        daoConfig
                                     }}
                                 />
                             </div>
