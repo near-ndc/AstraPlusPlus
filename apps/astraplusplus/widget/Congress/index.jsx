@@ -437,7 +437,9 @@ const getMembers = () => {
 };
 
 const getHouseUrl = (house) =>
-    `#//*__@appAccount__*//widget/home?page=congress&house=${house}`;
+    `#//*__@appAccount__*//widget/home?page=congress&house=${house}${
+        props.dev && "&dev=true"
+    }`;
 
 State.update({ selectedHouse: router.params.house ?? state.selectedHouse });
 getProposalsCount();
@@ -485,13 +487,15 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                         name: "Proposals",
                                         href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
                                             Content[state.selectedHouse].address
-                                        }`
+                                        }${props.dev && "&dev=true"}`
                                     },
                                     {
                                         name: "Members",
                                         href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
                                             Content[state.selectedHouse].address
-                                        }&tab=members`
+                                        }&tab=members${
+                                            props.dev && "&dev=true"
+                                        }`
                                     }
                                 ]
                             }}
@@ -668,7 +672,7 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                     variant: "info outline",
                     href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
                         Content[state.selectedHouse].address
-                    }`,
+                    }${props.dev && "&dev=true"}`,
                     size: "sm"
                 }}
             />
@@ -710,6 +714,7 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                         "/*__@appAccount__*//widget/DAO.Proposal.Create"
                                     }
                                     props={{
+                                        dev: props.dev,
                                         daoId: Content[state.selectedHouse]
                                             .address,
                                         dev: props.dev

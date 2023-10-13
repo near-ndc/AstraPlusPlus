@@ -2,6 +2,7 @@ const daoId = props.daoId;
 const accountId = props.accountId ?? context.accountId;
 const onClose = props.onClose;
 
+
 const CoADaoId = props.dev
     ? "/*__@replace:CoADaoIdTesting__*/"
     : "/*__@replace:CoADaoId__*/";
