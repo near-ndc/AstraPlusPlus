@@ -1,6 +1,19 @@
 const { router } = props;
 const accountId = props.accountId ?? context.accountId ?? "";
 
+const CoADaoId = props.dev
+    ? "/*__@replace:CoADaoIdTesting__*/"
+    : "/*__@replace:CoADaoId__*/";
+const VotingBodyDaoId = props.dev
+    ? "/*__@replace:VotingBodyDaoIdTesting__*/"
+    : "/*__@replace:VotingBodyDaoId__*/";
+const TCDaoId = props.dev
+    ? "/*__@replace:TCDaoIdTesting__*/"
+    : "/*__@replace:TCDaoId__*/";
+const HoMDaoId = props.dev
+    ? "/*__@replace:HoMDaoIdTesting__*/"
+    : "/*__@replace:HoMDaoId__*/";
+
 const HOM_IMG =
     "https://ipfs.near.social/ipfs/bafkreidqibol2yjcaja7hdivezfumbb323niqz6csntmeyrscl2iym5vrm";
 const COA_IMG =
@@ -16,7 +29,7 @@ const Content = {
     hom: {
         title: "House of Merit",
         abbr: "HoM",
-        address: "congress-hom-v1.ndc-gwg.near",
+        address: HoMDaoId,
         color: "#5BC65F",
         description:
             "The House of Merit is in charge of allocating the treasury and deploying capital for the growth of the ecosystem.",
@@ -64,7 +77,7 @@ const Content = {
     coa: {
         title: "Council of Advisors",
         abbr: "CoA",
-        address: "congress-coa-v1.ndc-gwg.near",
+        address: CoADaoId,
         color: "#4498E0",
         description:
             "The Council of Advisors is in charge of vetoing proposals from the HoM and guiding the deployment of the treasury.",
@@ -99,7 +112,7 @@ const Content = {
     tc: {
         title: "Transparency Commission",
         abbr: "TC",
-        address: "congress-tc-v1.ndc-gwg.near",
+        address: TCDaoId,
         color: "#F19D38",
         description:
             "The Transparency Commission is In charge of keeping behavior of elected officials clean, and making sure cartels do not form in the ecosystem.",
@@ -148,7 +161,7 @@ const Content = {
     // vb: {
     //     title: "Voting Body",
     //     abbr: "VB",
-    //     address: "vb.gwg-testing.near",
+    //     address: VotingBodyDaoId,
     //     color: "#F29BC0",
     //     description:
     //         "The Voting Body consists all fair voters who participated in the inaugural NDC elections and received a “I Voted” Soul Bound Token. ",

@@ -7,10 +7,18 @@ const powerType = props.powerType;
 const showPowers = props.showPowers ?? true;
 const registry = "registry.i-am-human.near";
 
-const CoADaoId = "/*__@replace:CoADaoId__*/";
-const VotingBodyDaoId = "/*__@replace:VotingBodyDaoId__*/";
-const TCDaoId = "/*__@replace:TCDaoId__*/";
-const HoMDaoId = "/*__@replace:HoMDaoId__*/";
+const CoADaoId = props.dev
+    ? "/*__@replace:CoADaoIdTesting__*/"
+    : "/*__@replace:CoADaoId__*/";
+const VotingBodyDaoId = props.dev
+    ? "/*__@replace:VotingBodyDaoIdTesting__*/"
+    : "/*__@replace:VotingBodyDaoId__*/";
+const TCDaoId = props.dev
+    ? "/*__@replace:TCDaoIdTesting__*/"
+    : "/*__@replace:TCDaoId__*/";
+const HoMDaoId = props.dev
+    ? "/*__@replace:HoMDaoIdTesting__*/"
+    : "/*__@replace:HoMDaoId__*/";
 
 if (!accountId) {
     return "Please connect your NEAR wallet :)";

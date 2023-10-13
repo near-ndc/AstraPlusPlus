@@ -3,7 +3,9 @@ const daoId = props.daoId ?? "multi.sputnik-dao.near";
 const onClose = props.onClose;
 const isCongressDaoID = props.isCongressDaoID;
 
-const HoMDaoId = "/*__@replace:HoMDaoId__*/";
+const HoMDaoId = props.dev
+    ? "/*__@replace:HoMDaoIdTesting__*/"
+    : "/*__@replace:HoMDaoId__*/";
 
 if (!accountId) {
     return "Please connect your NEAR wallet :)";
