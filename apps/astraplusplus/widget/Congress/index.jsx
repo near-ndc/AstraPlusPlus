@@ -721,7 +721,8 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                     props={{
                                         dev: props.dev,
                                         daoId: Content[state.selectedHouse]
-                                            .address
+                                            .address,
+                                        dev: props.dev
                                     }}
                                 />
                             </div>

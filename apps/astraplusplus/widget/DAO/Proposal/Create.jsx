@@ -238,7 +238,8 @@ return (
                         daoId,
                         onClose,
                         powerType: "DismissAndBan",
-                        showPowers: false
+                        showPowers: false,
+                        isCongressDaoID
                     }}
                 />
             )}
