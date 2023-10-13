@@ -395,7 +395,7 @@ const getProposalsCount = () => {
         "number_of_proposals",
         {}
     );
-    State.update({ proposalsCount });
+    State.update({ proposalsCount: proposalsCount ?? 0 });
 };
 
 const changeHouse = (house) => {
@@ -413,7 +413,7 @@ const getDissolvedStatus = () => {
         "is_dissolved",
         {}
     );
-    State.update({ isDissolved });
+    State.update({ isDissolved: isDissolved ?? false });
 };
 
 const getProposals = () => {
@@ -432,8 +432,13 @@ const getMembers = () => {
         "get_members",
         {}
     );
-    const isMember = resp?.members?.includes(accountId);
-    State.update({ members: resp?.members ?? [], hideProposalBtn: !isMember });
+
+    const members = resp?.members ?? [];
+    if (members)
+        State.update({
+            members,
+            hideProposalBtn: !members.includes(accountId)
+        });
 };
 
 const getHouseUrl = (house) =>
@@ -805,7 +810,7 @@ return (
                     state.vbWithTrust ? "px-1" : "px-5"
                 }`}
             >
-                {state.members.find((m) => m === context.accountId) && (
+                {state.members.find((m) => m === accountId) && (
                     <Info className="mb-4 py-2 px-3 gap-2 d-flex justify-content-center align-items-center">
                         <UserIcon color={Content[state.selectedHouse].color}>
                             <img
