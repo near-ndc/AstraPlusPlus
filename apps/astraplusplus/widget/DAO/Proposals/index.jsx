@@ -98,7 +98,7 @@ return (
 
             <Widget
                 src="/*__@appAccount__*//widget/DAO.Proposals.ProposalsPikespeak"
-                props={{ daoId: daoId }}
+                props={{ daoId: daoId, dev: props.dev }}
             />
         </div>
     </>
