@@ -336,7 +336,9 @@ function renderVoteButtons({
       z-index: 0;
       background-color: rgb(var(--vote-button-bg));
       ${({ percentage }) => `
-        min-width: ${percentage ? `${percentage}%` : "120px"};
+        min-width: ${
+            percentage && percentage > 25 ? `${percentage}%` : "120px" // with less than 25% the width is less than 120px
+        };
       `}
     }
 
@@ -352,7 +354,7 @@ function renderVoteButtons({
       background-color: var(--vote-button-bg);
 
       min-width: ${({ percentage }) =>
-          percentage ? `${percentage}%` : "120px"};
+          percentage && percentage > 25 ? `${percentage}%` : "120px"};
 
       ${({ finsihed, wins }) =>
           finsihed &&
