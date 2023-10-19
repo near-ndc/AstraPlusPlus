@@ -325,6 +325,10 @@ function renderVoteButtons({
       --vote-button-bg: 245, 197, 24;
     }
 
+    &.abstain {
+        --vote-button-bg: 245, 197, 24;
+      }
+
     &:before {
       content: "";
       position: absolute;
@@ -394,13 +398,15 @@ function renderVoteButtons({
     const percentages = {
         yes: Math.round((totalVotes.yes / totalVotesNeeded) * 100) || 0,
         no: Math.round((totalVotes.no / totalVotesNeeded) * 100) || 0,
-        spam: Math.round((totalVotes.spam / totalVotesNeeded) * 100) || 0
+        spam: Math.round((totalVotes.spam / totalVotesNeeded) * 100) || 0,
+        abstain: Math.round((totalVotes.abstain / totalVotesNeeded) * 100) || 0
     };
 
     const wins = {
         yes: statusName === "Approved",
         no: statusName === "Rejected",
-        spam: statusName === "Failed"
+        spam: statusName === "Failed",
+        abstain: statusName === "Failed"
     };
 
     const finsihed = statusName !== "In Progress";
@@ -408,18 +414,17 @@ function renderVoteButtons({
     const voted = {
         yes: votes[accountId || ";;;"] === "Approve",
         no: votes[accountId || ";;;"] === "Reject",
-        spam: votes[accountId || ";;;"] === "Remove"
+        spam: votes[accountId || ";;;"] === "Remove",
+        abstain: votes[accountId || ";;;"] === "Abstain"
     };
 
-    const alreadyVoted = voted.yes || voted.no || voted.spam;
+    const alreadyVoted = voted.yes || voted.no || voted.spam || voted.abstain;
 
     return (
         <div
             className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
             style={{
-                gridTemplateColumns: isCongressDaoID
-                    ? "1fr 1fr"
-                    : "1fr 1fr 120px"
+                gridTemplateColumns: "1fr 1fr 120px"
             }}
         >
             <div className="w-100">
@@ -500,7 +505,38 @@ function renderVoteButtons({
                     </div>
                 </VoteButton>
             </div>
-            {!isCongressDaoID && (
+            {isCongressDaoID ? (
+                <div className="w-100">
+                    {voted.abstain && (
+                        <Widget
+                            src="/*__@replace:nui__*//widget/Element.Badge"
+                            props={{
+                                size: "sm",
+                                variant: "info outline mb-1",
+                                children: "You voted"
+                            }}
+                        />
+                    )}
+
+                    <VoteButton
+                        className="abstain"
+                        percentage={percentages.abstain}
+                        finsihed={finsihed}
+                        wins={wins.abstain}
+                        myVote={voted.abstain}
+                        onClick={() => handleVote("VoteAbstain")}
+                        disabled={
+                            alreadyVoted || finsihed || !isAllowedToVote[2]
+                        }
+                    >
+                        <div>
+                            <span>Abstain</span>
+                            <i className="bi bi-exclamation-circle"></i>
+                        </div>
+                        <div></div>
+                    </VoteButton>
+                </div>
+            ) : (
                 <div className="w-100">
                     {voted.spam && (
                         <Widget

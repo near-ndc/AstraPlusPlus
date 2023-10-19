@@ -33,7 +33,7 @@ if (view === "submit") {
                     vote = "VoteReject";
                     break;
                 case "2":
-                    vote = "VoteRemove";
+                    vote = isCongressDaoID ? "VoteAbstain" : "VoteRemove";
                     break;
                 default:
                     console.error("Invalid vote");
@@ -70,7 +70,7 @@ if (view === "submit") {
     const indexToVote = (i) => {
         if (i === "0") return "Yes";
         if (i === "1") return "No";
-        if (i === "2") return "Spam";
+        if (i === "2") return isCongressDaoID ? "Abstain" : "Spam";
     };
     return (
         <Wrapper className="ndc-card p-4">
@@ -193,9 +193,12 @@ const Wrapper = styled.div`
     }
 `;
 
+const allowedMethods = isCongressDaoID
+    ? ["Yes", "No", "Abstain"]
+    : ["Yes", "No", "Spam"];
 return (
     <Wrapper className="d-flex gap-1" {...(props.containerProps || {})}>
-        {["Yes", "No", "Spam"].map((option, index) => {
+        {allowedMethods.map((option, index) => {
             return (
                 <label
                     key={index}
