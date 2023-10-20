@@ -3,13 +3,15 @@
     "aliases": {
         "nui": "nearui.near",
         "pikespeakApiKey": "36f2b87a-7ee6-40d8-80b9-5e68e587a5b5",
+        "RegistryId": "registry.i-am-human.near",
+        "RegistryIdTesting": "registry-v1.gwg-testing.near",
         "HoMDaoId": "congress-hom-v1.ndc-gwg.near",
-        "TCDaoId": "congress-tc-v1.ndc-gwg.near",
-        "CoADaoId": "congress-coa-v1.ndc-gwg.near",
-        "VotingBodyDaoId": "",
         "HoMDaoIdTesting": "hom.gwg-testing.near",
+        "TCDaoId": "congress-tc-v1.ndc-gwg.near",
         "TCDaoIdTesting": "tc.gwg-testing.near",
+        "CoADaoId": "congress-coa-v1.ndc-gwg.near",
         "CoADaoIdTesting": "coa.gwg-testing.near",
-        "VotingBodyDaoIdTesting": ""
+        "VotingBodyDaoId": "",
+        "VotingBodyDaoIdTesting": "vb.gwg-testing.near"
     }
 }

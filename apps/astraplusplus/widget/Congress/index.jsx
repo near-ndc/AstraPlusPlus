@@ -1,6 +1,9 @@
 const { router } = props;
 const accountId = props.accountId ?? context.accountId ?? "";
 
+const RegistryId = props.dev
+    ? "/*__@replace:RegistryIdTesting__*/"
+    : "/*__@replace:RegistryId__*/";
 const CoADaoId = props.dev
     ? "/*__@replace:CoADaoIdTesting__*/"
     : "/*__@replace:CoADaoId__*/";
@@ -157,52 +160,52 @@ const Content = {
                 }
             ]
         }
+    },
+    vb: {
+        title: "Voting Body",
+        abbr: "VB",
+        address: VotingBodyDaoId,
+        color: "#F29BC0",
+        description:
+            "The Voting Body consists all fair voters who participated in the inaugural NDC elections and received a “I Voted” Soul Bound Token. ",
+        metadata: {
+            funds: "10M",
+            groups: 1,
+            powers: [
+                {
+                    text: "The Voting Body must ratify Set Up Package.",
+                    description:
+                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
+                },
+                {
+                    text: "The Voting Body may veto large budget items and recurring budget items.",
+                    description:
+                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
+                },
+                {
+                    text: "The Voting Body may report activities to be investigated by the Transparency Commission.",
+                    description:
+                        "The Voting Body may bring issues to the Transparency Commission."
+                },
+                {
+                    text: "The Voting Body may vote to dissolve the House of Merit, Council of Advisors, and the Transparency Commission.",
+                    description:
+                        "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
+                },
+                {
+                    text: "The Voting Body may motion to amend the governance framework.",
+                    description:
+                        "The vote needs a NEAR Supermajority Consent, which is 12% of voting body participating with a supermajority of 60% approval."
+                },
+                {
+                    text: "The Voting Body may motion to amend the legal framework of the Trust Instrument.",
+                    description:
+                        "The vote needs a NEAR Supermajority Consent, which is 12% of voting body participating with a supermajority of 60% approval."
+                }
+            ],
+            checks: null
+        }
     }
-    // vb: {
-    //     title: "Voting Body",
-    //     abbr: "VB",
-    //     address: VotingBodyDaoId,
-    //     color: "#F29BC0",
-    //     description:
-    //         "The Voting Body consists all fair voters who participated in the inaugural NDC elections and received a “I Voted” Soul Bound Token. ",
-    //     metadata: {
-    //         funds: "10M",
-    //         groups: 1,
-    //         powers: [
-    //             {
-    //                 text: "The Voting Body must ratify Set Up Package.",
-    //                 description:
-    //                     "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
-    //             },
-    //             {
-    //                 text: "The Voting Body may veto large budget items and recurring budget items.",
-    //                 description:
-    //                     "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
-    //             },
-    //             {
-    //                 text: "The Voting Body may report activities to be investigated by the Transparency Commission.",
-    //                 description:
-    //                     "The Voting Body may bring issues to the Transparency Commission."
-    //             },
-    //             {
-    //                 text: "The Voting Body may vote to dissolve the House of Merit, Council of Advisors, and the Transparency Commission.",
-    //                 description:
-    //                     "The vote needs a NEAR Consent, which is 7% of voting body participating with a simple majority approval."
-    //             },
-    //             {
-    //                 text: "The Voting Body may motion to amend the governance framework.",
-    //                 description:
-    //                     "The vote needs a NEAR Supermajority Consent, which is 12% of voting body participating with a supermajority of 60% approval."
-    //             },
-    //             {
-    //                 text: "The Voting Body may motion to amend the legal framework of the Trust Instrument.",
-    //                 description:
-    //                     "The vote needs a NEAR Supermajority Consent, which is 12% of voting body participating with a supermajority of 60% approval."
-    //             }
-    //         ],
-    //         checks: null
-    //     }
-    // }
 };
 
 const Container = styled.div`
@@ -381,12 +384,11 @@ State.init({
     proposals: [],
     members: [],
     showPowerChecksDescription: false,
-    vbWithTrust: false,
     proposalsCount: 0,
-    hideProposalBtn: true,
     showOptions: false,
     showHouses: false,
-    isDissolved: false
+    isDissolved: false,
+    isHuman: false
 });
 
 const getProposalsCount = () => {
@@ -402,8 +404,7 @@ const changeHouse = (house) => {
     State.update({
         selectedHouse: house,
         selectedTab: "powers",
-        showPowerChecksDescription: false,
-        vbWithTrust: false
+        showPowerChecksDescription: false
     });
 };
 
@@ -434,11 +435,7 @@ const getMembers = () => {
     );
 
     const members = resp?.members ?? [];
-    if (members)
-        State.update({
-            members,
-            hideProposalBtn: !members.includes(accountId)
-        });
+    if (members) State.update({ members });
 };
 
 const getHouseUrl = (house) =>
@@ -446,11 +443,36 @@ const getHouseUrl = (house) =>
         props.dev && "&dev=true"
     }`;
 
+const getMenuItems = () => {
+    const widgetUrl = `#//*__@appAccount__*//widget/home?page=dao&daoId=${
+        Content[state.selectedHouse].address
+    }${props.dev && "&dev=true"}`;
+    const base = [{ name: "Proposals", href: `${widgetUrl}&tab=proposals` }];
+
+    if (state.selectedHouse !== "vb")
+        base.push({ name: "Members", href: `${widgetUrl}&tab=members` });
+
+    return base;
+};
+
+const checkIsHuman = () => {
+    const userSBTs = Near.view(RegistryId, "is_human", { account: accountId });
+    if (userSBTs) {
+        userSBTs.forEach((sbt) => {
+            if ("fractal.i-am-human.near" === sbt[0])
+                State.update({ isHuman: true });
+        });
+    }
+};
+
 State.update({ selectedHouse: router.params.house ?? state.selectedHouse });
+checkIsHuman();
 getProposalsCount();
 getProposals();
-getMembers();
-getDissolvedStatus();
+if (state.selectedHouse !== "vb") {
+    getDissolvedStatus();
+    getMembers();
+}
 
 const ContentBlock = ({ title, abbr, address, description, metadata }) => (
     <Section className="d-flex flex-column justify-content-between h-100">
@@ -487,22 +509,7 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                         }}
                                     />
                                 ),
-                                items: [
-                                    {
-                                        name: "Proposals",
-                                        href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
-                                            Content[state.selectedHouse].address
-                                        }${props.dev && "&dev=true"}`
-                                    },
-                                    {
-                                        name: "Members",
-                                        href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
-                                            Content[state.selectedHouse].address
-                                        }&tab=members${
-                                            props.dev && "&dev=true"
-                                        }`
-                                    }
-                                ]
+                                items: getMenuItems()
                             }}
                         />
                     </div>
@@ -535,12 +542,12 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                         name: Content.tc.title,
                                         onSelect: () => changeHouse("tc"),
                                         href: getHouseUrl("tc")
+                                    },
+                                    {
+                                        name: Content.vb.title,
+                                        onSelect: () => changeHouse("vb"),
+                                        href: getHouseUrl("vb")
                                     }
-                                    // {
-                                    //     name: Content.vb.title,
-                                    //     onSelect: () => changeHouse("vb"),
-                                    //     href: getHouseUrl("vb")
-                                    // }
                                 ]
                             }}
                         />
@@ -563,16 +570,18 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                 <span className="text-secondary">{description}</span>
             </div>
             <div className="d-flex justify-content-around my-4">
-                <div className="text-center">
-                    <h5 className="mb-0">
-                        <b>
-                            {state.members.length}/{1}
-                        </b>
-                    </h5>
-                    <span className="text-secondary">
-                        <b>Members / Groups</b>
-                    </span>
-                </div>
+                {state.selectedHouse !== "vb" && (
+                    <div className="text-center">
+                        <h5 className="mb-0">
+                            <b>
+                                {state.members.length}/{1}
+                            </b>
+                        </h5>
+                        <span className="text-secondary">
+                            <b>Members / Groups</b>
+                        </span>
+                    </div>
+                )}
                 <div className="text-center">
                     <h5 className="mb-0">
                         <b>
@@ -681,55 +690,58 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                     size: "sm"
                 }}
             />
-            {!state.hideProposalBtn && (
-                <Widget
-                    src="/*__@appAccount__*//widget/Common.Layout.CardModal"
-                    props={{
-                        title: "Create Proposal",
-                        onToggle: () =>
-                            State.update({
-                                isProposalModalOpen: !state.isProposalModalOpen
-                            }),
-                        isOpen: state.isProposalModalOpen,
-                        toggle: (
-                            <Widget
-                                src="nearui.near/widget/Input.Button"
-                                props={{
-                                    children: (
-                                        <>
-                                            Create Proposal
-                                            <i className="bi bi-16 bi-plus-lg"></i>
-                                        </>
-                                    ),
-                                    variant: "info",
-                                    size: "sm"
-                                }}
-                            />
-                        ),
-                        content: (
-                            <div
-                                className="d-flex flex-column align-items-stretch"
-                                style={{
-                                    width: "800px",
-                                    maxWidth: "100vw"
-                                }}
-                            >
+            {state.isHuman &&
+                (state.members.includes(accountId) ||
+                    state.selectedHouse === "vb") && (
+                    <Widget
+                        src="/*__@appAccount__*//widget/Common.Layout.CardModal"
+                        props={{
+                            title: "Create Proposal",
+                            onToggle: () =>
+                                State.update({
+                                    isProposalModalOpen:
+                                        !state.isProposalModalOpen
+                                }),
+                            isOpen: state.isProposalModalOpen,
+                            toggle: (
                                 <Widget
-                                    src={
-                                        "/*__@appAccount__*//widget/DAO.Proposal.Create"
-                                    }
+                                    src="nearui.near/widget/Input.Button"
                                     props={{
-                                        dev: props.dev,
-                                        daoId: Content[state.selectedHouse]
-                                            .address,
-                                        dev: props.dev
+                                        children: (
+                                            <>
+                                                Create Proposal
+                                                <i className="bi bi-16 bi-plus-lg"></i>
+                                            </>
+                                        ),
+                                        variant: "info",
+                                        size: "sm"
                                     }}
                                 />
-                            </div>
-                        )
-                    }}
-                />
-            )}
+                            ),
+                            content: (
+                                <div
+                                    className="d-flex flex-column align-items-stretch"
+                                    style={{
+                                        width: "800px",
+                                        maxWidth: "100vw"
+                                    }}
+                                >
+                                    <Widget
+                                        src={
+                                            "/*__@appAccount__*//widget/DAO.Proposal.Create"
+                                        }
+                                        props={{
+                                            dev: props.dev,
+                                            daoId: Content[state.selectedHouse]
+                                                .address,
+                                            dev: props.dev
+                                        }}
+                                    />
+                                </div>
+                            )
+                        }}
+                    />
+                )}
         </div>
     </Section>
 );
@@ -805,25 +817,25 @@ return (
                     <span className="text-white">Interhouse relations</span>
                 </h6>
             </div>
-            <ImgContainer
-                className={`w-100 d-flex flex-column justify-content-center align-items-center py-4 position-relative ${
-                    state.vbWithTrust ? "px-1" : "px-5"
-                }`}
-            >
-                {state.members.find((m) => m === accountId) && (
-                    <Info className="mb-4 py-2 px-3 gap-2 d-flex justify-content-center align-items-center">
-                        <UserIcon color={Content[state.selectedHouse].color}>
-                            <img
-                                width={11}
-                                src="https://ipfs.near.social/ipfs/bafkreig7hd3ysbcb7dkvgzhaavltjvaw5pjtaqyj4qdbamwxhhh4yqp4su"
-                            />
-                        </UserIcon>
-                        <small>
-                            You are a member of
-                            <b> {Content[state.selectedHouse].title}</b>
-                        </small>
-                    </Info>
-                )}
+            <ImgContainer className="px-5 w-100 d-flex flex-column justify-content-center align-items-center py-4 position-relative">
+                {state.isHuman &&
+                    (state.members.find((m) => m === accountId) ||
+                        state.selectedHouse === "vb") && (
+                        <Info className="mb-4 py-2 px-3 gap-2 d-flex justify-content-center align-items-center">
+                            <UserIcon
+                                color={Content[state.selectedHouse].color}
+                            >
+                                <img
+                                    width={11}
+                                    src="https://ipfs.near.social/ipfs/bafkreig7hd3ysbcb7dkvgzhaavltjvaw5pjtaqyj4qdbamwxhhh4yqp4su"
+                                />
+                            </UserIcon>
+                            <small>
+                                You are a member of
+                                <b> {Content[state.selectedHouse].title}</b>
+                            </small>
+                        </Info>
+                    )}
                 <Img
                     onClick={() =>
                         State.update({ vbWithTrust: !state.vbWithTrust })
@@ -835,12 +847,9 @@ return (
                             ? COA_IMG
                             : state.selectedHouse === "tc"
                             ? TC_IMG
-                            : null
-                        // : state.selectedHouse === "vb"
-                        // ? state.vbWithTrust
-                        //     ? VB_TRUST_IMG
-                        //     : VB_IMG
-                        // : HOM_IMG
+                            : state.selectedHouse === "vb"
+                            ? VB_IMG
+                            : HOM_IMG
                     }
                 />
             </ImgContainer>
