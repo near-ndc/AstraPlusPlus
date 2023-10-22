@@ -34,7 +34,6 @@ const constructURL = (paramObj, base) => {
 
 const isCongressDaoID =
     props.daoId === HoMDaoId ||
-    props.daoId === VotingBodyDaoId ||
     props.daoId === CoADaoId ||
     props.daoId === TCDaoId;
 
@@ -76,10 +75,14 @@ const tabs = {
     }
 };
 
-if (isCongressDaoID) {
+if (isCongressDaoID || props.daoId === VotingBodyDaoId) {
     delete tabs["funds"];
     delete tabs["projects"];
     delete tabs["bounties"];
+}
+// not showing members page in v1
+if (props.daoId === VotingBodyDaoId) {
+    delete tabs["members"];
 }
 
 if (!props.daoId) {

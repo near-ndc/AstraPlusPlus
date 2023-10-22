@@ -17,10 +17,7 @@ const HoMDaoId = props.dev
     : "/*__@replace:HoMDaoId__*/";
 
 const isCongressDaoID =
-    daoId === HoMDaoId ||
-    daoId === VotingBodyDaoId ||
-    daoId === CoADaoId ||
-    daoId === TCDaoId;
+    daoId === HoMDaoId || daoId === CoADaoId || daoId === TCDaoId;
 
 function fetchIsHuman(account) {
     const userSBTs = Near.view("registry.i-am-human.near", "is_human", {
@@ -146,9 +143,7 @@ function processCongressMembers(members) {
         case CoADaoId:
             group = "CoA Member";
             break;
-        case VotingBodyDaoId:
-            group = "Voting body Member";
-            break;
+
         case TCDaoId:
             group = "Transparency Commission Member";
             break;
@@ -179,6 +174,8 @@ const policy = isCongressDaoID
           daoId + "-processed_congress_policy",
           { subscribe: false }
       )
+    : daoId === VotingBodyDaoId
+    ? null
     : useCache(
           () =>
               Near.asyncView(daoId, "get_policy").then((policy) =>
@@ -212,7 +209,8 @@ return (
                 props={{
                     data: voters,
                     policy: policy,
-                    isCongressDaoID: isCongressDaoID
+                    isCongressDaoID: isCongressDaoID,
+                    isVotingBodyDao: daoId === VotingBodyDaoId
                 }}
             />
         </Wrapper>

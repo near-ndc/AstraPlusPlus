@@ -3,6 +3,7 @@ const policy = props.policy;
 const currentPage = props.page ?? 1;
 const resPerPage = props.resPerPage ?? 20;
 const isCongressDaoID = props.isCongressDaoID ?? false;
+const isVotingBodyDao = props.isVotingBodyDao ?? false;
 
 const EVERYONE = "Everyone";
 
@@ -427,16 +428,17 @@ const Table = ({ title, tableData, showExpand }) => {
                                             }}
                                         />
                                         {/* we don't show propose to mint and remove for congress dao */}
-                                        {!isCongressDaoID && (
-                                            <div className="d-flex gap-2 align-items-center">
-                                                <ProposeToMintSBT
-                                                    itemDetails={item}
-                                                />
-                                                <ProposeToRemove
-                                                    user={item.account}
-                                                />
-                                            </div>
-                                        )}
+                                        {!isCongressDaoID &&
+                                            !isVotingBodyDao && (
+                                                <div className="d-flex gap-2 align-items-center">
+                                                    <ProposeToMintSBT
+                                                        itemDetails={item}
+                                                    />
+                                                    <ProposeToRemove
+                                                        user={item.account}
+                                                    />
+                                                </div>
+                                            )}
                                     </td>
                                 </tr>
                             );
@@ -996,20 +998,21 @@ return (
                                                             height: "4rem"
                                                         }}
                                                     ></div>
-                                                    {!isCongressDaoID && (
-                                                        <div className="d-flex justify-content-between">
-                                                            <ProposeToMintSBT
-                                                                itemDetails={
-                                                                    item
-                                                                }
-                                                            />
-                                                            <ProposeToRemove
-                                                                user={
-                                                                    item.account
-                                                                }
-                                                            />
-                                                        </div>
-                                                    )}
+                                                    {!isCongressDaoID &&
+                                                        !isVotingBodyDao && (
+                                                            <div className="d-flex justify-content-between">
+                                                                <ProposeToMintSBT
+                                                                    itemDetails={
+                                                                        item
+                                                                    }
+                                                                />
+                                                                <ProposeToRemove
+                                                                    user={
+                                                                        item.account
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        )}
                                                     <Widget
                                                         src="nearui.near/widget/Input.Button"
                                                         props={{

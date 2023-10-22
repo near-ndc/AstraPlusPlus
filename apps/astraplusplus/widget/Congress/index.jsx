@@ -387,8 +387,7 @@ State.init({
     proposalsCount: 0,
     showOptions: false,
     showHouses: false,
-    isDissolved: false,
-    isHuman: false
+    isDissolved: false
 });
 
 const getProposalsCount = () => {
@@ -428,14 +427,39 @@ const getProposals = () => {
 };
 
 const getMembers = () => {
-    const resp = Near.view(
-        Content[state.selectedHouse].address,
-        "get_members",
-        {}
-    );
+    if (state.selectedHouse === "vb") {
+        const resp = useCache(
+            () =>
+                asyncFetch(
+                    `https://api.pikespeak.ai/sbt/sbt-by-owner?holder=${accountId}&registry=registry.i-am-human.near`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "x-api-key": "/*__@replace:pikespeakApiKey__*/"
+                        }
+                    }
+                ).then((res) => {}),
+            daoId + "-is-human-info",
+            { subscribe: false }
+        );
+        State.update({
+            hideProposalBtn: !resp?.length > 0
+        });
+    } else {
+        const resp = Near.view(
+            Content[state.selectedHouse].address,
+            "get_members",
+            {}
+        );
 
-    const members = resp?.members ?? [];
-    if (members) State.update({ members });
+        const members = resp?.members ?? [];
+        if (members)
+            State.update({
+                members,
+                hideProposalBtn: !members.includes(accountId)
+            });
+    }
 };
 
 const getHouseUrl = (house) =>
@@ -455,18 +479,7 @@ const getMenuItems = () => {
     return base;
 };
 
-const checkIsHuman = () => {
-    const userSBTs = Near.view(RegistryId, "is_human", { account: accountId });
-    if (userSBTs) {
-        userSBTs.forEach((sbt) => {
-            if ("fractal.i-am-human.near" === sbt[0])
-                State.update({ isHuman: true });
-        });
-    }
-};
-
 State.update({ selectedHouse: router.params.house ?? state.selectedHouse });
-checkIsHuman();
 getProposalsCount();
 getProposals();
 if (state.selectedHouse !== "vb") {
@@ -690,58 +703,55 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                     size: "sm"
                 }}
             />
-            {state.isHuman &&
-                (state.members.includes(accountId) ||
-                    state.selectedHouse === "vb") && (
-                    <Widget
-                        src="/*__@appAccount__*//widget/Common.Layout.CardModal"
-                        props={{
-                            title: "Create Proposal",
-                            onToggle: () =>
-                                State.update({
-                                    isProposalModalOpen:
-                                        !state.isProposalModalOpen
-                                }),
-                            isOpen: state.isProposalModalOpen,
-                            toggle: (
+            {!state.hideProposalBtn && (
+                <Widget
+                    src="/*__@appAccount__*//widget/Common.Layout.CardModal"
+                    props={{
+                        title: "Create Proposal",
+                        onToggle: () =>
+                            State.update({
+                                isProposalModalOpen: !state.isProposalModalOpen
+                            }),
+                        isOpen: state.isProposalModalOpen,
+                        toggle: (
+                            <Widget
+                                src="nearui.near/widget/Input.Button"
+                                props={{
+                                    children: (
+                                        <>
+                                            Create Proposal
+                                            <i className="bi bi-16 bi-plus-lg"></i>
+                                        </>
+                                    ),
+                                    variant: "info",
+                                    size: "sm"
+                                }}
+                            />
+                        ),
+                        content: (
+                            <div
+                                className="d-flex flex-column align-items-stretch"
+                                style={{
+                                    width: "800px",
+                                    maxWidth: "100vw"
+                                }}
+                            >
                                 <Widget
-                                    src="nearui.near/widget/Input.Button"
+                                    src={
+                                        "/*__@appAccount__*//widget/DAO.Proposal.Create"
+                                    }
                                     props={{
-                                        children: (
-                                            <>
-                                                Create Proposal
-                                                <i className="bi bi-16 bi-plus-lg"></i>
-                                            </>
-                                        ),
-                                        variant: "info",
-                                        size: "sm"
+                                        dev: props.dev,
+                                        daoId: Content[state.selectedHouse]
+                                            .address,
+                                        dev: props.dev
                                     }}
                                 />
-                            ),
-                            content: (
-                                <div
-                                    className="d-flex flex-column align-items-stretch"
-                                    style={{
-                                        width: "800px",
-                                        maxWidth: "100vw"
-                                    }}
-                                >
-                                    <Widget
-                                        src={
-                                            "/*__@appAccount__*//widget/DAO.Proposal.Create"
-                                        }
-                                        props={{
-                                            dev: props.dev,
-                                            daoId: Content[state.selectedHouse]
-                                                .address,
-                                            dev: props.dev
-                                        }}
-                                    />
-                                </div>
-                            )
-                        }}
-                    />
-                )}
+                            </div>
+                        )
+                    }}
+                />
+            )}
         </div>
     </Section>
 );
@@ -818,24 +828,20 @@ return (
                 </h6>
             </div>
             <ImgContainer className="px-5 w-100 d-flex flex-column justify-content-center align-items-center py-4 position-relative">
-                {state.isHuman &&
-                    (state.members.find((m) => m === accountId) ||
-                        state.selectedHouse === "vb") && (
-                        <Info className="mb-4 py-2 px-3 gap-2 d-flex justify-content-center align-items-center">
-                            <UserIcon
-                                color={Content[state.selectedHouse].color}
-                            >
-                                <img
-                                    width={11}
-                                    src="https://ipfs.near.social/ipfs/bafkreig7hd3ysbcb7dkvgzhaavltjvaw5pjtaqyj4qdbamwxhhh4yqp4su"
-                                />
-                            </UserIcon>
-                            <small>
-                                You are a member of
-                                <b> {Content[state.selectedHouse].title}</b>
-                            </small>
-                        </Info>
-                    )}
+                {!state.hideProposalBtn && (
+                    <Info className="mb-4 py-2 px-3 gap-2 d-flex justify-content-center align-items-center">
+                        <UserIcon color={Content[state.selectedHouse].color}>
+                            <img
+                                width={11}
+                                src="https://ipfs.near.social/ipfs/bafkreig7hd3ysbcb7dkvgzhaavltjvaw5pjtaqyj4qdbamwxhhh4yqp4su"
+                            />
+                        </UserIcon>
+                        <small>
+                            You are a member of
+                            <b> {Content[state.selectedHouse].title}</b>
+                        </small>
+                    </Info>
+                )}
                 <Img
                     onClick={() =>
                         State.update({ vbWithTrust: !state.vbWithTrust })

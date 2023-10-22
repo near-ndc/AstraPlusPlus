@@ -2,7 +2,11 @@ const accountId = props.accountId ?? context.accountId;
 const daoId = props.daoId ?? "multi.sputnik-dao.near";
 const onClose = props.onClose;
 const isCongressDaoID = props.isCongressDaoID;
+const isVotingBodyDao = props.isVotingBodyDao;
+const attachDeposit = props.attachDeposit ?? 0;
+const registry = "registry.i-am-human.near";
 
+console.log(attachDeposit);
 const HoMDaoId = props.dev
     ? "/*__@replace:HoMDaoIdTesting__*/"
     : "/*__@replace:HoMDaoId__*/";
@@ -37,7 +41,9 @@ const handleProposal = () => {
         return;
     }
     const gas = 200000000000000;
-    const deposit = 100000000000000000000000;
+    const deposit = Big(100000000000000000000000)
+        .plus(Big(attachDeposit))
+        .toFixed();
 
     const args = isCongressDaoID
         ? {
@@ -50,16 +56,43 @@ const handleProposal = () => {
                   kind: "Vote"
               }
           };
+    if (isVotingBodyDao) {
+        const args = Buffer.from(
+            JSON.stringify({
+                description: state.description,
+                kind: "Text",
+                caller: accountId
+            }),
+            "utf-8"
+        ).toString("base64");
 
-    Near.call([
-        {
-            contractName: daoId,
-            methodName: isCongressDaoID ? "create_proposal" : "add_proposal",
-            args: args,
-            gas: gas,
-            deposit: deposit
-        }
-    ]);
+        Near.call([
+            {
+                contractName: registry,
+                methodName: "is_human_call",
+                args: {
+                    ctr: daoId,
+                    function: "create_proposal",
+                    payload: args
+                },
+                gas: gas,
+                deposit: deposit
+            }
+        ]);
+    } else {
+        Near.call([
+            {
+                contractName: daoId,
+                methodName:
+                    isCongressDaoID || isVotingBodyDao
+                        ? "create_proposal"
+                        : "add_proposal",
+                args: args,
+                gas: gas,
+                deposit: deposit
+            }
+        ]);
+    }
 };
 
 const onChangeDescription = (description) => {

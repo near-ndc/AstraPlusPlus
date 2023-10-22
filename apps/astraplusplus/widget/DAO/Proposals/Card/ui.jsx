@@ -19,6 +19,7 @@ const {
     handleVote,
     comments,
     isCongressDaoID,
+    isVotingBodyDao,
     daoConfig
 } = props;
 const accountId = context.accountId;
@@ -144,7 +145,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                     size: "md"
                                 }}
                             />
-                            {isCongressDaoID &&
+                            {(isCongressDaoID || isVotingBodyDao) &&
                                 statusName === "Approved" &&
                                 proposal?.submission_time +
                                     daoConfig?.voting_duration +
@@ -246,7 +247,7 @@ function renderData({
                         <b>Submission date</b>
                         <p>
                             <small className="">
-                                {isCongressDaoID
+                                {isCongressDaoID || isVotingBodyDao
                                     ? new Date(submission_time).toLocaleString()
                                     : new Date(
                                           parseInt(

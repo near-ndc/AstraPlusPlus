@@ -2,7 +2,6 @@ const daoId = props.daoId;
 const accountId = props.accountId ?? context.accountId;
 const onClose = props.onClose;
 
-
 const CoADaoId = props.dev
     ? "/*__@replace:CoADaoIdTesting__*/"
     : "/*__@replace:CoADaoId__*/";
@@ -18,39 +17,65 @@ const HoMDaoId = props.dev
 
 const isCongressDaoID =
     props.daoId === HoMDaoId ||
-    props.daoId === VotingBodyDaoId ||
     props.daoId === CoADaoId ||
     props.daoId === TCDaoId;
 
 let permissions = [];
+const isVotingBodyDao = props.daoId === VotingBodyDaoId;
 
-const proposalTypes = [
-    {
-        text: "Text",
-        value: "Vote"
-    },
-    {
-        text: "Transfer",
-        value: "Transfer"
-    },
-    {
-        text: "Function Call",
-        value: "FunctionCall"
-    },
-    {
-        text: "Add Member To Role",
-        value: "AddMemberToRole"
-    },
-    {
-        text: "Remove Member From Role",
-        value: "RemoveMemberFromRole"
-    }
-];
+const proposalTypes = isVotingBodyDao
+    ? [
+          {
+              text: "Text",
+              value: "Text"
+          },
+          {
+              text: "Dismiss",
+              value: "Dismiss"
+          },
+          {
+              text: "Approve Budget",
+              value: "ApproveBudget"
+          },
+          {
+              text: "Veto big budget item",
+              value: "Veto"
+          },
+          {
+              text: "Dissolve House",
+              value: "Dissolve"
+          }
+      ]
+    : [
+          {
+              text: "Text",
+              value: "Vote"
+          },
+          {
+              text: "Transfer",
+              value: "Transfer"
+          },
+          {
+              text: "Function Call",
+              value: "FunctionCall"
+          },
+          {
+              text: "Add Member To Role",
+              value: "AddMemberToRole"
+          },
+          {
+              text: "Remove Member From Role",
+              value: "RemoveMemberFromRole"
+          }
+      ];
 
 State.init({
     members: [],
     proposalTypes: proposalTypes,
-    daoId
+    daoId,
+    proposalQueue: null, // for vb
+    attachDeposit: 0,
+    vbConfig: null
 });
 
 function convertCapitalLetterToSpace(inputString) {
@@ -83,6 +108,15 @@ if (isCongressDaoID) {
         proposalTypes: type,
         showCreateProposal: policy?.members?.includes(accountId)
     });
+}
+
+if (isVotingBodyDao) {
+    const config = useCache(
+        () => Near.asyncView(daoId, "config").then((data) => data),
+        daoId + "-vb-config",
+        { subscribe: false }
+    );
+    State.update({ vbConfig: config });
 }
 
 const Wrapper = styled.div`
@@ -188,12 +222,56 @@ return (
                 />
             </div>
         </div>
+        {isVotingBodyDao && (
+            <Widget
+                src={`sking.near/widget/Common.Inputs.Select`}
+                props={{
+                    label: "Proposal Queue",
+                    noLabel: true,
+                    placeholder: "Select Proposal Queue",
+                    options: [
+                        {
+                            text: "Pre-Vote Queue",
+                            value: "pre-vote"
+                        },
+                        {
+                            text: "Active Queue",
+                            value: "active"
+                        }
+                    ],
+                    value: state.proposalQueue,
+                    onChange: (proposalQueue) =>
+                        State.update({
+                            ...state,
+                            proposalQueue: proposalQueue.value,
+                            attachDeposit:
+                                proposalQueue.value === "pre-vote"
+                                    ? state.vbConfig?.pre_vote_bond
+                                    : state.vbConfig?.active_queue_bond
+                        }),
+                    validate: () => {
+                        if (!state.proposalQueue) {
+                            throw {
+                                message: "Please select a Proposal Queue"
+                            };
+                        }
+                    },
+                    error: undefined
+                }}
+            />
+        )}
         <div className="d-flex flex-column gap-2">
             {(state.proposalType.value === "Vote" ||
                 state.proposalType.value === "Text") && (
                 <Widget
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.Text"
-                    props={{ daoId, onClose, isCongressDaoID }}
+                    props={{
+                        daoId,
+                        onClose,
+                        isCongressDaoID,
+                        isVotingBodyDao,
+                        attachDeposit: state.attachDeposit
+                    }}
                 />
             )}
             {state.proposalType.value === "Transfer" && (
@@ -240,6 +318,46 @@ return (
                         powerType: "DismissAndBan",
                         showPowers: false,
                         isCongressDaoID
+                    }}
+                />
+            )}
+            {state.proposalType.value === "Veto" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.Veto"
+                    props={{
+                        daoId,
+                        attachDeposit: state.attachDeposit,
+                        dev: props.dev
+                    }}
+                />
+            )}
+            {state.proposalType.value === "Dismiss" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.Dismiss"
+                    props={{
+                        daoId,
+                        attachDeposit: state.attachDeposit,
+                        dev: props.dev
+                    }}
+                />
+            )}
+            {state.proposalType.value === "Dissolve" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.Dissolve"
+                    props={{
+                        daoId,
+                        attachDeposit: state.attachDeposit,
+                        dev: props.dev
+                    }}
+                />
+            )}
+            {state.proposalType.value === "ApproveBudget" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.ApproveBudget"
+                    props={{
+                        daoId,
+                        attachDeposit: state.attachDeposit,
+                        dev: props.dev
                     }}
                 />
             )}

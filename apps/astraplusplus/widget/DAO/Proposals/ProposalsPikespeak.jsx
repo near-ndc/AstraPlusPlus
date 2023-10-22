@@ -24,10 +24,9 @@ const HoMDaoId = props.dev
     : "/*__@replace:HoMDaoId__*/";
 
 const isCongressDaoID =
-    daoId === HoMDaoId ||
-    daoId === VotingBodyDaoId ||
-    daoId === CoADaoId ||
-    daoId === TCDaoId;
+    daoId === HoMDaoId || daoId === CoADaoId || daoId === TCDaoId;
+
+const isVotingBodyDao = dao === VotingBodyDaoId;
 
 const proposalsCount = Near.view(daoId, "number_of_proposals");
 
@@ -103,28 +102,29 @@ function fetchCongressDaoProposals() {
     }
     return data;
 }
-const res = isCongressDaoID
-    ? fetchCongressDaoProposals()
-    : fetch(
-          forgeUrl(apiUrl, {
-              offset: state.page * resPerPage,
-              limit: resPerPage,
-              daos: state.daos,
-              proposal_types: state.filters.proposal_types,
-              status: state.filters.status,
-              time_start: state.filters.time_start,
-              time_end: state.filters.time_end
-          }),
-          {
-              mode: "cors",
-              headers: {
-                  "x-api-key": publicApiKey
+const res =
+    isCongressDaoID || isVotingBodyDao
+        ? fetchCongressDaoProposals()
+        : fetch(
+              forgeUrl(apiUrl, {
+                  offset: state.page * resPerPage,
+                  limit: resPerPage,
+                  daos: state.daos,
+                  proposal_types: state.filters.proposal_types,
+                  status: state.filters.status,
+                  time_start: state.filters.time_start,
+                  time_end: state.filters.time_end
+              }),
+              {
+                  mode: "cors",
+                  headers: {
+                      "x-api-key": publicApiKey
+                  }
               }
-          }
-      );
+          );
 
 // filtering for congress daos
-if (isCongressDaoID) {
+if (isCongressDaoID || isVotingBodyDao) {
     if (state.filters.proposal_types?.length > 0) {
         res.body = res.body?.filter((item) => {
             const type =
@@ -143,7 +143,7 @@ if (isCongressDaoID) {
 
 function hasNextHandler() {
     const hasNext = false;
-    if (isCongressDaoID) {
+    if (isCongressDaoID || isVotingBodyDao) {
         hasNext =
             state.page === 0
                 ? proposalsCount > resPerPage
@@ -156,7 +156,7 @@ function hasNextHandler() {
 }
 
 function getDaoConfig() {
-    if (isCongressDaoID) {
+    if (isCongressDaoID || isVotingBodyDao) {
         const daoConfig = Near.view(daoId, "config", {});
         State.update({ daoConfig });
     }
@@ -306,6 +306,7 @@ return (
                         resPerPage,
                         proposals: res === null ? null : res.body,
                         isCongressDaoID,
+                        isVotingBodyDao,
                         daoConfig: state.daoConfig
                     }}
                 />
@@ -317,6 +318,7 @@ return (
                         resPerPage,
                         proposals: res === null ? null : res.body,
                         isCongressDaoID,
+                        isVotingBodyDao,
                         daoConfig: state.daoConfig
                     }}
                 />
@@ -363,7 +365,8 @@ return (
                             });
                             Storage.privateSet("multiSelectMode", false);
                         },
-                        isCongressDaoID
+                        isCongressDaoID,
+                        isVotingBodyDao
                     }}
                 />
             </>

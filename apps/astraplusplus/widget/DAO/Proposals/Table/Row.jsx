@@ -7,7 +7,8 @@ const {
     i,
     isAllowedTo,
     isCongressDaoID,
-    daoConfig
+    daoConfig,
+    isHuman
 } = props;
 const accountId = context.accountId;
 
@@ -46,17 +47,19 @@ const actions = {
 const kindName =
     typeof proposal.kind === "string"
         ? proposal.kind
-        : isCongressDaoID
+        : isCongressDaoID || isVotingBodyDao
         ? Object.keys(proposal.kind)?.[0]
         : typeof proposal.kind.typeEnum === "string"
         ? proposal.kind.typeEnum
         : Object.keys(proposal.kind)[0];
 
-const isAllowedToVote = [
-    isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
-    isAllowedTo(proposalKinds[kindName], actions.VoteReject),
-    isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
-];
+const isAllowedToVote = isVotingBodyDao
+    ? [isHuman, isHuman, isHuman]
+    : [
+          isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
+          isAllowedTo(proposalKinds[kindName], actions.VoteReject),
+          isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
+      ];
 
 // --- end check user permissions
 
@@ -205,14 +208,15 @@ return (
                         canVote,
                         proposal,
                         view: "multiVote",
-                        isCongressDaoID
+                        isCongressDaoID,
+                        isVotingBodyDao
                     }}
                 />
             </td>
         )}
         <td style={{ width: 150 }}>
             <div className="d-flex justify-content-end gap-2">
-                {isCongressDaoID &&
+                {(isCongressDaoID || isVotingBodyDao) &&
                     proposal.status === "Approved" &&
                     proposal?.submission_time +
                         daoConfig?.voting_duration +
@@ -259,6 +263,7 @@ return (
                                             JSON.stringify(proposal),
                                         multiSelectMode: state.multiSelectMode,
                                         isCongressDaoID,
+                                        isVotingBodyDao,
                                         daoConfig
                                     }}
                                 />

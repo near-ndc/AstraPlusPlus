@@ -1,11 +1,36 @@
 const multiSelectMode = props.multiSelectMode ?? false;
-const { proposalString, proposalId, daoId, isCongressDaoID, daoConfig } = props;
+const {
+    proposalString,
+    proposalId,
+    daoId,
+    isCongressDaoID,
+    daoConfig,
+    isVotingBodyDao
+} = props;
 const accountId = context.accountId;
+
+const isHuman = useCache(
+    () =>
+        asyncFetch(
+            `https://api.pikespeak.ai/sbt/sbt-by-owner?holder=${accountId}&registry=registry.i-am-human.near`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "/*__@replace:pikespeakApiKey__*/"
+                }
+            }
+        ).then((res) => res?.length > 0),
+    daoId + "-is-human-pikespeak",
+    { subscribe: false }
+);
 
 const proposal = proposalString ? JSON.parse(proposalString) : null;
 
 const policy = isCongressDaoID
     ? Near.view(daoId, "get_members")
+    : isVotingBodyDao
+    ? ""
     : Near.view(daoId, "get_policy");
 let roles = policy;
 
@@ -15,7 +40,13 @@ if (roles === null)
     );
 
 let new_proposal = null;
-if (!proposalString && proposalId && daoId && !isCongressDaoID) {
+if (
+    !proposalString &&
+    proposalId &&
+    daoId &&
+    !isCongressDaoID &&
+    !isVotingBodyDao
+) {
     // TODO: THIS API IS SO WEIRD AND INCONSISTENT WITH PROPOSALS API, VOTE IS BROKEN
     new_proposal = fetch(
         `https://api.pikespeak.ai/daos/proposal/${daoId}?id=${proposalId}`,
@@ -107,6 +138,17 @@ const expensiveWork = () => {
         ];
     }
 
+    if (isVotingBodyDao) {
+        userRoles = [
+            {
+                name: "all",
+                kind: "Everyone",
+                permissions: {},
+                vote_policy: {}
+            }
+        ];
+    }
+
     const isAllowedTo = (kind, action) => {
         // -- Check if the user is allowed to perform the action
         let allowed = false;
@@ -137,17 +179,19 @@ const expensiveWork = () => {
     const kindName =
         typeof my_proposal.kind === "string"
             ? my_proposal.kind
-            : isCongressDaoID
+            : isCongressDaoID || isVotingBodyDao
             ? Object.keys(my_proposal.kind)[0]
             : typeof my_proposal.kind.typeEnum === "string"
             ? my_proposal.kind.typeEnum
             : Object.keys(my_proposal.kind)[0];
 
-    const isAllowedToVote = [
-        isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
-        isAllowedTo(proposalKinds[kindName], actions.VoteReject),
-        isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
-    ];
+    const isAllowedToVote = isVotingBodyDao
+        ? [isHuman, isHuman, isHuman]
+        : [
+              isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
+              isAllowedTo(proposalKinds[kindName], actions.VoteReject),
+              isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
+          ];
     // --- end check user permissions
     // --- Votes required:
     // TODO: Needs to be reviewed
@@ -196,7 +240,7 @@ const expensiveWork = () => {
         });
     }
 
-    if (isCongressDaoID) {
+    if (isCongressDaoID || isVotingBodyDao) {
         totalVotesNeeded = daoConfig?.threshold;
     }
 
@@ -213,7 +257,7 @@ const expensiveWork = () => {
         totalVotes.spam += my_proposal.vote_counts[key][2];
     });
 
-    if (isCongressDaoID) {
+    if (isCongressDaoID || isVotingBodyDao) {
         for (const value of Object.values(my_proposal.votes)) {
             if (value === "Approve") {
                 totalVotes.yes++;
@@ -266,7 +310,7 @@ const handleVote = ({ action, proposalId, daoId }) => {
     let args = {
         id: JSON.parse(proposalId)
     };
-    if (isCongressDaoID) {
+    if (isCongressDaoID || isVotingBodyDao) {
         args["vote"] = action.replace("Vote", "");
     } else {
         args["action"] = action;
@@ -274,7 +318,8 @@ const handleVote = ({ action, proposalId, daoId }) => {
     Near.call([
         {
             contractName: daoId,
-            methodName: isCongressDaoID ? "vote" : "act_proposal",
+            methodName:
+                isCongressDaoID || isVotingBodyDao ? "vote" : "act_proposal",
             args: args,
             gas: 200000000000000
         }
@@ -293,6 +338,7 @@ return (
             comments: comments,
             handleVote,
             isCongressDaoID,
+            isVotingBodyDao,
             daoConfig
         }}
     />
