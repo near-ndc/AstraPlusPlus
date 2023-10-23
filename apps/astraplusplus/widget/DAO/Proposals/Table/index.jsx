@@ -1,5 +1,12 @@
-const { proposals, resPerPage, state, update, isCongressDaoID, daoConfig } =
-    props;
+const {
+    proposals,
+    resPerPage,
+    state,
+    update,
+    isCongressDaoID,
+    daoConfig,
+    isVotingBodyDao
+} = props;
 const { daoId, multiSelectMode } = state;
 const accountId = props.accountId ?? context.accountId ?? "";
 
@@ -14,10 +21,14 @@ const isHuman = useCache(
                     "x-api-key": "/*__@replace:pikespeakApiKey__*/"
                 }
             }
-        ).then((res) => res?.length > 0),
+        ).then((res) => res?.body?.length > 0),
     daoId + "-is-human-pikespeak-api",
     { subscribe: false }
 );
+
+if (isHuman === null) {
+    return <Widget src="nearui.near/widget/Feedback.Spinner" />;
+}
 
 const Table = styled.div`
     font-size: 13px;

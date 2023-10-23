@@ -26,7 +26,7 @@ const HoMDaoId = props.dev
 const isCongressDaoID =
     daoId === HoMDaoId || daoId === CoADaoId || daoId === TCDaoId;
 
-const isVotingBodyDao = dao === VotingBodyDaoId;
+const isVotingBodyDao = daoId === VotingBodyDaoId;
 
 const proposalsCount = Near.view(daoId, "number_of_proposals");
 
@@ -97,11 +97,13 @@ function fetchCongressDaoProposals() {
         limit: resPerPage,
         reverse: true
     });
+
     if (resp) {
         data = processProposals(resp);
     }
     return data;
 }
+
 const res =
     isCongressDaoID || isVotingBodyDao
         ? fetchCongressDaoProposals()

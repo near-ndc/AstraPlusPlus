@@ -2,7 +2,7 @@ const accountId = props.accountId ?? context.accountId;
 const daoId = props.daoId;
 const onClose = props.onClose;
 const attachDeposit = props.attachDeposit ?? 0;
-const registry = "registry.i-am-human.near";
+const registry = props.registry;
 
 if (!accountId) {
     return "Please connect your NEAR wallet :)";
@@ -37,14 +37,11 @@ const handleProposal = () => {
         .plus(Big(attachDeposit))
         .toFixed();
 
-    const args = Buffer.from(
-        {
-            description: state.description,
-            kind: { ApproveBudget: { prop_id: state.prop_id } },
-            caller: accountId
-        },
-        "utf-8"
-    ).toString("base64");
+    const args = JSON.stringify({
+        description: state.description,
+        kind: { ApproveBudget: { prop_id: state.prop_id } },
+        caller: accountId
+    });
 
     Near.call([
         {

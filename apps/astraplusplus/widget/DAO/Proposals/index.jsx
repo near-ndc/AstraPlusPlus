@@ -56,7 +56,6 @@ if (daoId === VotingBodyDaoId) {
         daoId + "-is-human-info",
         { subscribe: false }
     );
-    console.log("sss", resp);
     State.update({
         hideProposalBtn: !resp?.length > 0
     });

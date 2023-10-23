@@ -4,9 +4,8 @@ const onClose = props.onClose;
 const isCongressDaoID = props.isCongressDaoID;
 const isVotingBodyDao = props.isVotingBodyDao;
 const attachDeposit = props.attachDeposit ?? 0;
-const registry = "registry.i-am-human.near";
+const registry = props.registry;
 
-console.log(attachDeposit);
 const HoMDaoId = props.dev
     ? "/*__@replace:HoMDaoIdTesting__*/"
     : "/*__@replace:HoMDaoId__*/";
@@ -57,14 +56,11 @@ const handleProposal = () => {
               }
           };
     if (isVotingBodyDao) {
-        const args = Buffer.from(
-            JSON.stringify({
-                description: state.description,
-                kind: "Text",
-                caller: accountId
-            }),
-            "utf-8"
-        ).toString("base64");
+        const args = JSON.stringify({
+            description: state.description,
+            kind: "Text",
+            caller: accountId
+        });
 
         Near.call([
             {

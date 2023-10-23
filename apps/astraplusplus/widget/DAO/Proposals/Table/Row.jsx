@@ -8,7 +8,8 @@ const {
     isAllowedTo,
     isCongressDaoID,
     daoConfig,
-    isHuman
+    isHuman,
+    isVotingBodyDao
 } = props;
 const accountId = context.accountId;
 

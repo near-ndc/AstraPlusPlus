@@ -20,10 +20,14 @@ const isHuman = useCache(
                     "x-api-key": "/*__@replace:pikespeakApiKey__*/"
                 }
             }
-        ).then((res) => res?.length > 0),
-    daoId + "-is-human-pikespeak",
+        ).then((res) => res?.body?.length > 0),
+    daoId + "-is-voting-allowed",
     { subscribe: false }
 );
+
+if (isHuman === null) {
+    return <Widget src="nearui.near/widget/Feedback.Spinner" />;
+}
 
 const proposal = proposalString ? JSON.parse(proposalString) : null;
 
@@ -192,6 +196,7 @@ const expensiveWork = () => {
               isAllowedTo(proposalKinds[kindName], actions.VoteReject),
               isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
           ];
+
     // --- end check user permissions
     // --- Votes required:
     // TODO: Needs to be reviewed

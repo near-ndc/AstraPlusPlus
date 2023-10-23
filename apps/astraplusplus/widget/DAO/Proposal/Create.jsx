@@ -14,6 +14,9 @@ const TCDaoId = props.dev
 const HoMDaoId = props.dev
     ? "/*__@replace:HoMDaoIdTesting__*/"
     : "/*__@replace:HoMDaoId__*/";
+const registry = props.dev
+    ? "registry-v1.gwg-testing.near"
+    : "registry.i-am-human.near";
 
 const isCongressDaoID =
     props.daoId === HoMDaoId ||
@@ -73,7 +76,7 @@ State.init({
     members: [],
     proposalTypes: proposalTypes,
     daoId,
-    proposalQueue: null, // for vb
+    proposalQueue: "active", // for vb
     attachDeposit: 0,
     vbConfig: null
 });
@@ -270,7 +273,8 @@ return (
                         onClose,
                         isCongressDaoID,
                         isVotingBodyDao,
-                        attachDeposit: state.attachDeposit
+                        attachDeposit: state.attachDeposit,
+                        registry
                     }}
                 />
             )}
@@ -327,7 +331,8 @@ return (
                     props={{
                         daoId,
                         attachDeposit: state.attachDeposit,
-                        dev: props.dev
+                        dev: props.dev,
+                        registry
                     }}
                 />
             )}
@@ -337,7 +342,8 @@ return (
                     props={{
                         daoId,
                         attachDeposit: state.attachDeposit,
-                        dev: props.dev
+                        dev: props.dev,
+                        registry
                     }}
                 />
             )}
@@ -347,7 +353,8 @@ return (
                     props={{
                         daoId,
                         attachDeposit: state.attachDeposit,
-                        dev: props.dev
+                        dev: props.dev,
+                        registry
                     }}
                 />
             )}
@@ -357,7 +364,8 @@ return (
                     props={{
                         daoId,
                         attachDeposit: state.attachDeposit,
-                        dev: props.dev
+                        dev: props.dev,
+                        registry
                     }}
                 />
             )}

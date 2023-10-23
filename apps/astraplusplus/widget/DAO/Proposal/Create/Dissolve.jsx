@@ -2,7 +2,7 @@ const accountId = props.accountId ?? context.accountId;
 const daoId = props.daoId;
 const onClose = props.onClose;
 const attachDeposit = props.attachDeposit ?? 0;
-const registry = "registry.i-am-human.near";
+const registry = props.registry;
 
 const CoADaoId = props.dev
     ? "/*__@replace:CoADaoIdTesting__*/"
@@ -60,14 +60,11 @@ const handleProposal = () => {
         .plus(Big(attachDeposit))
         .toFixed();
 
-    const args = Buffer.from(
-        JSON.stringify({
-            description: state.description,
-            kind: { Dissolve: { dao: state.dao } },
-            caller: accountId
-        }),
-        "utf-8"
-    ).toString("base64");
+    const args = JSON.stringify({
+        description: state.description,
+        kind: { Dissolve: { dao: state.dao } },
+        caller: accountId
+    });
 
     Near.call([
         {

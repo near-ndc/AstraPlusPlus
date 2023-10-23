@@ -12,6 +12,12 @@ const constructURL = (paramObj, base) => {
     return `${baseURL}?${params}`;
 };
 
+const VotingBodyDaoId = props.dev
+    ? "/*__@replace:VotingBodyDaoIdTesting__*/"
+    : "/*__@replace:VotingBodyDaoId__*/";
+
+const isVotingBodyDao = daoId === VotingBodyDaoId;
+
 State.init({
     daoId,
     daos: [daoId],
@@ -256,7 +262,8 @@ return (
                                                             vote_counts: {}
                                                         }),
                                                     multiSelectMode: false,
-                                                    isCongressDaoID: true
+                                                    isCongressDaoID: true,
+                                                    isVotingBodyDao
                                                 }}
                                             />
                                         </div>
