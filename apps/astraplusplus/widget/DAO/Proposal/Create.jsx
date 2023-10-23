@@ -75,10 +75,7 @@ const proposalTypes = isVotingBodyDao
 State.init({
     members: [],
     proposalTypes: proposalTypes,
-    daoId,
-    proposalQueue: "active", // for vb
-    attachDeposit: 0,
-    vbConfig: null
+    daoId
 });
 
 function convertCapitalLetterToSpace(inputString) {
@@ -111,15 +108,6 @@ if (isCongressDaoID) {
         proposalTypes: type,
         showCreateProposal: policy?.members?.includes(accountId)
     });
-}
-
-if (isVotingBodyDao) {
-    const config = useCache(
-        () => Near.asyncView(daoId, "config").then((data) => data),
-        daoId + "-vb-config",
-        { subscribe: false }
-    );
-    State.update({ vbConfig: config });
 }
 
 const Wrapper = styled.div`
@@ -225,44 +213,7 @@ return (
                 />
             </div>
         </div>
-        {isVotingBodyDao && (
-            <Widget
-                src={`sking.near/widget/Common.Inputs.Select`}
-                props={{
-                    label: "Proposal Queue",
-                    noLabel: true,
-                    placeholder: "Select Proposal Queue",
-                    options: [
-                        {
-                            text: "Pre-Vote Queue",
-                            value: "pre-vote"
-                        },
-                        {
-                            text: "Active Queue",
-                            value: "active"
-                        }
-                    ],
-                    value: state.proposalQueue,
-                    onChange: (proposalQueue) =>
-                        State.update({
-                            ...state,
-                            proposalQueue: proposalQueue.value,
-                            attachDeposit:
-                                proposalQueue.value === "pre-vote"
-                                    ? state.vbConfig?.pre_vote_bond
-                                    : state.vbConfig?.active_queue_bond
-                        }),
-                    validate: () => {
-                        if (!state.proposalQueue) {
-                            throw {
-                                message: "Please select a Proposal Queue"
-                            };
-                        }
-                    },
-                    error: undefined
-                }}
-            />
-        )}
+
         <div className="d-flex flex-column gap-2">
             {(state.proposalType.value === "Vote" ||
                 state.proposalType.value === "Text") && (
@@ -273,7 +224,6 @@ return (
                         onClose,
                         isCongressDaoID,
                         isVotingBodyDao,
-                        attachDeposit: state.attachDeposit,
                         registry
                     }}
                 />
@@ -330,7 +280,6 @@ return (
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.Veto"
                     props={{
                         daoId,
-                        attachDeposit: state.attachDeposit,
                         dev: props.dev,
                         registry
                     }}
@@ -341,7 +290,6 @@ return (
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.Dismiss"
                     props={{
                         daoId,
-                        attachDeposit: state.attachDeposit,
                         dev: props.dev,
                         registry
                     }}
@@ -352,7 +300,6 @@ return (
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.Dissolve"
                     props={{
                         daoId,
-                        attachDeposit: state.attachDeposit,
                         dev: props.dev,
                         registry
                     }}
@@ -363,7 +310,6 @@ return (
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.ApproveBudget"
                     props={{
                         daoId,
-                        attachDeposit: state.attachDeposit,
                         dev: props.dev,
                         registry
                     }}

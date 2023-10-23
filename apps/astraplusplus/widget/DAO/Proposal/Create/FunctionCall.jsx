@@ -419,30 +419,20 @@ return (
                         placeholder="Specify member account"
                     />
                 </div>
-                <div className="mb-3">
-                    <Widget
-                        src={`sking.near/widget/Common.Inputs.Select`}
-                        props={{
-                            label: "House",
-                            noLabel: false,
-                            placeholder: "Select house account",
-                            options: [
-                                { text: CoADaoId, value: CoADaoId },
-                                { text: HoMDaoId, value: HoMDaoId },
-                                { text: TCDaoId, value: TCDaoId }
-                            ],
-                            value: state.house,
-                            onChange: (house) => {
-                                State.update({
-                                    house: house.value,
-                                    error: undefined
-                                });
-                            },
-
-                            error: undefined
-                        }}
-                    />
-                </div>
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Common.CongressHouseDropdown"
+                    props={{
+                        daoId: daoId,
+                        label: "House",
+                        placeholder: "Select house account",
+                        onUpdate: (house) => {
+                            State.update({
+                                house: house,
+                                error: undefined
+                            });
+                        }
+                    }}
+                />
             </>
         ) : (
             <>
@@ -508,25 +498,17 @@ return (
                         {state.showReceiverAsOptions && (
                             <div className="mb-3">
                                 <Widget
-                                    src={`sking.near/widget/Common.Inputs.Select`}
+                                    src="/*__@appAccount__*//widget/DAO.Proposal.Common.CongressHouseDropdown"
                                     props={{
+                                        daoId: daoId,
                                         label: "Recipient",
-                                        noLabel: false,
                                         placeholder: "Select Recipient account",
-                                        options: [
-                                            { text: CoADaoId, value: CoADaoId },
-                                            { text: HoMDaoId, value: HoMDaoId },
-                                            { text: TCDaoId, value: TCDaoId }
-                                        ],
-                                        value: state.receiver_id,
-                                        onChange: (house) => {
+                                        onUpdate: (house) => {
                                             State.update({
-                                                receiver_id: house.value,
+                                                receiver_id: house,
                                                 error: undefined
                                             });
-                                        },
-
-                                        error: undefined
+                                        }
                                     }}
                                 />
                             </div>

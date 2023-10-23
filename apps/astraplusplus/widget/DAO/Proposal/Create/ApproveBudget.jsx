@@ -1,21 +1,7 @@
 const accountId = props.accountId ?? context.accountId;
 const daoId = props.daoId;
 const onClose = props.onClose;
-const attachDeposit = props.attachDeposit ?? 0;
 const registry = props.registry;
-
-const CoADaoId = props.dev
-    ? "/*__@replace:CoADaoIdTesting__*/"
-    : "/*__@replace:CoADaoId__*/";
-const VotingBodyDaoId = props.dev
-    ? "/*__@replace:VotingBodyDaoIdTesting__*/"
-    : "/*__@replace:VotingBodyDaoId__*/";
-const TCDaoId = props.dev
-    ? "/*__@replace:TCDaoIdTesting__*/"
-    : "/*__@replace:TCDaoId__*/";
-const HoMDaoId = props.dev
-    ? "/*__@replace:HoMDaoIdTesting__*/"
-    : "/*__@replace:HoMDaoId__*/";
 
 if (!accountId) {
     return "Please connect your NEAR wallet :)";
@@ -38,13 +24,15 @@ function isNearAddress(address) {
 State.init({
     prop_id: null, // proposal id
     error: null,
-    dao: null
+    dao: null,
+    attachDeposit: 0,
+    proposalQueue: null
 });
 
 const handleProposal = () => {
     if (isEmpty(state.dao) || !isNearAddress(state.dao)) {
         State.update({
-            error: "Please enter a valid DAO ID"
+            error: "Please select an house"
         });
         return;
     }
@@ -63,9 +51,16 @@ const handleProposal = () => {
         return;
     }
 
+    if (isEmpty(state.proposalQueue)) {
+        State.update({
+            error: "Please select proposal queue"
+        });
+        return;
+    }
+
     const gas = 20000000000000;
     const deposit = Big(100000000000000000000000)
-        .plus(Big(attachDeposit))
+        .plus(Big(state.attachDeposit))
         .toFixed();
 
     const args = JSON.stringify({
@@ -110,31 +105,36 @@ const onChangeDao = (dao) => {
     });
 };
 
+const onChangeQueue = ({ amount, queue }) => {
+    State.update({
+        attachDeposit: amount,
+        proposalQueue: queue,
+        error: undefined
+    });
+};
+
 const defaultDescription =
     "### [Your Title Here]\n\n#### Description\n\n[Detailed description of what the proposal is about.]\n\n#### Why This Proposal?\n\n[Explanation of why this proposal is necessary or beneficial.]\n\n#### Execution Plan\n\n[Description of how the proposal will be implemented.]\n\n#### Budget\n\n[If applicable, outline the budget required to execute this proposal.]\n\n#### Timeline\n\n[Proposed timeline for the execution of the proposal.]";
 
 return (
     <>
-        <div className="mb-3">
-            <Widget
-                src={`sking.near/widget/Common.Inputs.Select`}
-                props={{
-                    label: "House",
-                    noLabel: false,
-                    placeholder: "Select house account",
-                    options: [
-                        { text: CoADaoId, value: CoADaoId },
-                        { text: HoMDaoId, value: HoMDaoId },
-                        { text: TCDaoId, value: TCDaoId }
-                    ],
-                    value: state.house,
-                    onChange: (house) => {
-                        onChangeDao(house.value);
-                    },
-                    error: undefined
-                }}
-            />
-        </div>
+        <Widget
+            src="/*__@appAccount__*//widget/DAO.Proposal.Common.ProposalQueue"
+            props={{
+                daoId: daoId,
+                onUpdate: onChangeQueue
+            }}
+        />
+
+        <Widget
+            src="/*__@appAccount__*//widget/DAO.Proposal.Common.CongressHouseDropdown"
+            props={{
+                daoId: daoId,
+                label: "House",
+                placeholder: "Select house account",
+                onUpdate: onChangeDao
+            }}
+        />
         <div className="mb-3">
             <h5>Proposal ID</h5>
             <input
