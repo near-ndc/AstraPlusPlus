@@ -114,6 +114,71 @@ if (proposal_type === "DismissAndBan") {
     );
 }
 
+if (proposal_type === "ApproveBudget" || proposal_type === "Veto") {
+    content = (
+        <>
+            <div>
+                <h5>Proposal ID</h5>
+                <p>{kind.ApproveBudget.prop_id}</p>
+            </div>
+            <div>
+                <h5>House</h5>
+                <Widget
+                    src="mob.near/widget/Profile.ShortInlineBlock"
+                    props={{
+                        accountId: kind.ApproveBudget.dao,
+                        tooltip: true
+                    }}
+                />
+            </div>
+        </>
+    );
+}
+
+if (proposal_type === "Dismiss") {
+    content = (
+        <>
+            <div>
+                <h5>Member</h5>
+                <Widget
+                    src="mob.near/widget/Profile.ShortInlineBlock"
+                    props={{
+                        accountId: kind.Dismiss.member,
+                        tooltip: true
+                    }}
+                />
+            </div>
+            <div>
+                <h5>House</h5>
+                <Widget
+                    src="mob.near/widget/Profile.ShortInlineBlock"
+                    props={{
+                        accountId: kind.Dismiss.dao,
+                        tooltip: true
+                    }}
+                />
+            </div>
+        </>
+    );
+}
+
+if (proposal_type === "Dissolve") {
+    content = (
+        <>
+            <div>
+                <h5>House</h5>
+                <Widget
+                    src="mob.near/widget/Profile.ShortInlineBlock"
+                    props={{
+                        accountId: kind.Dissolve.dao,
+                        tooltip: true
+                    }}
+                />
+            </div>
+        </>
+    );
+}
+
 if (proposal_type === "Transfer")
     content = (
         <>
