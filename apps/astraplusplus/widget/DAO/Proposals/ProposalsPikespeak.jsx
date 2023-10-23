@@ -65,13 +65,13 @@ function processProposals(proposals) {
                 proposer: item?.proposer,
                 description: item.description,
                 vote_counts: {},
-                submission_time: item?.submission_time
+                submission_time: item?.submission_time ?? item?.start // for vb it's start
             },
             proposal_type: item?.kind,
             proposal_id: item.id,
             proposer: item?.proposer,
             status: item?.status,
-            submission_time: item?.submission_time,
+            submission_time: item?.submission_time ?? item?.start,
             transaction_id: ""
         });
     });

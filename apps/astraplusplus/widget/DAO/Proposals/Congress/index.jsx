@@ -165,6 +165,9 @@ return (
     <Wrapper>
         <div>
             {state.proposals.map((proposal) => {
+                if (!proposal.submission_time) {
+                    proposal.submission_time = proposal.start;
+                }
                 const kindName =
                     typeof proposal.kind === "string"
                         ? proposal.kind
