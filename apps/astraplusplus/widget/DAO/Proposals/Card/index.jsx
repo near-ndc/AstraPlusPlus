@@ -1,13 +1,30 @@
 const multiSelectMode = props.multiSelectMode ?? false;
-const {
-    proposalString,
-    proposalId,
-    daoId,
-    isCongressDaoID,
-    daoConfig,
-    isVotingBodyDao
-} = props;
+let { proposalString, proposalId, daoId, daoConfig } = props;
 const accountId = context.accountId;
+
+const CoADaoId = props.dev
+    ? "/*__@replace:CoADaoIdTesting__*/"
+    : "/*__@replace:CoADaoId__*/";
+const VotingBodyDaoId = props.dev
+    ? "/*__@replace:VotingBodyDaoIdTesting__*/"
+    : "/*__@replace:VotingBodyDaoId__*/";
+const TCDaoId = props.dev
+    ? "/*__@replace:TCDaoIdTesting__*/"
+    : "/*__@replace:TCDaoId__*/";
+const HoMDaoId = props.dev
+    ? "/*__@replace:HoMDaoIdTesting__*/"
+    : "/*__@replace:HoMDaoId__*/";
+
+const isCongressDaoID =
+    daoId === HoMDaoId || daoId === CoADaoId || daoId === TCDaoId;
+
+if (!daoConfig) {
+    if (isCongressDaoID || isVotingBodyDao) {
+        daoConfig = Near.view(daoId, "config", {});
+    }
+}
+
+const isVotingBodyDao = daoId === VotingBodyDaoId;
 
 const isHuman = useCache(
     () =>
@@ -29,8 +46,6 @@ if (isHuman === null) {
     return <Widget src="nearui.near/widget/Feedback.Spinner" />;
 }
 
-const proposal = proposalString ? JSON.parse(proposalString) : null;
-
 const policy = isCongressDaoID
     ? Near.view(daoId, "get_members")
     : isVotingBodyDao
@@ -44,34 +59,59 @@ if (roles === null)
     );
 
 let new_proposal = null;
-if (
-    !proposalString &&
-    proposalId &&
-    daoId &&
-    !isCongressDaoID &&
-    !isVotingBodyDao
-) {
-    // TODO: THIS API IS SO WEIRD AND INCONSISTENT WITH PROPOSALS API, VOTE IS BROKEN
-    new_proposal = fetch(
-        `https://api.pikespeak.ai/daos/proposal/${daoId}?id=${proposalId}`,
-        {
-            mode: "cors",
-            headers: {
-                "x-api-key": "/*__@replace:pikespeakApiKey__*/"
-            }
+if (!proposalString && proposalId && daoId) {
+    if (isCongressDaoID || isVotingBodyDao) {
+        const resp = Near.view(daoId, "get_proposal", {
+            id: parseInt(proposalId)
+        });
+        if (res === null) {
+            return (
+                <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
+            );
+        } else {
+            new_proposal = {
+                id: resp.id,
+                kind: resp.kind,
+                votes: resp.votes,
+                status: resp.status,
+                proposer: resp?.proposer,
+                description: resp.description,
+                vote_counts: {},
+                submission_time: resp?.submission_time ?? resp?.start // for vb it's start
+            };
         }
-    );
-    if (new_proposal === null) {
-        return (
-            <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
+    } else {
+        // TODO: THIS API IS SO WEIRD AND INCONSISTENT WITH PROPOSALS API, VOTE IS BROKEN
+        new_proposal = fetch(
+            `https://api.pikespeak.ai/daos/proposal/${daoId}?id=${proposalId}`,
+            {
+                mode: "cors",
+                headers: {
+                    "x-api-key": "/*__@replace:pikespeakApiKey__*/"
+                }
+            }
         );
-    } else if (!new_proposal.ok) {
-        return "Proposal not found, check console for details.";
+
+        if (new_proposal === null) {
+            return (
+                <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
+            );
+        } else if (!new_proposal.ok) {
+            return "Proposal not found, check console for details.";
+        }
+        new_proposal = new_proposal.body[0].proposal;
     }
-    new_proposal = new_proposal.body[0].proposal;
 } else if (!proposalString) {
     return "Please provide a daoId and a proposal or proposalId.";
 }
+
+if (!proposalString && !new_proposal) {
+    return (
+        <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
+    );
+}
+
+const proposal = proposalString ? JSON.parse(proposalString) : new_proposal;
 
 const expensiveWork = () => {
     let my_proposal = new_proposal ? new_proposal : proposal;
