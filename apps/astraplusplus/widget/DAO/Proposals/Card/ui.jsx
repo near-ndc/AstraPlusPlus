@@ -553,6 +553,11 @@ function renderMultiVoteButtons({ daoId, proposal, canVote }) {
     );
 }
 
+// waiting for design
+function renderPreVoteButtons({ daoId, proposal, canVote }) {
+    return <div>Voting buttons for pre vote here</div>;
+}
+
 function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
     const items = [
         {
@@ -698,7 +703,9 @@ return (
                 proposal,
                 canVote
             })}
-        {!showMultiVote &&
+
+        {statusName !== "Pre Vote" &&
+            !showMultiVote &&
             renderVoteButtons({
                 totalVotes,
                 statusName,
@@ -713,6 +720,8 @@ return (
                     });
                 }
             })}
+
+        {statusName === "Pre Vote" && renderPreVoteButtons()}
         {renderFooter({
             totalVotes,
             votes,
