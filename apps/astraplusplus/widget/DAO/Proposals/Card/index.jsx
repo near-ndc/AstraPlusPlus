@@ -355,6 +355,9 @@ const handleVote = ({ action, proposalId, daoId }) => {
     let args = {
         id: JSON.parse(proposalId)
     };
+    if (isVotingBodyDao) {
+        args["caller"] = accountId;
+    }
     if (isCongressDaoID || isVotingBodyDao) {
         args["vote"] = action.replace("Vote", "");
     } else {

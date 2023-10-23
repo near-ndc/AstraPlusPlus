@@ -1,5 +1,6 @@
 const view = props.view ?? "multiVote";
 const isCongressDaoID = props.isCongressDaoID;
+const isVotingBodyDao = props.isVotingBodyDao;
 
 const daoId = props.daoId;
 
@@ -42,7 +43,10 @@ if (view === "submit") {
             let args = {
                 id: parseInt(id)
             };
-            if (isCongressDaoID) {
+            if (isVotingBodyDao) {
+                args["caller"] = accountId;
+            }
+            if (isCongressDaoID || isVotingBodyDao) {
                 args["vote"] = vote.replace("Vote", "");
             } else {
                 args["action"] = vote;
