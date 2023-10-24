@@ -1,6 +1,9 @@
 const view = props.view ?? "multiVote";
 const isCongressDaoID = props.isCongressDaoID;
-
+const isVotingBodyDao = props.isVotingBodyDao;
+const registry = props.dev
+    ? "registry-v1.gwg-testing.near"
+    : "registry.i-am-human.near";
 const daoId = props.daoId;
 
 const STORAGE_KEY = "proposalsMultiVote";
@@ -33,26 +36,48 @@ if (view === "submit") {
                     vote = "VoteReject";
                     break;
                 case "2":
-                    vote = isCongressDaoID ? "VoteAbstain" : "VoteRemove";
+                    vote =
+                        isCongressDaoID || isVotingBodyDao
+                            ? "VoteAbstain"
+                            : "VoteRemove";
+                    break;
+                case "3":
+                    vote = "VoteSpam";
                     break;
                 default:
                     console.error("Invalid vote");
                     break;
             }
-            let args = {
-                id: parseInt(id)
-            };
-            if (isCongressDaoID) {
+            let args = {};
+            if (isVotingBodyDao) {
+                args["prop_id"] = parseInt(id);
+                args["caller"] = accountId;
                 args["vote"] = vote.replace("Vote", "");
+                calls.push({
+                    contractName: registry,
+                    methodName: "is_human_call",
+                    args: {
+                        ctr: daoId,
+                        function: "vote",
+                        payload: JSON.stringify(args)
+                    },
+                    gas: 200000000000000,
+                    deposit: 170000000000000000000
+                });
             } else {
-                args["action"] = vote;
+                args["id"] = parseInt(id);
+                if (isCongressDaoID) {
+                    args["vote"] = vote.replace("Vote", "");
+                } else {
+                    args["action"] = vote;
+                }
+                calls.push({
+                    contractName: daoId,
+                    methodName: isCongressDaoID ? "vote" : "act_proposal",
+                    args: args,
+                    gas: 200000000000000
+                });
             }
-            calls.push({
-                contractName: daoId,
-                methodName: isCongressDaoID ? "vote" : "act_proposal",
-                args: args,
-                gas: 200000000000000
-            });
         });
         return Near.call(calls);
     };
@@ -70,7 +95,9 @@ if (view === "submit") {
     const indexToVote = (i) => {
         if (i === "0") return "Yes";
         if (i === "1") return "No";
-        if (i === "2") return isCongressDaoID ? "Abstain" : "Spam";
+        if (i === "2")
+            return isCongressDaoID || isVotingBodyDao ? "Abstain" : "Spam";
+        if (i === "2") return "Spam";
     };
     return (
         <Wrapper className="ndc-card p-4">
@@ -190,10 +217,19 @@ const Wrapper = styled.div`
                 background-color: #ffd50d;
             }
         }
+        &:nth-child(4) {
+            background-color: #ffd50d30;
+
+            &.active {
+                background-color: #ffd50d;
+            }
+        }
     }
 `;
 
-const allowedMethods = isCongressDaoID
+const allowedMethods = isVotingBodyDao
+    ? ["Yes", "No", "Abstain", "Spam"]
+    : isCongressDaoID
     ? ["Yes", "No", "Abstain"]
     : ["Yes", "No", "Spam"];
 return (

@@ -16,10 +16,7 @@ const HoMDaoId = props.dev
     : "/*__@replace:HoMDaoId__*/";
 
 const isCongressDaoID =
-    daoId === HoMDaoId ||
-    daoId === VotingBodyDaoId ||
-    daoId === CoADaoId ||
-    daoId === TCDaoId;
+    daoId === HoMDaoId || daoId === CoADaoId || daoId === TCDaoId;
 
 State.init({
     isProposalModalOpen: false,
@@ -41,6 +38,27 @@ if (isCongressDaoID) {
     const policy = Near.view(daoId, "get_members");
     const isMember = policy?.members?.includes(accountId);
     State.update({ hideProposalBtn: !isMember });
+}
+
+if (daoId === VotingBodyDaoId) {
+    const resp = useCache(
+        () =>
+            asyncFetch(
+                `https://api.pikespeak.ai/sbt/sbt-by-owner?holder=${accountId}&registry=registry.i-am-human.near`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-api-key": "/*__@replace:pikespeakApiKey__*/"
+                    }
+                }
+            ).then((res) => res.body),
+        daoId + "-is-human-info",
+        { subscribe: false }
+    );
+    State.update({
+        hideProposalBtn: !resp?.length > 0
+    });
 }
 
 return (
@@ -86,7 +104,8 @@ return (
                                             "/*__@appAccount__*//widget/DAO.Proposal.Create"
                                         }
                                         props={{
-                                            daoId: daoId
+                                            daoId: daoId,
+                                            dev: props.dev
                                         }}
                                     />
                                 </div>

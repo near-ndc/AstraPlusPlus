@@ -12,6 +12,12 @@ const constructURL = (paramObj, base) => {
     return `${baseURL}?${params}`;
 };
 
+const VotingBodyDaoId = props.dev
+    ? "/*__@replace:VotingBodyDaoIdTesting__*/"
+    : "/*__@replace:VotingBodyDaoId__*/";
+
+const isVotingBodyDao = daoId === VotingBodyDaoId;
+
 State.init({
     daoId,
     daos: [daoId],
@@ -99,6 +105,12 @@ function renderHeader({ id, statusName }) {
             statustext = "Rejected";
             statusvariant = "danger";
             break;
+        case "PreVote":
+        case "Pre Vote":
+            statusicon = "bi bi-hourglass-split";
+            statustext = "Pre Vote";
+            statusvariant = "disabled";
+            break;
     }
 
     return (
@@ -159,6 +171,9 @@ return (
     <Wrapper>
         <div>
             {state.proposals.map((proposal) => {
+                if (!proposal.submission_time) {
+                    proposal.submission_time = proposal.start;
+                }
                 const kindName =
                     typeof proposal.kind === "string"
                         ? proposal.kind
@@ -256,7 +271,9 @@ return (
                                                             vote_counts: {}
                                                         }),
                                                     multiSelectMode: false,
-                                                    isCongressDaoID: true
+                                                    isCongressDaoID: true,
+                                                    isVotingBodyDao,
+                                                    dev: props.dev
                                                 }}
                                             />
                                         </div>

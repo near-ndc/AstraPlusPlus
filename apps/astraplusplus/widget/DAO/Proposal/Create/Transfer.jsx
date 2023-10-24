@@ -197,7 +197,7 @@ if (!res) {
 
 return (
     <>
-        <div className="mb-2">
+        <div className="mb-3">
             <h5>Recipient</h5>
             <input
                 type="text"

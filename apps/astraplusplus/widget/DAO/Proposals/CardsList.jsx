@@ -1,5 +1,12 @@
-const { proposals, resPerPage, state, update, isCongressDaoID, daoConfig } =
-    props;
+const {
+    proposals,
+    resPerPage,
+    state,
+    update,
+    isCongressDaoID,
+    daoConfig,
+    isVotingBodyDao
+} = props;
 
 return (
     <div>
@@ -12,7 +19,7 @@ return (
         )}
         {proposals !== null &&
             proposals.map(({ proposal, proposal_type, proposal_id }, i) => {
-                if (!isCongressDaoID) {
+                if (!isCongressDaoID && !isVotingBodyDao) {
                     proposal.kind = {
                         [proposal_type]: {
                             ...proposal.kind
@@ -40,7 +47,9 @@ return (
                             proposalString: JSON.stringify(proposal),
                             multiSelectMode: state.multiSelectMode,
                             isCongressDaoID,
-                            daoConfig
+                            isVotingBodyDao,
+                            daoConfig,
+                            dev: props.dev
                         }}
                     />
                 );

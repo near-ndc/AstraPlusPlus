@@ -2,6 +2,8 @@ const accountId = props.accountId ?? context.accountId;
 const daoId = props.daoId ?? "multi.sputnik-dao.near";
 const onClose = props.onClose;
 const isCongressDaoID = props.isCongressDaoID;
+const isVotingBodyDao = props.isVotingBodyDao;
+const registry = props.registry;
 
 const HoMDaoId = props.dev
     ? "/*__@replace:HoMDaoIdTesting__*/"
@@ -14,7 +16,9 @@ if (!accountId) {
 State.init({
     description: state.description,
     error: state.error,
-    powerType: null
+    powerType: null,
+    attachDeposit: 0,
+    proposalQueue: null
 });
 
 // only for UI
@@ -37,8 +41,9 @@ const handleProposal = () => {
         return;
     }
     const gas = 200000000000000;
-    const deposit = 100000000000000000000000;
-
+    const deposit = state.attachDeposit
+        ? Big(state.attachDeposit)
+        : 100000000000000000000000;
     const args = isCongressDaoID
         ? {
               description: state.description,
@@ -50,16 +55,47 @@ const handleProposal = () => {
                   kind: "Vote"
               }
           };
+    if (isVotingBodyDao) {
+        const args = JSON.stringify({
+            description: state.description,
+            kind: "Text",
+            caller: accountId
+        });
 
-    Near.call([
-        {
-            contractName: daoId,
-            methodName: isCongressDaoID ? "create_proposal" : "add_proposal",
-            args: args,
-            gas: gas,
-            deposit: deposit
+        if (!state.proposalQueue) {
+            State.update({
+                error: "Please select proposal queue"
+            });
+            return;
         }
-    ]);
+
+        Near.call([
+            {
+                contractName: registry,
+                methodName: "is_human_call",
+                args: {
+                    ctr: daoId,
+                    function: "create_proposal",
+                    payload: args
+                },
+                gas: gas,
+                deposit: deposit
+            }
+        ]);
+    } else {
+        Near.call([
+            {
+                contractName: daoId,
+                methodName:
+                    isCongressDaoID || isVotingBodyDao
+                        ? "create_proposal"
+                        : "add_proposal",
+                args: args,
+                gas: gas,
+                deposit: deposit
+            }
+        ]);
+    }
 };
 
 const onChangeDescription = (description) => {
@@ -69,13 +105,28 @@ const onChangeDescription = (description) => {
     });
 };
 
+const onChangeQueue = ({ amount, queue }) => {
+    State.update({
+        attachDeposit: amount,
+        proposalQueue: queue,
+        error: undefined
+    });
+};
+
 const defaultDescription =
     "### [Your Title Here]\n\n#### Description\n\n[Detailed description of what the proposal is about.]\n\n#### Why This Proposal?\n\n[Explanation of why this proposal is necessary or beneficial.]\n\n#### Execution Plan\n\n[Description of how the proposal will be implemented.]\n\n#### Budget\n\n[If applicable, outline the budget required to execute this proposal.]\n\n#### Timeline\n\n[Proposed timeline for the execution of the proposal.]";
 
 return (
     <>
+        <Widget
+            src="/*__@appAccount__*//widget/DAO.Proposal.Common.ProposalQueue"
+            props={{
+                daoId: daoId,
+                onUpdate: onChangeQueue
+            }}
+        />
         {daoId === HoMDaoId && (
-            <div className="mb-2">
+            <div className="mb-3">
                 <Widget
                     src={`sking.near/widget/Common.Inputs.Select`}
                     props={{
@@ -94,15 +145,17 @@ return (
                 />
             </div>
         )}
-        <h5>Proposal Description</h5>
-        <Widget
-            src="sking.near/widget/Common.Inputs.Markdown"
-            props={{
-                onChange: (value) => onChangeDescription(value),
-                height: "270px",
-                initialText: defaultDescription
-            }}
-        />
+        <div className="mb-3">
+            <h5>Proposal Description</h5>
+            <Widget
+                src="sking.near/widget/Common.Inputs.Markdown"
+                props={{
+                    onChange: (value) => onChangeDescription(value),
+                    height: "270px",
+                    initialText: defaultDescription
+                }}
+            />
+        </div>
         {state.error && <div className="text-danger">{state.error}</div>}
         <div className="ms-auto">
             <Widget

@@ -1,7 +1,34 @@
-const { proposals, resPerPage, state, update, isCongressDaoID, daoConfig } =
-    props;
+const {
+    proposals,
+    resPerPage,
+    state,
+    update,
+    isCongressDaoID,
+    daoConfig,
+    isVotingBodyDao
+} = props;
 const { daoId, multiSelectMode } = state;
 const accountId = props.accountId ?? context.accountId ?? "";
+
+const isHuman = useCache(
+    () =>
+        asyncFetch(
+            `https://api.pikespeak.ai/sbt/sbt-by-owner?holder=${accountId}&registry=registry.i-am-human.near`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "/*__@replace:pikespeakApiKey__*/"
+                }
+            }
+        ).then((res) => res?.body?.length > 0),
+    daoId + "-is-human-pikespeak-api",
+    { subscribe: false }
+);
+
+if (isHuman === null) {
+    return <Widget src="nearui.near/widget/Feedback.Spinner" />;
+}
 
 const Table = styled.div`
     font-size: 13px;
@@ -33,6 +60,8 @@ const Table = styled.div`
 
 const roles = isCongressDaoID
     ? Near.view(daoId, "get_members")
+    : isVotingBodyDao
+    ? null
     : Near.view(daoId, "get_policy");
 
 roles = roles === null ? [] : roles?.roles ?? roles;
@@ -66,6 +95,18 @@ if (isCongressDaoID) {
         }
     ];
 }
+
+if (isVotingBodyDao) {
+    userRoles = [
+        {
+            name: "all",
+            kind: "Everyone",
+            permissions: {},
+            vote_policy: {}
+        }
+    ];
+}
+
 const isAllowedTo = (kind, action) => {
     // -- Check if the user is allowed to perform the action
     let allowed = false;
@@ -124,7 +165,7 @@ return (
                     {proposals !== null &&
                         proposals.map(
                             ({ proposal, proposal_type, proposal_id }, i) => {
-                                if (!isCongressDaoID) {
+                                if (!isCongressDaoID && !isVotingBodyDao) {
                                     proposal.kind = {
                                         [proposal_type]: {
                                             ...proposal.kind
@@ -158,7 +199,10 @@ return (
                                             multiSelectMode,
                                             isAllowedTo,
                                             isCongressDaoID,
-                                            daoConfig
+                                            isVotingBodyDao,
+                                            daoConfig,
+                                            isHuman,
+                                            dev: props.dev
                                         }}
                                     />
                                 );

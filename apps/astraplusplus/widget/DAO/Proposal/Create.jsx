@@ -2,7 +2,6 @@ const daoId = props.daoId;
 const accountId = props.accountId ?? context.accountId;
 const onClose = props.onClose;
 
-
 const CoADaoId = props.dev
     ? "/*__@replace:CoADaoIdTesting__*/"
     : "/*__@replace:CoADaoId__*/";
@@ -15,37 +14,67 @@ const TCDaoId = props.dev
 const HoMDaoId = props.dev
     ? "/*__@replace:HoMDaoIdTesting__*/"
     : "/*__@replace:HoMDaoId__*/";
+const registry = props.dev
+    ? "registry-v1.gwg-testing.near"
+    : "registry.i-am-human.near";
 
 const isCongressDaoID =
     props.daoId === HoMDaoId ||
-    props.daoId === VotingBodyDaoId ||
     props.daoId === CoADaoId ||
     props.daoId === TCDaoId;
 
 let permissions = [];
+const isVotingBodyDao = props.daoId === VotingBodyDaoId;
 
-const proposalTypes = [
-    {
-        text: "Text",
-        value: "Vote"
-    },
-    {
-        text: "Transfer",
-        value: "Transfer"
-    },
-    {
-        text: "Function Call",
-        value: "FunctionCall"
-    },
-    {
-        text: "Add Member To Role",
-        value: "AddMemberToRole"
-    },
-    {
-        text: "Remove Member From Role",
-        value: "RemoveMemberFromRole"
-    }
-];
+const proposalTypes = isVotingBodyDao
+    ? [
+          {
+              text: "Text",
+              value: "Text"
+          },
+          {
+              text: "Dismiss",
+              value: "Dismiss"
+          },
+          {
+              text: "Approve Budget",
+              value: "ApproveBudget"
+          },
+          {
+              text: "Veto big budget item",
+              value: "Veto"
+          },
+          {
+              text: "Dissolve House",
+              value: "Dissolve"
+          },
+          {
+              text: "Function Call",
+              value: "FunctionCall"
+          }
+      ]
+    : [
+          {
+              text: "Text",
+              value: "Vote"
+          },
+          {
+              text: "Transfer",
+              value: "Transfer"
+          },
+          {
+              text: "Function Call",
+              value: "FunctionCall"
+          },
+          {
+              text: "Add Member To Role",
+              value: "AddMemberToRole"
+          },
+          {
+              text: "Remove Member From Role",
+              value: "RemoveMemberFromRole"
+          }
+      ];
 
 State.init({
     members: [],
@@ -188,12 +217,19 @@ return (
                 />
             </div>
         </div>
+
         <div className="d-flex flex-column gap-2">
             {(state.proposalType.value === "Vote" ||
                 state.proposalType.value === "Text") && (
                 <Widget
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.Text"
-                    props={{ daoId, onClose, isCongressDaoID }}
+                    props={{
+                        daoId,
+                        onClose,
+                        isCongressDaoID,
+                        isVotingBodyDao,
+                        registry
+                    }}
                 />
             )}
             {state.proposalType.value === "Transfer" && (
@@ -217,7 +253,13 @@ return (
             {state.proposalType.value === "FunctionCall" && (
                 <Widget
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.FunctionCall"
-                    props={{ daoId, onClose, isCongressDaoID }}
+                    props={{
+                        daoId,
+                        onClose,
+                        isCongressDaoID,
+                        registry,
+                        isVotingBodyDao
+                    }}
                 />
             )}
             {(state.proposalType.value === "FundingRequest" ||
@@ -240,6 +282,46 @@ return (
                         powerType: "DismissAndBan",
                         showPowers: false,
                         isCongressDaoID
+                    }}
+                />
+            )}
+            {state.proposalType.value === "Veto" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.Veto"
+                    props={{
+                        daoId,
+                        dev: props.dev,
+                        registry
+                    }}
+                />
+            )}
+            {state.proposalType.value === "Dismiss" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.Dismiss"
+                    props={{
+                        daoId,
+                        dev: props.dev,
+                        registry
+                    }}
+                />
+            )}
+            {state.proposalType.value === "Dissolve" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.Dissolve"
+                    props={{
+                        daoId,
+                        dev: props.dev,
+                        registry
+                    }}
+                />
+            )}
+            {state.proposalType.value === "ApproveBudget" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.ApproveBudget"
+                    props={{
+                        daoId,
+                        dev: props.dev,
+                        registry
                     }}
                 />
             )}

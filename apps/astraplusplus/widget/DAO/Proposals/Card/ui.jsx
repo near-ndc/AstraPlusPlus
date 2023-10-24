@@ -17,9 +17,13 @@ const {
     proposal,
     policy,
     handleVote,
+    handlePreVoteAction,
     comments,
     isCongressDaoID,
-    daoConfig
+    isVotingBodyDao,
+    daoConfig,
+    isHuman,
+    currentuserCongressHouse
 } = props;
 const accountId = context.accountId;
 
@@ -127,6 +131,12 @@ function renderHeader({ typeName, id, daoId, statusName }) {
             statustext = "Proposal Rejected";
             statusvariant = "danger";
             break;
+        case "PreVote":
+        case "Pre Vote":
+            statusicon = "bi bi-hourglass-split";
+            statustext = "Pre Vote";
+            statusvariant = "disabled";
+            break;
     }
 
     return (
@@ -144,7 +154,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                     size: "md"
                                 }}
                             />
-                            {isCongressDaoID &&
+                            {(isCongressDaoID || isVotingBodyDao) &&
                                 statusName === "Approved" &&
                                 proposal?.submission_time +
                                     daoConfig?.voting_duration +
@@ -246,7 +256,7 @@ function renderData({
                         <b>Submission date</b>
                         <p>
                             <small className="">
-                                {isCongressDaoID
+                                {isCongressDaoID || isVotingBodyDao
                                     ? new Date(submission_time).toLocaleString()
                                     : new Date(
                                           parseInt(
@@ -409,7 +419,7 @@ function renderVoteButtons({
     const wins = {
         yes: statusName === "Approved",
         no: statusName === "Rejected",
-        spam: statusName === "Failed",
+        spam: statusName === "Failed" || statusName === "Spam",
         abstain: statusName === "Failed"
     };
 
@@ -418,7 +428,9 @@ function renderVoteButtons({
     const voted = {
         yes: votes[accountId || ";;;"] === "Approve",
         no: votes[accountId || ";;;"] === "Reject",
-        spam: votes[accountId || ";;;"] === "Remove",
+        spam: isVotingBodyDao
+            ? votes[accountId || ";;;"] === "Spam"
+            : votes[accountId || ";;;"] === "Remove",
         abstain: votes[accountId || ";;;"] === "Abstain"
     };
 
@@ -428,7 +440,9 @@ function renderVoteButtons({
         <div
             className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
             style={{
-                gridTemplateColumns: "1fr 1fr 120px"
+                gridTemplateColumns: isVotingBodyDao
+                    ? "1fr 1fr 120px 120px"
+                    : "1fr 1fr 120px"
             }}
         >
             <div className="w-100">
@@ -509,7 +523,7 @@ function renderVoteButtons({
                     </div>
                 </VoteButton>
             </div>
-            {isCongressDaoID ? (
+            {(isVotingBodyDao || isCongressDaoID) && (
                 <div className="w-100">
                     {voted.abstain && (
                         <Widget
@@ -537,7 +551,8 @@ function renderVoteButtons({
                         <div></div>
                     </VoteButton>
                 </div>
-            ) : (
+            )}
+            {!isCongressDaoID && (
                 <div className="w-100">
                     {voted.spam && (
                         <Widget
@@ -556,7 +571,11 @@ function renderVoteButtons({
                         finsihed={finsihed}
                         wins={wins.spam}
                         myVote={voted.spam}
-                        onClick={() => handleVote("VoteRemove")}
+                        onClick={() =>
+                            handleVote(
+                                isVotingBodyDao ? "VoteSpam" : "VoteRemove"
+                            )
+                        }
                         disabled={
                             alreadyVoted || finsihed || !isAllowedToVote[2]
                         }
@@ -582,9 +601,50 @@ function renderMultiVoteButtons({ daoId, proposal, canVote }) {
                 proposal,
                 canVote,
                 view: "multiVote",
-                isCongressDaoID
+                isCongressDaoID,
+                isVotingBodyDao,
+                dev: props.dev
             }}
         />
+    );
+}
+
+function renderPreVoteButtons({ proposal }) {
+    return (
+        <div className="d-lg-grid d-flex flex-wrap gap-2 align-items-end">
+            <button
+                disabled={currentuserCongressHouse === null}
+                onClick={() =>
+                    handlePreVoteAction({
+                        action: "support_proposal_by_congress",
+                        proposalId: proposal.id
+                    })
+                }
+            >
+                Congress member to support it
+            </button>
+            <button
+                disabled={!isHuman}
+                onClick={() =>
+                    handlePreVoteAction({
+                        action: "support_proposal",
+                        proposalId: proposal.id
+                    })
+                }
+            >
+                VB member to support it
+            </button>
+            <button
+                onClick={() =>
+                    handlePreVoteAction({
+                        action: "top_up_proposal",
+                        proposalId: proposal.id
+                    })
+                }
+            >
+                Top Up bond to the "active queue bond"
+            </button>
+        </div>
     );
 }
 
@@ -733,7 +793,9 @@ return (
                 proposal,
                 canVote
             })}
-        {!showMultiVote &&
+
+        {statusName !== "Pre Vote" &&
+            !showMultiVote &&
             renderVoteButtons({
                 totalVotes,
                 statusName,
@@ -747,6 +809,11 @@ return (
                         proposalId: proposal.id
                     });
                 }
+            })}
+
+        {statusName === "Pre Vote" &&
+            renderPreVoteButtons({
+                proposal
             })}
         {renderFooter({
             totalVotes,

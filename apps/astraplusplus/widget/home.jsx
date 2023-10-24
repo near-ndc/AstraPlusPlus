@@ -108,14 +108,14 @@ const pages = [
             href: currentLink + `?page=congress&house=tc`,
             onClick: () => router.navigate({ page: "congress", house: "tc" }),
             widgetName: "DAO.index"
+        },
+        {
+            title: "Voting Body",
+            active: page === "congress" && router.params.house === "vb",
+            href: currentLink + `?page=congress&house=vb`,
+            onClick: () => router.navigate({ page: "congress", house: "vb" }),
+            widgetName: "DAO.index"
         }
-        // {
-        //     title: "Voting Body",
-        //     active: page === "congress" && router.params.house === "vb",
-        //     href: currentLink + `?page=congress&house=vb`,
-        //     onClick: () => router.navigate({ page: "congress", house: "vb" }),
-        //     widgetName: "DAO.index"
-        // }
     ],
     [
         {

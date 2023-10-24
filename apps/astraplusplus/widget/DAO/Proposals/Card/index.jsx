@@ -1,11 +1,83 @@
 const multiSelectMode = props.multiSelectMode ?? false;
-const { proposalString, proposalId, daoId, isCongressDaoID, daoConfig } = props;
+let { proposalString, proposalId, daoId, daoConfig } = props;
 const accountId = context.accountId;
 
-const proposal = proposalString ? JSON.parse(proposalString) : null;
+const CoADaoId = props.dev
+    ? "/*__@replace:CoADaoIdTesting__*/"
+    : "/*__@replace:CoADaoId__*/";
+const VotingBodyDaoId = props.dev
+    ? "/*__@replace:VotingBodyDaoIdTesting__*/"
+    : "/*__@replace:VotingBodyDaoId__*/";
+const TCDaoId = props.dev
+    ? "/*__@replace:TCDaoIdTesting__*/"
+    : "/*__@replace:TCDaoId__*/";
+const HoMDaoId = props.dev
+    ? "/*__@replace:HoMDaoIdTesting__*/"
+    : "/*__@replace:HoMDaoId__*/";
+
+const registry = props.dev
+    ? "registry-v1.gwg-testing.near"
+    : "registry.i-am-human.near";
+const isCongressDaoID =
+    daoId === HoMDaoId || daoId === CoADaoId || daoId === TCDaoId;
+
+const isVotingBodyDao = daoId === VotingBodyDaoId;
+
+if (!daoConfig) {
+    if (isCongressDaoID || isVotingBodyDao) {
+        daoConfig = Near.view(daoId, "config", {});
+    }
+}
+
+const currentuserCongressHouse = null; // if the current user is a member of any house
+
+const isHuman = useCache(
+    () =>
+        asyncFetch(
+            `https://api.pikespeak.ai/sbt/sbt-by-owner?holder=${accountId}&registry=registry.i-am-human.near`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "/*__@replace:pikespeakApiKey__*/"
+                }
+            }
+        ).then((res) => {
+            res.body?.map((item) => {
+                if (item.registry === "elections.ndc-gwg.near") {
+                    switch (item.class_id) {
+                        // class2=HoM
+                        case 2:
+                        case "2":
+                            currentuserCongressHouse = HoMDaoId;
+                            break;
+                        // class3=CoA
+                        case 3:
+                        case "3":
+                            currentuserCongressHouse = CoADaoId;
+                            break;
+                        // class4=TC
+                        case 4:
+                        case "4":
+                            currentuserCongressHouse = TCDaoId;
+                            break;
+                    }
+                }
+            });
+            return res?.body?.length > 0;
+        }),
+    daoId + "-is-voting-allowed",
+    { subscribe: false }
+);
+
+if (isHuman === null) {
+    return <Widget src="nearui.near/widget/Feedback.Spinner" />;
+}
 
 const policy = isCongressDaoID
     ? Near.view(daoId, "get_members")
+    : isVotingBodyDao
+    ? ""
     : Near.view(daoId, "get_policy");
 let roles = policy;
 
@@ -15,28 +87,59 @@ if (roles === null)
     );
 
 let new_proposal = null;
-if (!proposalString && proposalId && daoId && !isCongressDaoID) {
-    // TODO: THIS API IS SO WEIRD AND INCONSISTENT WITH PROPOSALS API, VOTE IS BROKEN
-    new_proposal = fetch(
-        `https://api.pikespeak.ai/daos/proposal/${daoId}?id=${proposalId}`,
-        {
-            mode: "cors",
-            headers: {
-                "x-api-key": "/*__@replace:pikespeakApiKey__*/"
-            }
+if (!proposalString && proposalId && daoId) {
+    if (isCongressDaoID || isVotingBodyDao) {
+        const resp = Near.view(daoId, "get_proposal", {
+            id: parseInt(proposalId)
+        });
+        if (res === null) {
+            return (
+                <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
+            );
+        } else {
+            new_proposal = {
+                id: resp.id,
+                kind: resp.kind,
+                votes: resp.votes,
+                status: resp.status,
+                proposer: resp?.proposer,
+                description: resp.description,
+                vote_counts: {},
+                submission_time: resp?.submission_time ?? resp?.start // for vb it's start
+            };
         }
-    );
-    if (new_proposal === null) {
-        return (
-            <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
+    } else {
+        // TODO: THIS API IS SO WEIRD AND INCONSISTENT WITH PROPOSALS API, VOTE IS BROKEN
+        new_proposal = fetch(
+            `https://api.pikespeak.ai/daos/proposal/${daoId}?id=${proposalId}`,
+            {
+                mode: "cors",
+                headers: {
+                    "x-api-key": "/*__@replace:pikespeakApiKey__*/"
+                }
+            }
         );
-    } else if (!new_proposal.ok) {
-        return "Proposal not found, check console for details.";
+
+        if (new_proposal === null) {
+            return (
+                <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
+            );
+        } else if (!new_proposal.ok) {
+            return "Proposal not found, check console for details.";
+        }
+        new_proposal = new_proposal.body[0].proposal;
     }
-    new_proposal = new_proposal.body[0].proposal;
 } else if (!proposalString) {
     return "Please provide a daoId and a proposal or proposalId.";
 }
+
+if (!proposalString && !new_proposal) {
+    return (
+        <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
+    );
+}
+
+const proposal = proposalString ? JSON.parse(proposalString) : new_proposal;
 
 const expensiveWork = () => {
     let my_proposal = new_proposal ? new_proposal : proposal;
@@ -108,6 +211,17 @@ const expensiveWork = () => {
         ];
     }
 
+    if (isVotingBodyDao) {
+        userRoles = [
+            {
+                name: "all",
+                kind: "Everyone",
+                permissions: {},
+                vote_policy: {}
+            }
+        ];
+    }
+
     const isAllowedTo = (kind, action) => {
         // -- Check if the user is allowed to perform the action
         let allowed = false;
@@ -138,19 +252,22 @@ const expensiveWork = () => {
     const kindName =
         typeof my_proposal.kind === "string"
             ? my_proposal.kind
-            : isCongressDaoID
+            : isCongressDaoID || isVotingBodyDao
             ? Object.keys(my_proposal.kind)[0]
             : typeof my_proposal.kind.typeEnum === "string"
             ? my_proposal.kind.typeEnum
             : Object.keys(my_proposal.kind)[0];
 
-    const isAllowedToVote = [
-        isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
-        isAllowedTo(proposalKinds[kindName], actions.VoteReject),
-        isCongressDaoID
-            ? isAllowedTo(proposalKinds[kindName], actions.VoteAbstain)
-            : isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
-    ];
+    const isAllowedToVote = isVotingBodyDao
+        ? [isHuman, isHuman, isHuman]
+        : [
+              isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
+              isAllowedTo(proposalKinds[kindName], actions.VoteReject),
+              isCongressDaoID
+                  ? isAllowedTo(proposalKinds[kindName], actions.VoteAbstain)
+                  : isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
+          ];
+
     // --- end check user permissions
     // --- Votes required:
     // TODO: Needs to be reviewed
@@ -199,7 +316,7 @@ const expensiveWork = () => {
         });
     }
 
-    if (isCongressDaoID) {
+    if (isCongressDaoID || isVotingBodyDao) {
         totalVotesNeeded = daoConfig?.threshold;
     }
 
@@ -217,7 +334,7 @@ const expensiveWork = () => {
         totalVotes.spam += my_proposal.vote_counts[key][2];
     });
 
-    if (isCongressDaoID) {
+    if (isCongressDaoID || isVotingBodyDao) {
         for (const value of Object.values(my_proposal.votes)) {
             if (value === "Approve") {
                 totalVotes.yes++;
@@ -225,6 +342,8 @@ const expensiveWork = () => {
                 totalVotes.no++;
             } else if (value === "Abstain") {
                 totalVotes.abstain++;
+            } else if (value === "Spam") {
+                totalVotes.spam++;
             }
         }
     }
@@ -270,22 +389,96 @@ if (!state || state.proposal.id !== proposal.id) {
 }
 
 const handleVote = ({ action, proposalId, daoId }) => {
-    let args = {
-        id: JSON.parse(proposalId)
-    };
-    if (isCongressDaoID) {
+    let args = {};
+    if (isVotingBodyDao) {
+        args["prop_id"] = parseInt(proposalId);
+        args["caller"] = accountId;
         args["vote"] = action.replace("Vote", "");
+        Near.call([
+            {
+                contractName: registry,
+                methodName: "is_human_call",
+                args: {
+                    ctr: daoId,
+                    function: "vote",
+                    payload: JSON.stringify(args)
+                },
+                gas: 200000000000000,
+                deposit: 170000000000000000000
+            }
+        ]);
     } else {
-        args["action"] = action;
-    }
-    Near.call([
-        {
-            contractName: daoId,
-            methodName: isCongressDaoID ? "vote" : "act_proposal",
-            args: args,
-            gas: 200000000000000
+        args["id"] = JSON.parse(proposalId);
+        if (isCongressDaoID) {
+            args["vote"] = action.replace("Vote", "");
+        } else {
+            args["action"] = action;
         }
-    ]);
+        Near.call([
+            {
+                contractName: daoId,
+                methodName: isCongressDaoID ? "vote" : "act_proposal",
+                args: args,
+                gas: 200000000000000
+            }
+        ]);
+    }
+};
+
+const handlePreVoteAction = ({ action, proposalId }) => {
+    switch (action) {
+        case "support_proposal_by_congress": {
+            Near.call([
+                {
+                    contractName: daoId,
+                    methodName: "support_proposal_by_congress",
+                    args: {
+                        prop_id: parseInt(proposalId),
+                        dao: currentuserCongressHouse
+                    },
+                    gas: 200000000000000
+                }
+            ]);
+            break;
+        }
+        case "support_proposal": {
+            Near.call([
+                {
+                    contractName: registry,
+                    methodName: "is_human_call",
+                    args: {
+                        ctr: daoId,
+                        function: "support_proposal",
+                        payload: JSON.stringify({
+                            caller: accountId,
+                            prop_id: parseInt(proposalId)
+                        })
+                    },
+                    gas: 200000000000000,
+                    deposit: 100000000000000000000000
+                }
+            ]);
+            break;
+        }
+        case "top_up_proposal": {
+            const deposit =
+                parseInt(daoConfig?.active_queue_bond) -
+                parseInt(daoConfig?.pre_vote_bond);
+
+            Near.call([
+                {
+                    contractName: daoId,
+                    methodName: "top_up_proposal",
+                    args: {
+                        id: parseInt(proposalId)
+                    },
+                    gas: 200000000000000,
+                    deposit: deposit
+                }
+            ]);
+            break;
+        }
+    }
 };
 
 return (
@@ -300,7 +493,11 @@ return (
             comments: comments,
             handleVote,
             isCongressDaoID,
-            daoConfig
+            isVotingBodyDao,
+            daoConfig,
+            handlePreVoteAction,
+            isHuman,
+            currentuserCongressHouse
         }}
     />
 );
