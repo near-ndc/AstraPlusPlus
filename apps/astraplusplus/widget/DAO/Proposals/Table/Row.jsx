@@ -42,7 +42,8 @@ const actions = {
     AddProposal: "AddProposal",
     VoteApprove: "VoteApprove",
     VoteReject: "VoteReject",
-    VoteRemove: "VoteRemove"
+    VoteRemove: "VoteRemove",
+    VoteAbstain: "VoteAbstain"
 };
 
 const kindName =
@@ -59,7 +60,9 @@ const isAllowedToVote = isVotingBodyDao
     : [
           isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
           isAllowedTo(proposalKinds[kindName], actions.VoteReject),
-          isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
+          isCongressDaoID
+              ? isAllowedTo(proposalKinds[kindName], actions.VoteAbstain)
+              : isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
       ];
 
 // --- end check user permissions
@@ -87,10 +90,11 @@ const formatDate = (date) => {
 const voted = {
     yes: proposal.votes[accountId || ";;;"] === "Approve",
     no: proposal.votes[accountId || ";;;"] === "Reject",
-    spam: proposal.votes[accountId || ";;;"] === "Remove"
+    spam: proposal.votes[accountId || ";;;"] === "Remove",
+    abstain: proposal.votes[accountId || ";;;"] === "Abstain"
 };
 
-const alreadyVoted = voted.yes || voted.no || voted.spam;
+const alreadyVoted = voted.yes || voted.no || voted.spam || voted.abstain;
 
 const canVote =
     isAllowedToVote.every((v) => v) &&

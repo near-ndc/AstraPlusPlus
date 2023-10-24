@@ -555,12 +555,12 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                         name: Content.tc.title,
                                         onSelect: () => changeHouse("tc"),
                                         href: getHouseUrl("tc")
-                                    },
-                                    {
-                                        name: Content.vb.title,
-                                        onSelect: () => changeHouse("vb"),
-                                        href: getHouseUrl("vb")
                                     }
+                                    // {
+                                    //     name: Content.vb.title,
+                                    //     onSelect: () => changeHouse("vb"),
+                                    //     href: getHouseUrl("vb")
+                                    // }
                                 ]
                             }}
                         />

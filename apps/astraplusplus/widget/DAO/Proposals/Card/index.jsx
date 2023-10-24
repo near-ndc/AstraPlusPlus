@@ -173,7 +173,8 @@ const expensiveWork = () => {
         AddProposal: "AddProposal",
         VoteApprove: "VoteApprove",
         VoteReject: "VoteReject",
-        VoteRemove: "VoteRemove"
+        VoteRemove: "VoteRemove",
+        VoteAbstain: "VoteAbstain"
     };
 
     // -- Get all the roles from the DAO policy
@@ -261,7 +262,9 @@ const expensiveWork = () => {
         : [
               isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
               isAllowedTo(proposalKinds[kindName], actions.VoteReject),
-              isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
+              isCongressDaoID
+                  ? isAllowedTo(proposalKinds[kindName], actions.VoteAbstain)
+                  : isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
           ];
 
     // --- end check user permissions
@@ -320,6 +323,7 @@ const expensiveWork = () => {
         yes: 0,
         no: 0,
         spam: 0,
+        abstain: 0,
         total: 0
     };
 
@@ -335,10 +339,13 @@ const expensiveWork = () => {
                 totalVotes.yes++;
             } else if (value === "Reject") {
                 totalVotes.no++;
+            } else if (value === "Abstain") {
+                totalVotes.abstain++;
             }
         }
     }
-    totalVotes.total = totalVotes.yes + totalVotes.no + totalVotes.spam;
+    totalVotes.total =
+        totalVotes.yes + totalVotes.no + totalVotes.spam + totalVotes.abstain;
 
     my_proposal.totalVotesNeeded = totalVotesNeeded;
     my_proposal.totalVotes = totalVotes;
