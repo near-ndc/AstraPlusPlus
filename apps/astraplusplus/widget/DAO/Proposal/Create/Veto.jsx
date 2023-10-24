@@ -26,7 +26,8 @@ State.init({
     dao: null,
     error: null,
     attachDeposit: 0,
-    proposalQueue: null
+    proposalQueue: null,
+    description: null
 });
 
 const handleProposal = () => {
@@ -65,7 +66,7 @@ const handleProposal = () => {
 
     const args = JSON.stringify({
         description: state.description,
-        kind: { Veto: { prop_id: state.prop_id, dao: state.dao } },
+        kind: { Veto: { prop_id: parseInt(state.prop_id), dao: state.dao } },
         caller: accountId
     });
 

@@ -105,6 +105,12 @@ function renderHeader({ id, statusName }) {
             statustext = "Rejected";
             statusvariant = "danger";
             break;
+        case "PreVote":
+        case "Pre Vote":
+            statusicon = "bi bi-hourglass-split";
+            statustext = "Pre Vote";
+            statusvariant = "disabled";
+            break;
     }
 
     return (

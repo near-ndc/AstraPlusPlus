@@ -1,7 +1,9 @@
 const view = props.view ?? "multiVote";
 const isCongressDaoID = props.isCongressDaoID;
 const isVotingBodyDao = props.isVotingBodyDao;
-
+const registry = props.dev
+    ? "registry-v1.gwg-testing.near"
+    : "registry.i-am-human.near";
 const daoId = props.daoId;
 
 const STORAGE_KEY = "proposalsMultiVote";
@@ -40,23 +42,36 @@ if (view === "submit") {
                     console.error("Invalid vote");
                     break;
             }
-            let args = {
-                id: parseInt(id)
-            };
+            let args = {};
             if (isVotingBodyDao) {
+                args["prop_id"] = parseInt(id);
                 args["caller"] = accountId;
-            }
-            if (isCongressDaoID || isVotingBodyDao) {
                 args["vote"] = vote.replace("Vote", "");
+                calls.push({
+                    contractName: registry,
+                    methodName: "is_human_call",
+                    args: {
+                        ctr: daoId,
+                        function: "vote",
+                        payload: JSON.stringify(args)
+                    },
+                    gas: 200000000000000,
+                    deposit: 170000000000000000000
+                });
             } else {
-                args["action"] = vote;
+                args["id"] = parseInt(id);
+                if (isCongressDaoID) {
+                    args["vote"] = vote.replace("Vote", "");
+                } else {
+                    args["action"] = vote;
+                }
+                calls.push({
+                    contractName: daoId,
+                    methodName: isCongressDaoID ? "vote" : "act_proposal",
+                    args: args,
+                    gas: 200000000000000
+                });
             }
-            calls.push({
-                contractName: daoId,
-                methodName: isCongressDaoID ? "vote" : "act_proposal",
-                args: args,
-                gas: 200000000000000
-            });
         });
         return Near.call(calls);
     };

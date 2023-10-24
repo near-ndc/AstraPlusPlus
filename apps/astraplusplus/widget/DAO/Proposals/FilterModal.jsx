@@ -58,6 +58,22 @@ const type = {
         {
             title: "Dismiss And Ban",
             value: "DismissAndBan"
+        },
+        {
+            title: "Dismiss",
+            value: "Dismiss"
+        },
+        {
+            title: "Dissolve",
+            value: "Dissolve"
+        },
+        {
+            title: "Veto",
+            value: "Veto"
+        },
+        {
+            title: "Approve Budget",
+            value: "ApproveBudget"
         }
     ],
     policy: [

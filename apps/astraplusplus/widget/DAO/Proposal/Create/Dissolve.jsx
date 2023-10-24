@@ -11,7 +11,8 @@ State.init({
     dao: null,
     error: null,
     attachDeposit: 0,
-    proposalQueue: null
+    proposalQueue: null,
+    description: null
 });
 
 function isEmpty(value) {

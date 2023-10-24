@@ -17,10 +17,13 @@ const {
     proposal,
     policy,
     handleVote,
+    handlePreVoteAction,
     comments,
     isCongressDaoID,
     isVotingBodyDao,
-    daoConfig
+    daoConfig,
+    isHuman,
+    currentuserCongressHouse
 } = props;
 const accountId = context.accountId;
 
@@ -127,6 +130,12 @@ function renderHeader({ typeName, id, daoId, statusName }) {
             statusicon = "bi bi-ban";
             statustext = "Proposal Rejected";
             statusvariant = "danger";
+            break;
+        case "PreVote":
+        case "Pre Vote":
+            statusicon = "bi bi-hourglass-split";
+            statustext = "Pre Vote";
+            statusvariant = "disabled";
             break;
     }
 
@@ -553,9 +562,43 @@ function renderMultiVoteButtons({ daoId, proposal, canVote }) {
     );
 }
 
-// waiting for design
-function renderPreVoteButtons({ daoId, proposal, canVote }) {
-    return <div>Voting buttons for pre vote here</div>;
+function renderPreVoteButtons({ proposal }) {
+    return (
+        <div className="d-lg-grid d-flex flex-wrap gap-2 align-items-end">
+            <button
+                disabled={currentuserCongressHouse === null}
+                onClick={() =>
+                    handlePreVoteAction({
+                        action: "support_proposal_by_congress",
+                        proposalId: proposal.id
+                    })
+                }
+            >
+                Congress member to support it
+            </button>
+            <button
+                disabled={!isHuman}
+                onClick={() =>
+                    handlePreVoteAction({
+                        action: "support_proposal",
+                        proposalId: proposal.id
+                    })
+                }
+            >
+                VB member to support it
+            </button>
+            <button
+                onClick={() =>
+                    handlePreVoteAction({
+                        action: "top_up_proposal",
+                        proposalId: proposal.id
+                    })
+                }
+            >
+                Top Up bond to the "active queue bond"
+            </button>
+        </div>
+    );
 }
 
 function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
@@ -721,7 +764,10 @@ return (
                 }
             })}
 
-        {statusName === "Pre Vote" && renderPreVoteButtons()}
+        {statusName === "Pre Vote" &&
+            renderPreVoteButtons({
+                proposal
+            })}
         {renderFooter({
             totalVotes,
             votes,

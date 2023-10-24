@@ -47,6 +47,10 @@ const proposalTypes = isVotingBodyDao
           {
               text: "Dissolve House",
               value: "Dissolve"
+          },
+          {
+              text: "Function Call",
+              value: "FunctionCall"
           }
       ]
     : [
@@ -249,7 +253,13 @@ return (
             {state.proposalType.value === "FunctionCall" && (
                 <Widget
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.FunctionCall"
-                    props={{ daoId, onClose, isCongressDaoID }}
+                    props={{
+                        daoId,
+                        onClose,
+                        isCongressDaoID,
+                        registry,
+                        isVotingBodyDao
+                    }}
                 />
             )}
             {(state.proposalType.value === "FundingRequest" ||

@@ -15,6 +15,9 @@ const HoMDaoId = props.dev
     ? "/*__@replace:HoMDaoIdTesting__*/"
     : "/*__@replace:HoMDaoId__*/";
 
+const registry = props.dev
+    ? "registry-v1.gwg-testing.near"
+    : "registry.i-am-human.near";
 const isCongressDaoID =
     daoId === HoMDaoId || daoId === CoADaoId || daoId === TCDaoId;
 
@@ -25,6 +28,7 @@ if (!daoConfig) {
 }
 
 const isVotingBodyDao = daoId === VotingBodyDaoId;
+const currentuserCongressHouse = null; // if the current user is a member of any house
 
 const isHuman = useCache(
     () =>
@@ -37,7 +41,30 @@ const isHuman = useCache(
                     "x-api-key": "/*__@replace:pikespeakApiKey__*/"
                 }
             }
-        ).then((res) => res?.body?.length > 0),
+        ).then((res) => {
+            res.body?.map((item) => {
+                if (item.registry === "elections.ndc-gwg.near") {
+                    switch (item.class_id) {
+                        // class2=HoM
+                        case 2:
+                        case "2":
+                            currentuserCongressHouse = HoMDaoId;
+                            break;
+                        // class3=CoA
+                        case 3:
+                        case "3":
+                            currentuserCongressHouse = CoADaoId;
+                            break;
+                        // class4=TC
+                        case 4:
+                        case "4":
+                            currentuserCongressHouse = TCDaoId;
+                            break;
+                    }
+                }
+            });
+            return res?.body?.length > 0;
+        }),
     daoId + "-is-voting-allowed",
     { subscribe: false }
 );
@@ -352,26 +379,91 @@ if (!state || state.proposal.id !== proposal.id) {
 }
 
 const handleVote = ({ action, proposalId, daoId }) => {
-    let args = {
-        id: JSON.parse(proposalId)
-    };
+    let args = {};
     if (isVotingBodyDao) {
+        args["prop_id"] = parseInt(proposalId);
         args["caller"] = accountId;
-    }
-    if (isCongressDaoID || isVotingBodyDao) {
         args["vote"] = action.replace("Vote", "");
+        Near.call([
+            {
+                contractName: registry,
+                methodName: "is_human_call",
+                args: {
+                    ctr: daoId,
+                    function: "vote",
+                    payload: JSON.stringify(args)
+                },
+                gas: 200000000000000,
+                deposit: 170000000000000000000
+            }
+        ]);
     } else {
-        args["action"] = action;
-    }
-    Near.call([
-        {
-            contractName: daoId,
-            methodName:
-                isCongressDaoID || isVotingBodyDao ? "vote" : "act_proposal",
-            args: args,
-            gas: 200000000000000
+        args["id"] = JSON.parse(proposalId);
+        if (isCongressDaoID) {
+            args["vote"] = action.replace("Vote", "");
+        } else {
+            args["action"] = action;
         }
-    ]);
+        Near.call([
+            {
+                contractName: daoId,
+                methodName: isCongressDaoID ? "vote" : "act_proposal",
+                args: args,
+                gas: 200000000000000
+            }
+        ]);
+    }
+};
+
+const handlePreVoteAction = ({ action, proposalId }) => {
+    switch (action) {
+        case "support_proposal_by_congress": {
+            Near.call([
+                {
+                    contractName: daoId,
+                    methodName: "support_proposal_by_congress",
+                    args: {
+                        prop_id: parseInt(proposalId),
+                        dao: currentuserCongressHouse
+                    },
+                    gas: 200000000000000
+                }
+            ]);
+            break;
+        }
+        case "support_proposal": {
+            Near.call([
+                {
+                    contractName: registry,
+                    methodName: "is_human_call",
+                    args: {
+                        ctr: daoId,
+                        function: "support_proposal",
+                        payload: JSON.stringify({
+                            caller: accountId,
+                            prop_id: parseInt(proposalId)
+                        })
+                    },
+                    gas: 200000000000000,
+                    deposit: 100000000000000000000000
+                }
+            ]);
+            break;
+        }
+        case "top_up_proposal": {
+            Near.call([
+                {
+                    contractName: daoId,
+                    methodName: "top_up_proposal",
+                    args: {
+                        id: parseInt(proposalId)
+                    },
+                    gas: 200000000000000
+                }
+            ]);
+            break;
+        }
+    }
 };
 
 return (
@@ -387,7 +479,10 @@ return (
             handleVote,
             isCongressDaoID,
             isVotingBodyDao,
-            daoConfig
+            daoConfig,
+            handlePreVoteAction,
+            isHuman,
+            currentuserCongressHouse
         }}
     />
 );
