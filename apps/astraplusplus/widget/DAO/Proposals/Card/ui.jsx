@@ -323,10 +323,14 @@ function renderVoteButtons({
 
     &.spam {
       --vote-button-bg: 245, 197, 24;
+      display :flex;
+      justify-content: center;
     }
 
     &.abstain {
         --vote-button-bg: 245, 197, 24;
+        display: flex;
+        justify-content: center;
       }
 
     &:before {
@@ -520,10 +524,7 @@ function renderVoteButtons({
 
                     <VoteButton
                         className="abstain"
-                        percentage={percentages.abstain}
                         finsihed={finsihed}
-                        wins={wins.abstain}
-                        myVote={voted.abstain}
                         onClick={() => handleVote("VoteAbstain")}
                         disabled={
                             alreadyVoted || finsihed || !isAllowedToVote[2]
