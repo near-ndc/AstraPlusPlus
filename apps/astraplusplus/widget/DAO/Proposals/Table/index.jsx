@@ -201,7 +201,8 @@ return (
                                             isCongressDaoID,
                                             isVotingBodyDao,
                                             daoConfig,
-                                            isHuman
+                                            isHuman,
+                                            dev: props.dev
                                         }}
                                     />
                                 );

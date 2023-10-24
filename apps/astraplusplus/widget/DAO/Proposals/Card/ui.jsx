@@ -419,7 +419,7 @@ function renderVoteButtons({
     const wins = {
         yes: statusName === "Approved",
         no: statusName === "Rejected",
-        spam: statusName === "Failed",
+        spam: statusName === "Failed" || statusName === "Spam",
         abstain: statusName === "Failed"
     };
 
@@ -428,7 +428,9 @@ function renderVoteButtons({
     const voted = {
         yes: votes[accountId || ";;;"] === "Approve",
         no: votes[accountId || ";;;"] === "Reject",
-        spam: votes[accountId || ";;;"] === "Remove",
+        spam: isVotingBodyDao
+            ? votes[accountId || ";;;"] === "Spam"
+            : votes[accountId || ";;;"] === "Remove",
         abstain: votes[accountId || ";;;"] === "Abstain"
     };
 
@@ -438,7 +440,9 @@ function renderVoteButtons({
         <div
             className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
             style={{
-                gridTemplateColumns: "1fr 1fr 120px"
+                gridTemplateColumns: isVotingBodyDao
+                    ? "1fr 1fr 120px 120px"
+                    : "1fr 1fr 120px"
             }}
         >
             <div className="w-100">
@@ -519,7 +523,7 @@ function renderVoteButtons({
                     </div>
                 </VoteButton>
             </div>
-            {isCongressDaoID ? (
+            {(isVotingBodyDao || isCongressDaoID) && (
                 <div className="w-100">
                     {voted.abstain && (
                         <Widget
@@ -547,7 +551,8 @@ function renderVoteButtons({
                         <div></div>
                     </VoteButton>
                 </div>
-            ) : (
+            )}
+            {!isCongressDaoID && (
                 <div className="w-100">
                     {voted.spam && (
                         <Widget
@@ -566,7 +571,11 @@ function renderVoteButtons({
                         finsihed={finsihed}
                         wins={wins.spam}
                         myVote={voted.spam}
-                        onClick={() => handleVote("VoteRemove")}
+                        onClick={() =>
+                            handleVote(
+                                isVotingBodyDao ? "VoteSpam" : "VoteRemove"
+                            )
+                        }
                         disabled={
                             alreadyVoted || finsihed || !isAllowedToVote[2]
                         }
@@ -593,7 +602,8 @@ function renderMultiVoteButtons({ daoId, proposal, canVote }) {
                 canVote,
                 view: "multiVote",
                 isCongressDaoID,
-                isVotingBodyDao
+                isVotingBodyDao,
+                dev: props.dev
             }}
         />
     );

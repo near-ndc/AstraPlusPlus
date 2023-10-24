@@ -272,7 +272,8 @@ return (
                                                         }),
                                                     multiSelectMode: false,
                                                     isCongressDaoID: true,
-                                                    isVotingBodyDao
+                                                    isVotingBodyDao,
+                                                    dev: props.dev
                                                 }}
                                             />
                                         </div>

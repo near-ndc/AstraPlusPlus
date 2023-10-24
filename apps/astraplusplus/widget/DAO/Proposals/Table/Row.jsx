@@ -220,7 +220,8 @@ return (
                         proposal,
                         view: "multiVote",
                         isCongressDaoID,
-                        isVotingBodyDao
+                        isVotingBodyDao,
+                        dev: props.dev
                     }}
                 />
             </td>
@@ -275,7 +276,8 @@ return (
                                         multiSelectMode: state.multiSelectMode,
                                         isCongressDaoID,
                                         isVotingBodyDao,
-                                        daoConfig
+                                        daoConfig,
+                                        dev: props.dev
                                     }}
                                 />
                             </div>

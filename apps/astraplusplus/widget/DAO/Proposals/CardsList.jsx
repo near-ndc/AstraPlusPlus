@@ -48,7 +48,8 @@ return (
                             multiSelectMode: state.multiSelectMode,
                             isCongressDaoID,
                             isVotingBodyDao,
-                            daoConfig
+                            daoConfig,
+                            dev: props.dev
                         }}
                     />
                 );

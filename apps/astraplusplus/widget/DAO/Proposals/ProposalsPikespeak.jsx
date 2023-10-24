@@ -309,7 +309,8 @@ return (
                         proposals: res === null ? null : res.body,
                         isCongressDaoID,
                         isVotingBodyDao,
-                        daoConfig: state.daoConfig
+                        daoConfig: state.daoConfig,
+                        dev: props.dev
                     }}
                 />
             ) : (
@@ -321,7 +322,8 @@ return (
                         proposals: res === null ? null : res.body,
                         isCongressDaoID,
                         isVotingBodyDao,
-                        daoConfig: state.daoConfig
+                        daoConfig: state.daoConfig,
+                        dev: props.dev
                     }}
                 />
             )}
@@ -368,7 +370,8 @@ return (
                             Storage.privateSet("multiSelectMode", false);
                         },
                         isCongressDaoID,
-                        isVotingBodyDao
+                        isVotingBodyDao,
+                        dev: props.dev
                     }}
                 />
             </>

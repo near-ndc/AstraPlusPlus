@@ -104,7 +104,8 @@ return (
                                             "/*__@appAccount__*//widget/DAO.Proposal.Create"
                                         }
                                         props={{
-                                            daoId: daoId
+                                            daoId: daoId,
+                                            dev: props.dev
                                         }}
                                     />
                                 </div>

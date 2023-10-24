@@ -36,7 +36,13 @@ if (view === "submit") {
                     vote = "VoteReject";
                     break;
                 case "2":
-                    vote = isCongressDaoID ? "VoteAbstain" : "VoteRemove";
+                    vote =
+                        isCongressDaoID || isVotingBodyDao
+                            ? "VoteAbstain"
+                            : "VoteRemove";
+                    break;
+                case "3":
+                    vote = "VoteSpam";
                     break;
                 default:
                     console.error("Invalid vote");
@@ -89,7 +95,9 @@ if (view === "submit") {
     const indexToVote = (i) => {
         if (i === "0") return "Yes";
         if (i === "1") return "No";
-        if (i === "2") return isCongressDaoID ? "Abstain" : "Spam";
+        if (i === "2")
+            return isCongressDaoID || isVotingBodyDao ? "Abstain" : "Spam";
+        if (i === "2") return "Spam";
     };
     return (
         <Wrapper className="ndc-card p-4">
@@ -209,10 +217,19 @@ const Wrapper = styled.div`
                 background-color: #ffd50d;
             }
         }
+        &:nth-child(4) {
+            background-color: #ffd50d30;
+
+            &.active {
+                background-color: #ffd50d;
+            }
+        }
     }
 `;
 
-const allowedMethods = isCongressDaoID
+const allowedMethods = isVotingBodyDao
+    ? ["Yes", "No", "Abstain", "Spam"]
+    : isCongressDaoID
     ? ["Yes", "No", "Abstain"]
     : ["Yes", "No", "Spam"];
 return (
