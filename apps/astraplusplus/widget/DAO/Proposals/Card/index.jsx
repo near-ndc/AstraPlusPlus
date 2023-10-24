@@ -21,13 +21,14 @@ const registry = props.dev
 const isCongressDaoID =
     daoId === HoMDaoId || daoId === CoADaoId || daoId === TCDaoId;
 
+const isVotingBodyDao = daoId === VotingBodyDaoId;
+
 if (!daoConfig) {
     if (isCongressDaoID || isVotingBodyDao) {
         daoConfig = Near.view(daoId, "config", {});
     }
 }
 
-const isVotingBodyDao = daoId === VotingBodyDaoId;
 const currentuserCongressHouse = null; // if the current user is a member of any house
 
 const isHuman = useCache(
@@ -460,6 +461,10 @@ const handlePreVoteAction = ({ action, proposalId }) => {
             break;
         }
         case "top_up_proposal": {
+            const deposit =
+                parseInt(daoConfig?.active_queue_bond) -
+                parseInt(daoConfig?.pre_vote_bond);
+
             Near.call([
                 {
                     contractName: daoId,
@@ -467,7 +472,8 @@ const handlePreVoteAction = ({ action, proposalId }) => {
                     args: {
                         id: parseInt(proposalId)
                     },
-                    gas: 200000000000000
+                    gas: 200000000000000,
+                    deposit: deposit
                 }
             ]);
             break;
