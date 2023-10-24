@@ -341,6 +341,8 @@ const expensiveWork = () => {
                 totalVotes.no++;
             } else if (value === "Abstain") {
                 totalVotes.abstain++;
+            } else if (value === "Spam") {
+                totalVotes.spam++;
             }
         }
     }
