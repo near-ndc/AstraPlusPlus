@@ -31,6 +31,39 @@ if (!daoConfig) {
 
 const currentuserCongressHouse = null; // if the current user is a member of any house
 
+function itemIsInArray(item, array) {
+    return array.includes(item);
+}
+
+if (VotingBodyDaoId) {
+    currentuserCongressHouse = useCache(
+        () =>
+            Near.asyncView(HoMDaoId, "get_members").then((res) =>
+                itemIsInArray(accountId, res?.members) ? HoMDaoId : null
+            ),
+        HoMDaoId + "-is-hom-member",
+        { subscribe: false }
+    );
+
+    currentuserCongressHouse = useCache(
+        () =>
+            Near.asyncView(CoADaoId, "get_members").then((res) =>
+                itemIsInArray(accountId, res?.members) ? CoADaoId : null
+            ),
+        CoADaoId + "-is-coa-member",
+        { subscribe: false }
+    );
+
+    currentuserCongressHouse = useCache(
+        () =>
+            Near.asyncView(TCDaoId, "get_members").then((res) =>
+                itemIsInArray(accountId, res?.members) ? TCDaoId : null
+            ),
+        TCDaoId + "-is-tc-member",
+        { subscribe: false }
+    );
+}
+
 const isHuman = useCache(
     () =>
         asyncFetch(
@@ -42,30 +75,7 @@ const isHuman = useCache(
                     "x-api-key": "/*__@replace:pikespeakApiKey__*/"
                 }
             }
-        ).then((res) => {
-            res.body?.map((item) => {
-                if (item.registry === "elections.ndc-gwg.near") {
-                    switch (item.class_id) {
-                        // class2=HoM
-                        case 2:
-                        case "2":
-                            currentuserCongressHouse = HoMDaoId;
-                            break;
-                        // class3=CoA
-                        case 3:
-                        case "3":
-                            currentuserCongressHouse = CoADaoId;
-                            break;
-                        // class4=TC
-                        case 4:
-                        case "4":
-                            currentuserCongressHouse = TCDaoId;
-                            break;
-                    }
-                }
-            });
-            return res?.body?.length > 0;
-        }),
+        ).then((res) => res?.body?.length > 0),
     daoId + "-is-voting-allowed",
     { subscribe: false }
 );
