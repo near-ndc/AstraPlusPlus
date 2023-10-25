@@ -675,7 +675,8 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                         <Widget
                             src="/*__@appAccount__*//widget/DAO.Proposals.Congress.index"
                             props={{
-                                daoId: Content[state.selectedHouse].address
+                                daoId: Content[state.selectedHouse].address,
+                                dev: props.dev
                             }}
                         />
                     )}

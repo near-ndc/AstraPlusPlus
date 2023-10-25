@@ -1,6 +1,1 @@
-return (
-  <Widget
-    src={`sking.near/widget/DAO.Bounties`}
-    props={{ daoId: props.daoId }}
-  />
-);
+return <div>Page under development</div>;

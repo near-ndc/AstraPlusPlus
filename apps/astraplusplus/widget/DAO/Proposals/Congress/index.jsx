@@ -291,7 +291,9 @@ return (
                         variant: "info outline",
                         children: (
                             <a
-                                href={`#//*__@appAccount__*//widget/home?page=dao&daoId=${daoId}`}
+                                href={`#//*__@appAccount__*//widget/home?page=dao&daoId=${daoId}${
+                                    props.dev && "&dev=true"
+                                }`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 style={{ color: "rgb(68, 152, 224)" }}

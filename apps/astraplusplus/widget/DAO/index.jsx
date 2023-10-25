@@ -41,37 +41,65 @@ const tabs = {
     proposals: {
         name: "Proposals",
         widget: "DAO.Proposals.index",
-        href: constructURL({ tab: "proposals", daoId: state.daoId })
+        href: constructURL({
+            tab: "proposals",
+            daoId: state.daoId,
+            dev: props.dev ?? false
+        })
     },
     home: {
         name: "Discussion",
         widget: "DAO.Discussion",
-        href: constructURL({ tab: "home", daoId: state.daoId })
+        href: constructURL({
+            tab: "home",
+            daoId: state.daoId,
+            dev: props.dev ?? false
+        })
     },
     funds: {
         name: "Fund Flows",
         widget: "DAO.Funds.index",
-        href: constructURL({ tab: "funds", daoId: state.daoId })
+        href: constructURL({
+            tab: "funds",
+            daoId: state.daoId,
+            dev: props.dev ?? false
+        })
     },
     members: {
         name: "Members & Policy",
         widget: "DAO.Members.index",
-        href: constructURL({ tab: "members", daoId: state.daoId })
+        href: constructURL({
+            tab: "members",
+            daoId: state.daoId,
+            dev: props.dev ?? false
+        })
     },
     projects: {
         name: "Projects",
         widget: "DAO.Projects",
-        href: constructURL({ tab: "projects", daoId: state.daoId })
+        href: constructURL({
+            tab: "projects",
+            daoId: state.daoId,
+            dev: props.dev ?? false
+        })
     },
     followers: {
         name: "Followers",
         widget: "DAO.Followers.index",
-        href: constructURL({ tab: "followers", daoId: state.daoId })
+        href: constructURL({
+            tab: "followers",
+            daoId: state.daoId,
+            dev: props.dev ?? false
+        })
     },
     bounties: {
         name: "Bounties",
         widget: "DAO.Bounties",
-        href: constructURL({ tab: "bounties", daoId: state.daoId })
+        href: constructURL({
+            tab: "bounties",
+            daoId: state.daoId,
+            dev: props.dev ?? false
+        })
     }
 };
 
