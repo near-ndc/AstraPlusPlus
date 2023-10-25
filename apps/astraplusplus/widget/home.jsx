@@ -157,15 +157,6 @@ const pages = [
         }
     ],
     {
-        title: "Bounties area",
-        icon: <i class="bi bi-briefcase"></i>,
-        active: page === "bounties",
-        href: currentLink + "?page=bounties",
-        onClick: () => router.navigate({ page: "bounties" }),
-        widgetName: "Bounties.index",
-        defaultProps: {}
-    },
-    {
         title: "Actions library",
         icon: <i class="bi bi-code-slash"></i>,
         active: page === "actions",
