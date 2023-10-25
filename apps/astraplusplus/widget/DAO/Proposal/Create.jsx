@@ -228,7 +228,8 @@ return (
                         onClose,
                         isCongressDaoID,
                         isVotingBodyDao,
-                        registry
+                        registry,
+                        dev: props.dev
                     }}
                 />
             )}
@@ -258,7 +259,8 @@ return (
                         onClose,
                         isCongressDaoID,
                         registry,
-                        isVotingBodyDao
+                        isVotingBodyDao,
+                        dev: props.dev
                     }}
                 />
             )}

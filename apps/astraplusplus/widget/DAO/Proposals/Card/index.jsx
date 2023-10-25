@@ -464,8 +464,7 @@ const handlePreVoteAction = ({ action, proposalId }) => {
                             prop_id: parseInt(proposalId)
                         })
                     },
-                    gas: 200000000000000,
-                    deposit: 100000000000000000000000
+                    gas: 200000000000000
                 }
             ]);
             break;

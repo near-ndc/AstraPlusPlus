@@ -422,6 +422,14 @@ const defaultDescription =
 
 return (
     <>
+        <Widget
+            src="/*__@appAccount__*//widget/DAO.Proposal.Common.ProposalQueue"
+            props={{
+                daoId: daoId,
+                onUpdate: onChangeQueue,
+                dev: props.dev
+            }}
+        />
         {(daoId === CoADaoId || daoId === TCDaoId) && showPowers && (
             <div className="mb-3">
                 <Widget

@@ -119,14 +119,14 @@ if (proposal_type === "ApproveBudget" || proposal_type === "Veto") {
         <>
             <div>
                 <h5>Proposal ID</h5>
-                <p>{kind.ApproveBudget.prop_id}</p>
+                <p>{kind[proposal_type].prop_id}</p>
             </div>
             <div>
                 <h5>House</h5>
                 <Widget
                     src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
-                        accountId: kind.ApproveBudget.dao,
+                        accountId: kind[proposal_type].dao,
                         tooltip: true
                     }}
                 />

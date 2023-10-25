@@ -108,7 +108,8 @@ return (
             src="/*__@appAccount__*//widget/DAO.Proposal.Common.ProposalQueue"
             props={{
                 daoId: daoId,
-                onUpdate: onChangeQueue
+                onUpdate: onChangeQueue,
+                dev: props.dev
             }}
         />
 

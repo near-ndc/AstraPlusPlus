@@ -611,7 +611,10 @@ function renderMultiVoteButtons({ daoId, proposal, canVote }) {
 
 function renderPreVoteButtons({ proposal }) {
     return (
-        <div className="d-lg-grid d-flex flex-wrap gap-2 align-items-end">
+        <div
+            className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
+            style={{ gridTemplateColumns: "repeat(3,1fr)" }}
+        >
             <button
                 disabled={currentuserCongressHouse === null}
                 onClick={() =>
