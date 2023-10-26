@@ -91,6 +91,14 @@ const policy = isCongressDaoID
     : Near.view(daoId, "get_policy");
 let roles = policy;
 
+function getPreVoteVotes(supported) {
+    const votes = {};
+    for (const item of supported) {
+        votes[item] = "Support";
+    }
+    return votes;
+}
+
 if (roles === null)
     return (
         <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
@@ -107,15 +115,20 @@ if (!proposalString && proposalId && daoId) {
                 <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
             );
         } else {
+            console.log(resp);
             new_proposal = {
                 id: resp.id,
                 kind: resp.kind,
-                votes: resp.votes,
+                votes:
+                    resp.status === "PreVote"
+                        ? getPreVoteVotes(resp.supported)
+                        : resp.votes,
                 status: resp.status,
                 proposer: resp?.proposer,
                 description: resp.description,
                 vote_counts: {},
-                submission_time: resp?.submission_time ?? resp?.start // for vb it's start
+                submission_time: resp?.submission_time ?? resp?.start, // for vb it's start
+                supported: resp?.supported ?? [] // for vb
             };
         }
     } else {
@@ -269,7 +282,7 @@ const expensiveWork = () => {
             : Object.keys(my_proposal.kind)[0];
 
     const isAllowedToVote = isVotingBodyDao
-        ? [isHuman, isHuman, isHuman]
+        ? [isHuman, isHuman, isHuman, isHuman]
         : [
               isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
               isAllowedTo(proposalKinds[kindName], actions.VoteReject),
@@ -326,8 +339,21 @@ const expensiveWork = () => {
         });
     }
 
-    if (isCongressDaoID || isVotingBodyDao) {
+    if (isCongressDaoID) {
         totalVotesNeeded = daoConfig?.threshold;
+    }
+
+    if (isVotingBodyDao) {
+        if (
+            my_proposal.status === "ApproveBudget" ||
+            my_proposal.status === "Dissolve"
+        ) {
+            totalVotesNeeded = daoConfig?.super_consent?.threshold;
+        } else if (my_proposal.status === "PreVote") {
+            totalVotesNeeded = daoConfig?.pre_vote_support;
+        } else {
+            totalVotesNeeded = daoConfig?.simple_consent?.threshold;
+        }
     }
 
     let totalVotes = {
@@ -359,6 +385,10 @@ const expensiveWork = () => {
     }
     totalVotes.total =
         totalVotes.yes + totalVotes.no + totalVotes.spam + totalVotes.abstain;
+
+    if (my_proposal.status === "PreVote") {
+        totalVotes.total = my_proposal?.supported?.length;
+    }
 
     my_proposal.totalVotesNeeded = totalVotesNeeded;
     my_proposal.totalVotes = totalVotes;

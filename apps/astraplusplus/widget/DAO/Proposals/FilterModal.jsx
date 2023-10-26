@@ -142,6 +142,22 @@ const statuss = [
     {
         title: "Expired",
         value: "Expired"
+    },
+    {
+        title: "Failed",
+        value: "Failed"
+    },
+    {
+        title: "Executed",
+        value: "Executed"
+    },
+    {
+        title: "Vetoed",
+        value: "Vetoed"
+    },
+    {
+        title: "Draft",
+        value: "PreVote"
     }
 ];
 

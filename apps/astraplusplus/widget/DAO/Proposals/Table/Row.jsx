@@ -56,7 +56,7 @@ const kindName =
         : Object.keys(proposal.kind)[0];
 
 const isAllowedToVote = isVotingBodyDao
-    ? [isHuman, isHuman, isHuman]
+    ? [isHuman, isHuman, isHuman, isHuman]
     : [
           isAllowedTo(proposalKinds[kindName], actions.VoteApprove),
           isAllowedTo(proposalKinds[kindName], actions.VoteReject),

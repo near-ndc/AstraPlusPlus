@@ -50,6 +50,14 @@ State.init({
     daoConfig: null
 });
 
+function getPreVoteVotes(supported) {
+    const votes = {};
+    for (const item of supported) {
+        votes[item] = "Support";
+    }
+    return votes;
+}
+
 // convert to the data structure required by proposals component (similar to pikespeak API)
 function processProposals(proposals) {
     const parsedResp = [];
@@ -60,7 +68,10 @@ function processProposals(proposals) {
             proposal: {
                 id: item.id,
                 kind: item.kind,
-                votes: item.votes,
+                votes:
+                    item.status === "PreVote"
+                        ? getPreVoteVotes(item.supported)
+                        : item.votes,
                 status: item.status,
                 proposer: item?.proposer,
                 description: item.description,
@@ -72,7 +83,8 @@ function processProposals(proposals) {
             proposer: item?.proposer,
             status: item?.status,
             submission_time: item?.submission_time ?? item?.start,
-            transaction_id: ""
+            transaction_id: "",
+            supported: item?.supported ?? [] // for vb
         });
     });
 
@@ -90,6 +102,23 @@ const forgeUrl = (apiUrl, params) =>
 function fetchCongressDaoProposals() {
     const data = [];
     const resp = Near.view(daoId, "get_proposals", {
+        from_index:
+            state.page === 0
+                ? proposalsCount
+                : proposalsCount - state.page * resPerPage,
+        limit: resPerPage,
+        reverse: true
+    });
+
+    if (resp) {
+        data = processProposals(resp);
+    }
+    return data;
+}
+
+function fetchVBPreVoteProposals() {
+    const data = [];
+    const resp = Near.view(daoId, "get_pre_vote_proposals", {
         from_index:
             state.page === 0
                 ? proposalsCount
@@ -140,6 +169,11 @@ if (isCongressDaoID || isVotingBodyDao) {
         res.body = res.body?.filter((item) =>
             state.filters.status.includes(item.status)
         );
+        // fetch pre vote proposals
+        if (state.filters.status?.includes("PreVote") && isVotingBodyDao) {
+            const data = fetchVBPreVoteProposals();
+            res.body.push(...data);
+        }
     }
 }
 

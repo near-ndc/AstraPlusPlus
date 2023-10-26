@@ -66,6 +66,51 @@ const Wrapper = styled.div`
   .text-muted {
         color: #8c8c8c !important;
     }
+
+    /* Tooltip container */
+    .custom-tooltip {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Tooltip text */
+    .custom-tooltip .tooltiptext {
+        visibility: hidden;
+        width: auto;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+
+        /* Position the tooltip text */
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 0%;
+
+        /* Fade in tooltip */
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    /* Tooltip arrow */
+    .custom-tooltip .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .custom-tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
 `;
 
 const cls = (c) => c.join(" ");
@@ -255,7 +300,7 @@ function renderData({
                     <div>
                         <b>Submission date</b>
                         <p>
-                            <small className="">
+                            <small>
                                 {isCongressDaoID || isVotingBodyDao
                                     ? new Date(submission_time).toLocaleString()
                                     : new Date(
@@ -263,6 +308,18 @@ function renderData({
                                               Big(submission_time).div(1000000)
                                           )
                                       ).toLocaleString()}
+                            </small>
+                        </p>
+                    </div>
+                )}
+                {(isCongressDaoID || isVotingBodyDao) && (
+                    <div>
+                        <b>Expiration date</b>
+                        <p>
+                            <small>
+                                {new Date(
+                                    submission_time + daoConfig?.voting_duration
+                                ).toLocaleString()}
                             </small>
                         </p>
                     </div>
@@ -338,9 +395,7 @@ function renderVoteButtons({
     }
 
     &.abstain {
-        --vote-button-bg: 245, 197, 24;
-        display: flex;
-        justify-content: center;
+        --vote-button-bg: 169, 169, 169;
       }
 
     &:before {
@@ -441,7 +496,9 @@ function renderVoteButtons({
             className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
             style={{
                 gridTemplateColumns: isVotingBodyDao
-                    ? "1fr 1fr 120px 120px"
+                    ? "1fr 1fr 1fr 120px"
+                    : isCongressDaoID
+                    ? "1fr 1fr 1fr"
                     : "1fr 1fr 120px"
             }}
         >
@@ -538,17 +595,25 @@ function renderVoteButtons({
 
                     <VoteButton
                         className="abstain"
+                        percentage={percentages.abstain}
                         finsihed={finsihed}
+                        wins={wins.abstain}
+                        myVote={voted.abstain}
                         onClick={() => handleVote("VoteAbstain")}
                         disabled={
                             alreadyVoted || finsihed || !isAllowedToVote[2]
                         }
                     >
-                        <div>
+                        <div className="d-flex gap-2 align-items-center">
                             <span>Abstain</span>
-                            <i className="bi bi-exclamation-circle"></i>
                         </div>
-                        <div></div>
+                        <div>
+                            <span>
+                                {percentages.abstain}
+                                <i className="bi bi-percent"></i>
+                            </span>
+                            <span>{totalVotes.abstain} Votes</span>
+                        </div>
                     </VoteButton>
                 </div>
             )}
@@ -582,7 +647,6 @@ function renderVoteButtons({
                     >
                         <div>
                             <span>Spam</span>
-                            <i className="bi bi-exclamation-circle"></i>
                         </div>
                         <div></div>
                     </VoteButton>
@@ -610,12 +674,14 @@ function renderMultiVoteButtons({ daoId, proposal, canVote }) {
 }
 
 function renderPreVoteButtons({ proposal }) {
+    const voted = proposal?.supported?.includes(accountId);
     return (
         <div
             className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
             style={{ gridTemplateColumns: "repeat(3,1fr)" }}
         >
             <button
+                class="custom-tooltip btn btn-primary"
                 disabled={currentuserCongressHouse === null}
                 onClick={() =>
                     handlePreVoteAction({
@@ -624,20 +690,44 @@ function renderPreVoteButtons({ proposal }) {
                     })
                 }
             >
-                Congress member to support it
+                <span class="tooltiptext">
+                    This proposal requires a Congressional member to support in
+                    order to move into the active status.
+                </span>
+                Congress Member Upvote
             </button>
+            <div className="d-flex flex-column gap-1">
+                <div style={{ width: "fit-content" }}>
+                    {voted && (
+                        <Widget
+                            src="/*__@replace:nui__*//widget/Element.Badge"
+                            props={{
+                                size: "sm",
+                                variant: "info outline mb-1",
+                                children: "You voted"
+                            }}
+                        />
+                    )}
+                </div>
+                <button
+                    class="custom-tooltip btn btn-primary"
+                    disabled={!isHuman || voted}
+                    onClick={() =>
+                        handlePreVoteAction({
+                            action: "support_proposal",
+                            proposalId: proposal.id
+                        })
+                    }
+                >
+                    <span class="tooltiptext">
+                        This proposal requires a minimal number of voters to
+                        support in order to move into the active status.
+                    </span>
+                    Voting Body Upvote
+                </button>
+            </div>
             <button
-                disabled={!isHuman}
-                onClick={() =>
-                    handlePreVoteAction({
-                        action: "support_proposal",
-                        proposalId: proposal.id
-                    })
-                }
-            >
-                VB member to support it
-            </button>
-            <button
+                class="custom-tooltip btn btn-primary"
                 onClick={() =>
                     handlePreVoteAction({
                         action: "top_up_proposal",
@@ -645,7 +735,11 @@ function renderPreVoteButtons({ proposal }) {
                     })
                 }
             >
-                Top Up bond to the "active queue bond"
+                <span class="tooltiptext">
+                    This proposal requires additional bond to support in order
+                    to move into the active status.
+                </span>
+                Bond to move to Active Status
             </button>
         </div>
     );

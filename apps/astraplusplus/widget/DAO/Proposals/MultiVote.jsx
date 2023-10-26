@@ -218,10 +218,10 @@ const Wrapper = styled.div`
             }
         }
         &:nth-child(4) {
-            background-color: #ffd50d30;
+            background-color: #edeef5;
 
             &.active {
-                background-color: #ffd50d;
+                background-color: #c5c6d0;
             }
         }
     }

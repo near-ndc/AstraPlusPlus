@@ -44,7 +44,9 @@ State.init({
     accounts: null, // for unban hook
     memo: null, // for unban hook
     showReceiverAsOptions: false,
-    disableReceiverField: false
+    disableReceiverField: false,
+    attachDeposit: 0,
+    proposalQueue: null
 });
 
 // only for UI
@@ -84,7 +86,7 @@ function isNearAddress(address) {
 }
 
 const handleFunctionCall = () => {
-    if (!isCongressDaoID) {
+    if (!isCongressDaoID && !VotingBodyDaoId) {
         if (isEmpty(state.contractId) || !isNearAddress(state.contractId)) {
             State.update({
                 error: "Please enter a valid contract ID"
@@ -162,7 +164,9 @@ const handleFunctionCall = () => {
                         description: state.description
                     })
                 },
-                deposit: 100000000000000000000000,
+                deposit: state.attachDeposit
+                    ? Big(state.attachDeposit)
+                    : 100000000000000000000000,
                 gas: 20000000000000
             }
         ]);
@@ -371,6 +375,14 @@ const onChangeMemo = (memo) => {
     });
 };
 
+const onChangeQueue = ({ amount, queue }) => {
+    State.update({
+        attachDeposit: amount,
+        proposalQueue: queue,
+        error: undefined
+    });
+};
+
 const onChangePowerType = (power) => {
     switch (power?.value) {
         case "Dismiss": {
@@ -509,7 +521,7 @@ return (
                     </>
                 ) : (
                     <>
-                        {!isCongressDaoID && (
+                        {!isCongressDaoID && !isVotingBodyDao && (
                             <div className="mb-3">
                                 <h5>Contract</h5>
                                 <input
@@ -559,7 +571,8 @@ return (
                                 />
                             </div>
                         )}
-                        {isCongressDaoID && !state.showReceiverAsOptions && (
+                        {((isCongressDaoID && !state.showReceiverAsOptions) ||
+                            isVotingBodyDao) && (
                             <div className="mb-3">
                                 <h5>Recipient</h5>
                                 <input
