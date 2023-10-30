@@ -53,12 +53,17 @@ const handleProposal = () => {
         ? Big(state.attachDeposit)
         : 100000000000000000000000;
 
+    const preVoteBond = Big(state.pre_vote_bond).mul(Big(10).pow(24)).toFixed();
+    const activeBond = Big(state.active_queue_bond)
+        .mul(Big(10).pow(24))
+        .toFixed();
+
     const args = JSON.stringify({
         description: state.description,
         kind: {
             UpdateBonds: {
-                pre_vote_bond: parseInt(state.pre_vote_bond),
-                active_queue_bond: parseInt(state.active_queue_bond)
+                pre_vote_bond: preVoteBond,
+                active_queue_bond: activeBond
             }
         },
         caller: accountId
