@@ -232,7 +232,7 @@ return (
                     proposal.status === "Approved" &&
                     proposal?.submission_time +
                         daoConfig?.voting_duration +
-                        daoConfig?.cooldown <
+                        (daoConfig?.cooldown ?? 0) < // cooldown is not available in vb
                         Date.now() && (
                         <Widget
                             src="nearui.near/widget/Input.Button"

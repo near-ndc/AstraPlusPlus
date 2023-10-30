@@ -133,6 +133,9 @@ function renderPermission({ isAllowedToVote }) {
 const execProposal = ({ daoId, id }) =>
     Near.call(daoId, "execute", { id }, 300000000000000);
 
+const slashPreVoteProposal = ({ id }) =>
+    Near.call(daoId, "slash_prevote_proposal", { id }, 300000000000000);
+
 function renderHeader({ typeName, id, daoId, statusName }) {
     let statusicon;
     let statustext;
@@ -203,7 +206,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                 statusName === "Approved" &&
                                 proposal?.submission_time +
                                     daoConfig?.voting_duration +
-                                    daoConfig?.cooldown <
+                                    (daoConfig?.cooldown ?? 0) < // cooldown is not available in vb
                                     Date.now() && (
                                     <Widget
                                         src="nearui.near/widget/Input.Button"
@@ -214,6 +217,34 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                             ),
                                             onClick: () =>
                                                 execProposal({ daoId, id })
+                                        }}
+                                    />
+                                )}
+                            {isVotingBodyDao && statusName === "Spam" && (
+                                <Widget
+                                    src="nearui.near/widget/Input.Button"
+                                    props={{
+                                        variant: "danger",
+                                        children: "Slash",
+                                        onClick: () =>
+                                            execProposal({ daoId, id })
+                                    }}
+                                />
+                            )}
+                            {isVotingBodyDao &&
+                                statusName === "PreVote" &&
+                                proposal?.submission_time +
+                                    daoConfig?.pre_vote_duration <
+                                    Date.now() && (
+                                    <Widget
+                                        src="nearui.near/widget/Input.Button"
+                                        props={{
+                                            variant: "danger",
+                                            children: "Slash",
+                                            onClick: () =>
+                                                slashPreVoteProposal({
+                                                    id
+                                                })
                                         }}
                                     />
                                 )}
@@ -694,7 +725,7 @@ function renderPreVoteButtons({ proposal }) {
                     This proposal requires a Congressional member to support in
                     order to move into the active status.
                 </span>
-                Congress Member Upvote
+                Congress Member UpVote
             </button>
             <div className="d-flex flex-column gap-1">
                 <div style={{ width: "fit-content" }}>
@@ -720,10 +751,10 @@ function renderPreVoteButtons({ proposal }) {
                     }
                 >
                     <span class="tooltiptext">
-                        This proposal requires a minimal number of voters to
-                        support in order to move into the active status.
+                        This proposal requires a minimal support from 50 members
+                        in order to move into the active status.
                     </span>
-                    Voting Body Upvote
+                    Voting Body Support
                 </button>
             </div>
             <button

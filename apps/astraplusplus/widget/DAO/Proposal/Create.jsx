@@ -51,6 +51,10 @@ const proposalTypes = isVotingBodyDao
           {
               text: "Function Call",
               value: "FunctionCall"
+          },
+          {
+              text: "Update Bonds",
+              value: "UpdateBonds"
           }
       ]
     : [
@@ -320,6 +324,16 @@ return (
             {state.proposalType.value === "ApproveBudget" && (
                 <Widget
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.ApproveBudget"
+                    props={{
+                        daoId,
+                        dev: props.dev,
+                        registry
+                    }}
+                />
+            )}
+            {state.proposalType.value === "UpdateBonds" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.UpdateBonds"
                     props={{
                         daoId,
                         dev: props.dev,
