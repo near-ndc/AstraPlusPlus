@@ -115,7 +115,6 @@ if (!proposalString && proposalId && daoId) {
                 <Widget src="/*__@appAccount__*//widget/DAO.Proposals.Card.skeleton" />
             );
         } else {
-            console.log(resp);
             new_proposal = {
                 id: resp.id,
                 kind: resp.kind,

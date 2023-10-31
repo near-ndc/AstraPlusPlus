@@ -1,7 +1,11 @@
 const accountId = props.accountId ?? context.accountId;
 const daoId = props.daoId;
+const isHookCall = props.isHookCall;
 const onClose = props.onClose;
 const registry = props.registry;
+const HoMDaoId = props.dev
+    ? "/*__@replace:HoMDaoIdTesting__*/"
+    : "/*__@replace:HoMDaoId__*/";
 
 if (!accountId) {
     return "Please connect your NEAR wallet :)";
@@ -31,58 +35,83 @@ State.init({
 });
 
 const handleProposal = () => {
-    if (isEmpty(state.dao) || !isNearAddress(state.dao)) {
-        State.update({
-            error: "Please enter a valid DAO ID"
-        });
-        return;
-    }
-
-    if (isEmpty(state.prop_id)) {
-        State.update({
-            error: "Please enter a proposal ID"
-        });
-        return;
-    }
-
-    if (isEmpty(state.description)) {
-        State.update({
-            error: "Please enter a description"
-        });
-        return;
-    }
-
-    if (!state.proposalQueue) {
-        State.update({
-            error: "Please select proposal queue"
-        });
-        return;
-    }
-
+    let error;
+    let args;
     const gas = 20000000000000;
     const deposit = state.attachDeposit
         ? Big(state.attachDeposit)
         : 100000000000000000000000;
 
-    const args = JSON.stringify({
-        description: state.description,
-        kind: { Veto: { prop_id: parseInt(state.prop_id), dao: state.dao } },
-        caller: accountId
-    });
+    if (!isHookCall) {
+        if (isEmpty(state.dao) || !isNearAddress(state.dao))
+            error = "Please enter a valid DAO ID";
+        if (isEmpty(state.prop_id)) error = "Please enter a proposal ID";
+        if (isEmpty(state.description)) error = "Please enter a description";
+        if (!state.proposalQueue) error = "Please select proposal queue";
 
-    Near.call([
-        {
-            contractName: registry,
-            methodName: "is_human_call",
-            args: {
-                ctr: daoId,
-                function: "create_proposal",
-                payload: args
-            },
-            gas: gas,
-            deposit: deposit
+        if (error) {
+            State.update({ error });
+            return;
         }
-    ]);
+    }
+
+    if (isHookCall) {
+        const fc_args = Buffer.from(
+            JSON.stringify({ id: parseInt(state.prop_id) }),
+            "utf-8"
+        ).toString("base64");
+
+        args = {
+            kind: {
+                FunctionCall: {
+                    receiver_id: HoMDaoId,
+                    actions: [
+                        {
+                            method_name: "veto_hook",
+                            args: fc_args,
+                            deposit: "100000000000000000000000",
+                            gas: "300000000000000"
+                        }
+                    ]
+                }
+            },
+            description: state.description
+        };
+        Near.call([
+            {
+                contractName: daoId,
+                methodName: "create_proposal",
+                args: args,
+                deposit: 100000000000000000000000,
+                gas: 20000000000000
+            }
+        ]);
+    } else {
+        args = JSON.stringify({
+            description: state.description,
+            kind: {
+                Veto: {
+                    prop_id: parseInt(state.prop_id),
+                    dao: state.dao
+                }
+            },
+            caller: accountId
+        });
+
+        Near.call([
+            {
+                contractName: registry,
+                methodName: "is_human_call",
+                args: {
+                    ctr: daoId,
+                    function: "create_proposal",
+                    payload: args
+                },
+                gas: gas,
+                deposit: deposit
+            }
+        ]);
+    }
 };
 
 const onChangePropID = (prop_id) => {
@@ -119,24 +148,28 @@ const defaultDescription =
 
 return (
     <>
-        <Widget
-            src="/*__@appAccount__*//widget/DAO.Proposal.Common.ProposalQueue"
-            props={{
-                daoId: daoId,
-                onUpdate: onChangeQueue,
-                dev: props.dev
-            }}
-        />
+        {!props.isHookCall && (
+            <>
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Common.ProposalQueue"
+                    props={{
+                        daoId: daoId,
+                        onUpdate: onChangeQueue,
+                        dev: props.dev
+                    }}
+                />
 
-        <Widget
-            src="/*__@appAccount__*//widget/DAO.Proposal.Common.CongressHouseDropdown"
-            props={{
-                daoId: daoId,
-                label: "House",
-                placeholder: "Select house account",
-                onUpdate: onChangeDao
-            }}
-        />
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Common.CongressHouseDropdown"
+                    props={{
+                        daoId: daoId,
+                        label: "House",
+                        placeholder: "Select house account",
+                        onUpdate: onChangeDao
+                    }}
+                />
+            </>
+        )}
         <div className="mb-3">
             <h5>Proposal ID</h5>
             <input

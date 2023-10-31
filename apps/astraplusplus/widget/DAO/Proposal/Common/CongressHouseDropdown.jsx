@@ -28,16 +28,14 @@ return (
                 noLabel: false,
                 placeholder: placeholder,
                 options: [
-                    { text: CoADaoId, value: CoADaoId },
-                    { text: HoMDaoId, value: HoMDaoId },
-                    { text: TCDaoId, value: TCDaoId }
+                    { text: "House of Merit", value: HoMDaoId },
+                    { text: "Council of Advisors", value: CoADaoId },
+                    { text: "Transparency Commission", value: TCDaoId }
                 ],
                 value: state.house,
                 onChange: (house) => {
                     onUpdate(house.value);
-                    State.update({
-                        house: house.value
-                    });
+                    State.update({ house: house.value });
                 },
                 error: undefined
             }}
