@@ -85,7 +85,7 @@ return (
                             <span className="vote">{vote}</span>
                         </div>
                     </li>
-                    {isCongressDaoID && (
+                    {isCongressDaoID && props.dev && (
                         <div className="p-3 d-flex gap-2">
                             <p>Time: </p>
                             {new Date(

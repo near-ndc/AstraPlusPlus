@@ -28,7 +28,7 @@ const {
 const accountId = context.accountId;
 
 function checkVotesForCongressDao(value) {
-    if (isCongressDaoID) {
+    if (isCongressDaoID && !props.dev) {
         return votes[accountId]?.vote === value;
     } else {
         return votes[accountId || ";;;"] === value;
@@ -874,7 +874,8 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
                 daoId,
                 votes,
                 totalVotes,
-                isCongressDaoID
+                isCongressDaoID,
+                dev: props.dev
             }
         },
         {
