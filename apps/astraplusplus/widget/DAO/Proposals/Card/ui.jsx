@@ -125,7 +125,7 @@ const Wrapper = styled.div`
     }
 
     .counter-text {
-        font-size: 16px;
+        font-size: 14px;
         margin-right: 5px;
         border-width: 2px;
         animation-duration: 8s;
