@@ -119,6 +119,10 @@ const Wrapper = styled.div`
         visibility: visible;
         opacity: 1;
     }
+
+    .text-sm {
+        font-size: 14px;
+    }
 `;
 
 const cls = (c) => c.join(" ");
@@ -259,7 +263,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                         </h4>
                     </div>
                 </div>
-                <div>
+                <div className="d-flex gap-2 align-items-center">
                     <Widget
                         src="/*__@replace:nui__*//widget/Element.Badge"
                         props={{
@@ -281,6 +285,56 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                             size: "lg"
                         }}
                     />
+
+                    {(isCongressDaoID || isVotingBodyDao) &&
+                        statusName === "In Progress" && (
+                            <Widget
+                                src="/*__@replace:nui__*//widget/Element.Badge"
+                                props={{
+                                    children: (
+                                        <Widget
+                                            src="/*__@appAccount__*//widget/Common.Layout.Countdown"
+                                            props={{
+                                                timeToCheck:
+                                                    proposal?.submission_time +
+                                                    daoConfig?.voting_duration
+                                            }}
+                                        />
+                                    ),
+                                    variant: `info round`,
+                                    size: "lg"
+                                }}
+                            />
+                        )}
+
+                    {isCongressDaoID &&
+                        statusName !== "In Progress" &&
+                        proposal?.submission_time +
+                            daoConfig?.voting_duration +
+                            daoConfig?.cooldown <
+                            Date.now() && (
+                            <Widget
+                                src="/*__@replace:nui__*//widget/Element.Badge"
+                                props={{
+                                    children: (
+                                        <div className="d-flex gap-1 align-items-center">
+                                            <div>Cooldown:</div>
+                                            <Widget
+                                                src="/*__@appAccount__*//widget/Common.Layout.Countdown"
+                                                props={{
+                                                    timeToCheck:
+                                                        proposal?.submission_time +
+                                                        daoConfig?.voting_duration +
+                                                        daoConfig?.cooldown
+                                                }}
+                                            />
+                                        </div>
+                                    ),
+                                    variant: `info round`,
+                                    size: "lg"
+                                }}
+                            />
+                        )}
                 </div>
             </div>
             <h6 className="text-secondary">{daoId}</h6>
@@ -567,7 +621,7 @@ function renderVoteButtons({
                                 <i className="bi bi-check-circle"></i>
                             </span>
                         )}
-                        <span>Yes</span>
+                        <span className="text-sm">Approve</span>
                         <i className="bi bi-hand-thumbs-up"></i>
                     </div>
 
@@ -606,7 +660,7 @@ function renderVoteButtons({
                                 <i className="bi bi-check-circle"></i>
                             </span>
                         )}
-                        <span>No</span>
+                        <span className="text-sm">Reject</span>
                         <i className="bi bi-hand-thumbs-down"></i>
                     </div>
 

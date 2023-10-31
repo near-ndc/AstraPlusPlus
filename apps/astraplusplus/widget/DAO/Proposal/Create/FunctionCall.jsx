@@ -598,7 +598,10 @@ return (
                     </>
                 )}
                 <div className="mb-3">
-                    <h5>Deposit</h5>
+                    <h5>
+                        Deposit{" "}
+                        {(isCongressDaoID || isVotingBodyDao) && "(NEAR)"}
+                    </h5>
                     <input
                         type="number"
                         value={state.deposit}

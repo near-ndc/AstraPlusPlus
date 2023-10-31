@@ -128,14 +128,14 @@ return (
         />
 
         <div className="mb-3">
-            <h5>Pre Vote Bond amount</h5>
+            <h5>Pre Vote Bond amount (NEAR)</h5>
             <input
                 type="number"
                 onChange={(e) => onChangePreVoteBond(e.target.value)}
             />
         </div>
         <div className="mb-3">
-            <h5>Active Queue Bond amount</h5>
+            <h5>Active Queue Bond amount (NEAR)</h5>
             <input
                 type="number"
                 onChange={(e) => onChangeActiveQueueBond(e.target.value)}
