@@ -26,6 +26,9 @@ const constructURL = (paramObj, base) => {
     const baseURL = base ?? `#/${widgetOwner}/widget/home`;
     let params = "";
     for (const [key, value] of Object.entries(paramObj)) {
+        if (key === "dev" && value === false) {
+            continue;
+        }
         params += `${key}=${value}&`;
     }
     params = params.slice(0, -1);
