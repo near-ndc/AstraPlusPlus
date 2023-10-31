@@ -87,11 +87,21 @@ const formatDate = (date) => {
     } ${date.getDate()}, ${date.getFullYear()}`;
 };
 
+function checkVotesForCongressDao(value) {
+    if (isCongressDaoID) {
+        return votes[accountId]?.vote === value;
+    } else {
+        return votes[accountId || ";;;"] === value;
+    }
+}
+
 const voted = {
-    yes: proposal.votes[accountId || ";;;"] === "Approve",
-    no: proposal.votes[accountId || ";;;"] === "Reject",
-    spam: proposal.votes[accountId || ";;;"] === "Remove",
-    abstain: proposal.votes[accountId || ";;;"] === "Abstain"
+    yes: checkVotesForCongressDao("Approve"),
+    no: checkVotesForCongressDao("Reject"),
+    spam: isVotingBodyDao
+        ? checkVotesForCongressDao("Spam")
+        : checkVotesForCongressDao("Remove"),
+    abstain: checkVotesForCongressDao("Abstain")
 };
 
 const alreadyVoted = voted.yes || voted.no || voted.spam || voted.abstain;

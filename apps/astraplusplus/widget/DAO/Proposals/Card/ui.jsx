@@ -27,6 +27,14 @@ const {
 } = props;
 const accountId = context.accountId;
 
+function checkVotesForCongressDao(value) {
+    if (isCongressDaoID) {
+        return votes[accountId]?.vote === value;
+    } else {
+        return votes[accountId || ";;;"] === value;
+    }
+}
+
 // TODO: implement category
 const category = "";
 
@@ -512,12 +520,12 @@ function renderVoteButtons({
     const finsihed = statusName !== "In Progress";
 
     const voted = {
-        yes: votes[accountId || ";;;"] === "Approve",
-        no: votes[accountId || ";;;"] === "Reject",
+        yes: checkVotesForCongressDao("Approve"),
+        no: checkVotesForCongressDao("Reject"),
         spam: isVotingBodyDao
-            ? votes[accountId || ";;;"] === "Spam"
-            : votes[accountId || ";;;"] === "Remove",
-        abstain: votes[accountId || ";;;"] === "Abstain"
+            ? checkVotesForCongressDao("Spam")
+            : checkVotesForCongressDao("Remove"),
+        abstain: checkVotesForCongressDao("Abstain")
     };
 
     const alreadyVoted = voted.yes || voted.no || voted.spam || voted.abstain;
@@ -802,7 +810,8 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
             props: {
                 daoId,
                 votes,
-                totalVotes
+                totalVotes,
+                isCongressDaoID
             }
         },
         {
@@ -869,10 +878,14 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
         </div>
     );
 }
+
 const voted = {
-    yes: votes[accountId || ";;;"] === "Approve",
-    no: votes[accountId || ";;;"] === "Reject",
-    spam: votes[accountId || ";;;"] === "Remove"
+    yes: checkVotesForCongressDao("Approve"),
+    no: checkVotesForCongressDao("Reject"),
+    spam: isVotingBodyDao
+        ? checkVotesForCongressDao("Spam")
+        : checkVotesForCongressDao("Remove"),
+    abstain: checkVotesForCongressDao("Abstain")
 };
 
 const alreadyVoted = voted.yes || voted.no || voted.spam;

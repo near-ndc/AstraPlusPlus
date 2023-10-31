@@ -370,7 +370,7 @@ const expensiveWork = () => {
         totalVotes.spam += my_proposal.vote_counts[key][2];
     });
 
-    if (isCongressDaoID || isVotingBodyDao) {
+    if (isVotingBodyDao) {
         for (const value of Object.values(my_proposal.votes)) {
             if (value === "Approve") {
                 totalVotes.yes++;
@@ -379,6 +379,20 @@ const expensiveWork = () => {
             } else if (value === "Abstain") {
                 totalVotes.abstain++;
             } else if (value === "Spam") {
+                totalVotes.spam++;
+            }
+        }
+    }
+
+    if (isCongressDaoID) {
+        for (const { vote } of Object.values(my_proposal.votes)) {
+            if (vote === "Approve") {
+                totalVotes.yes++;
+            } else if (vote === "Reject") {
+                totalVotes.no++;
+            } else if (vote === "Abstain") {
+                totalVotes.abstain++;
+            } else if (vote === "Spam") {
                 totalVotes.spam++;
             }
         }
