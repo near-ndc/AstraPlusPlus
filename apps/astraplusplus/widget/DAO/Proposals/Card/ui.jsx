@@ -270,7 +270,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                         </h4>
                     </div>
                 </div>
-                <div className="d-flex gap-2 align-items-center">
+                <div className="d-flex gap-2 flex-wrap align-items-center">
                     <Widget
                         src="/*__@replace:nui__*//widget/Element.Badge"
                         props={{
@@ -315,12 +315,11 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                 }}
                             />
                         )}
-
                     {isCongressDaoID &&
                         statusName !== "In Progress" &&
                         proposal?.submission_time +
                             daoConfig?.voting_duration +
-                            daoConfig?.cooldown <
+                            daoConfig?.cooldown >
                             Date.now() && (
                             <Widget
                                 src="/*__@replace:nui__*//widget/Element.Badge"
