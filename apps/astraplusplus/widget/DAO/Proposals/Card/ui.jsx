@@ -212,7 +212,11 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                 <div>
                     <div className="d-flex gap-2">
                         <h4 className="h4 d-flex align-items-center gap-2">
-                            {typeName}
+                            <div>
+                                <p className="mb-1">{typeName}</p>
+                                <h6 className="text-secondary">{daoId}</h6>
+                            </div>
+
                             <Widget
                                 src="/*__@replace:nui__*//widget/Element.Badge"
                                 props={{
@@ -345,7 +349,6 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                         )}
                 </div>
             </div>
-            <h6 className="text-secondary">{daoId}</h6>
         </div>
     );
 }
