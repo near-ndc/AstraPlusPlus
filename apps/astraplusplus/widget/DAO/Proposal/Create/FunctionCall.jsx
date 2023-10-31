@@ -34,7 +34,7 @@ State.init({
     method_name: state.method_name,
     args: state.args || "{}",
     deposit: state.deposit || "0",
-    gas: "200000000000000",
+    gas: "300000000000000",
     error: undefined,
     receiver_id: null,
     description: null,
@@ -586,15 +586,19 @@ return (
                                 />
                             </div>
                         )}
-                        <div className="mb-3">
-                            <h5>Gas</h5>
-                            <input
-                                type="number"
-                                value={state.gas}
-                                onChange={(e) => onChangeGas(e.target.value)}
-                                defaultValue="200000000000000"
-                            />
-                        </div>
+                        {!isCongressDaoID && !isVotingBodyDao && (
+                            <div className="mb-3">
+                                <h5>Gas</h5>
+                                <input
+                                    type="number"
+                                    value={state.gas}
+                                    onChange={(e) =>
+                                        onChangeGas(e.target.value)
+                                    }
+                                    defaultValue="300000000000000"
+                                />
+                            </div>
+                        )}
                     </>
                 )}
                 <div className="mb-3">

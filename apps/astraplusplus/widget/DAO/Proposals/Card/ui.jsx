@@ -123,6 +123,13 @@ const Wrapper = styled.div`
     .text-sm {
         font-size: 14px;
     }
+
+    .counter-text {
+        font-size: 16px;
+        margin-right: 5px;
+        border-width: 2px;
+        animation-duration: 8s;
+    }
 `;
 
 const cls = (c) => c.join(" ");
@@ -292,14 +299,16 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                 src="/*__@replace:nui__*//widget/Element.Badge"
                                 props={{
                                     children: (
-                                        <Widget
-                                            src="/*__@appAccount__*//widget/Common.Layout.Countdown"
-                                            props={{
-                                                timeToCheck:
-                                                    proposal?.submission_time +
-                                                    daoConfig?.voting_duration
-                                            }}
-                                        />
+                                        <div className="counter-text">
+                                            <Widget
+                                                src="/*__@appAccount__*//widget/Common.Layout.Countdown"
+                                                props={{
+                                                    timeToCheck:
+                                                        proposal?.submission_time +
+                                                        daoConfig?.voting_duration
+                                                }}
+                                            />
+                                        </div>
                                     ),
                                     variant: `info round`,
                                     size: "lg"
@@ -317,7 +326,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                 src="/*__@replace:nui__*//widget/Element.Badge"
                                 props={{
                                     children: (
-                                        <div className="d-flex gap-1 align-items-center">
+                                        <div className="d-flex gap-1 align-items-center counter-text">
                                             <div>Cooldown:</div>
                                             <Widget
                                                 src="/*__@appAccount__*//widget/Common.Layout.Countdown"
@@ -330,7 +339,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                             />
                                         </div>
                                     ),
-                                    variant: `info round`,
+                                    variant: `disabled round`,
                                     size: "lg"
                                 }}
                             />
