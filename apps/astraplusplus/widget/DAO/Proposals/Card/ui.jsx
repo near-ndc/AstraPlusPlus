@@ -950,7 +950,7 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
     const renderModal = (item, index) => {
         return (
             <Widget
-                src="/*__@replace:nui__*//widget/Layout.Modal"
+                src="/*__@appAccount__*//widget/Layout.Modal"
                 props={{
                     content: (
                         <Widget

@@ -17,17 +17,10 @@ const Wrapper = styled.ul`
 
     li {
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 0.9rem;
-        padding: 20px 10px 10px;
-        gap: 1em;
+        flex-direction: column;
+        padding: 12px;
+        gap: 10px;
         border-radius: 14px;
-
-        & > div:last-child {
-            text-align: end;
-        }
     }
 
     div.Approve {
@@ -72,27 +65,39 @@ return (
             return (
                 <div className={vote + " radius"}>
                     <li className={vote}>
-                        <div>
+                        <div className="d-flex items-center justify-content-between">
+                            <div>
+                                <Widget
+                                    src="mob.near/widget/Profile.ShortInlineBlock"
+                                    props={{
+                                        accountId: voterId
+                                    }}
+                                />
+                            </div>
                             <Widget
-                                src="mob.near/widget/Profile.ShortInlineBlock"
+                                src="/*__@replace:nui__*//widget/Element.Badge"
                                 props={{
-                                    accountId: voterId
+                                    children: (
+                                        <span className="vote">{vote}</span>
+                                    ),
+                                    variant: `round`,
+                                    size: "md"
                                 }}
                             />
                         </div>
-                        <div>
-                            voted
-                            <span className="vote">{vote}</span>
-                        </div>
+                        {isCongressDaoID && votes[voterId].timestamp > 0 && (
+                            <div className="d-flex gap-2">
+                                <small>
+                                    <i className="bi bi-clock" />
+                                </small>
+                                <small className="text-secondary">
+                                    {new Date(
+                                        votes[voterId].timestamp
+                                    ).toLocaleString()}
+                                </small>
+                            </div>
+                        )}
                     </li>
-                    {isCongressDaoID && votes[voterId].timestamp !== 0 && (
-                        <div className="p-3 d-flex gap-2">
-                            <p>Time: </p>
-                            {new Date(
-                                votes[voterId].timestamp
-                            ).toLocaleString()}
-                        </div>
-                    )}
                 </div>
             );
         })}

@@ -23,10 +23,8 @@ const Overlay = styled.div`
 `;
 
 const Content = styled.div`
-  width: 100%;
-  max-width: 700px;
-  max-height: 100%;
-  overflow-y: auto;
+  min-width: 500px;
+  max-width: 1000px;
   margin-top: 20px;
   margin-bottom: 20px;
   outline: none !important;
