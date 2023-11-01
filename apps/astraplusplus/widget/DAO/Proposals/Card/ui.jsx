@@ -931,8 +931,11 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
                 url: `https://near.org//*__@appAccount__*//widget/home?page=dao&tab=proposals&daoId=${daoId}&proposalId=${proposal.id}`,
                 text: "Explore this new proposal from our DAO! Your support and feedback are essential as we work towards a decentralized future. Review the details and join the discussion here:"
             }
-        },
-        {
+        }
+    ];
+
+    if (proposal.typeName !== "Text") {
+        items.push({
             title: "More details",
             icon: "bi bi-three-dots",
             widget: "Common.Modals.ProposalArguments",
@@ -941,8 +944,8 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
                 proposal,
                 showCard: true
             }
-        }
-    ];
+        });
+    }
 
     const renderModal = (item, index) => {
         return (
