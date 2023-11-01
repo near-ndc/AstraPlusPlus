@@ -28,7 +28,7 @@ const {
 const accountId = context.accountId;
 
 function checkVotesForCongressDao(value) {
-    if (isCongressDaoID && !props.dev) {
+    if (isCongressDaoID) {
         return votes[accountId]?.vote === value;
     } else {
         return votes[accountId || ";;;"] === value;
