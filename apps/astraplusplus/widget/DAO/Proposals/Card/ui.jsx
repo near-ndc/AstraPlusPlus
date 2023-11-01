@@ -23,7 +23,10 @@ const {
     isVotingBodyDao,
     daoConfig,
     isHuman,
-    currentuserCongressHouse
+    currentuserCongressHouse,
+    CoADaoId,
+    HoMDaoId,
+    registry
 } = props;
 const accountId = context.accountId;
 
@@ -129,6 +132,19 @@ const Wrapper = styled.div`
         margin-right: 5px;
         border-width: 2px;
         animation-duration: 8s;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .veto-btn {
+        padding: 10px;
+        padding-inline: 40px;
+        background-color: red;
+        color: white;
+        border-radius: 10px;
+        line-height: 23px;
     }
 `;
 
@@ -594,12 +610,18 @@ function renderVoteButtons({
     };
 
     const alreadyVoted = voted.yes || voted.no || voted.spam || voted.abstain;
-
+    const showVeto =
+        daoId === HoMDaoId && currentuserCongressHouse === CoADaoId
+            ? // (isHuman && proposal.typeName === "Recurrent Funding Request")) // add after voting body contract is ready
+              true
+            : false;
     return (
         <div
             className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
             style={{
-                gridTemplateColumns: isVotingBodyDao
+                gridTemplateColumns: showVeto
+                    ? "1fr 1fr 1fr 120px"
+                    : isVotingBodyDao
                     ? "1fr 1fr 1fr 120px"
                     : isCongressDaoID
                     ? "1fr 1fr 1fr"
@@ -736,7 +758,7 @@ function renderVoteButtons({
 
                     <VoteButton
                         className="spam"
-                        percentage={percentages.spam}
+                        // percentage={percentages.spam}
                         finsihed={finsihed}
                         wins={wins.spam}
                         myVote={voted.spam}
@@ -754,6 +776,27 @@ function renderVoteButtons({
                         </div>
                         <div></div>
                     </VoteButton>
+                </div>
+            )}
+
+            {showVeto && (
+                <div className="w-100">
+                    <Widget
+                        src="/*__@appAccount__*//widget/DAO.Proposal.Common.VetoButton"
+                        props={{
+                            daoId,
+                            proposal,
+                            isCongressDaoID,
+                            isVotingBodyDao,
+                            daoConfig,
+                            isHuman,
+                            currentuserCongressHouse,
+                            CoADaoId,
+                            HoMDaoId,
+                            registry,
+                            dev: props.dev
+                        }}
+                    />
                 </div>
             )}
         </div>

@@ -35,7 +35,7 @@ function itemIsInArray(item, array) {
     return array.includes(item);
 }
 
-if (VotingBodyDaoId) {
+if (isVotingBodyDao || daoId === HoMDaoId) {
     currentuserCongressHouse = useCache(
         () =>
             Near.asyncView(HoMDaoId, "get_members").then((res) =>
@@ -551,7 +551,10 @@ return (
             handlePreVoteAction,
             isHuman,
             currentuserCongressHouse,
-            dev: props.dev
+            dev: props.dev,
+            HoMDaoId,
+            CoADaoId,
+            registry
         }}
     />
 );

@@ -49,6 +49,17 @@ State.init({
     proposalQueue: null
 });
 
+if (props.powerType === "Veto") {
+    State.update({
+        method_name: "veto_hook",
+        args: JSON.stringify({
+            id: props.proposalId
+        }),
+        receiver_id: HoMDaoId,
+        disableReceiverField: true
+    });
+}
+
 // only for UI
 const powerTypes =
     daoId === CoADaoId

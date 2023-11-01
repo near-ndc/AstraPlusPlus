@@ -2,6 +2,8 @@ const accountId = props.accountId ?? context.accountId;
 const daoId = props.daoId;
 const onClose = props.onClose;
 const registry = props.registry;
+const house = props.house;
+const proposalID = props.proposalID;
 
 if (!accountId) {
     return "Please connect your NEAR wallet :)";
@@ -22,8 +24,8 @@ function isNearAddress(address) {
 }
 
 State.init({
-    prop_id: null, // proposal id
-    dao: null,
+    prop_id: proposalID, // proposal id
+    dao: house,
     error: null,
     attachDeposit: 0,
     proposalQueue: null,
@@ -132,9 +134,11 @@ return (
             src="/*__@appAccount__*//widget/DAO.Proposal.Common.CongressHouseDropdown"
             props={{
                 daoId: daoId,
+                house: state.dao,
                 label: "House",
                 placeholder: "Select house account",
-                onUpdate: onChangeDao
+                onUpdate: onChangeDao,
+                dev: props.dev
             }}
         />
         <div className="mb-3">
