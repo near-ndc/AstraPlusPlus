@@ -2,6 +2,7 @@ const accountId = props.accountId ?? context.accountId;
 const daoId = props.daoId;
 const onClose = props.onClose;
 const registry = props.registry;
+const isHookCall = props.isHookCall;
 
 if (!accountId) {
     return "Please connect your NEAR wallet :)";
@@ -31,57 +32,79 @@ function isNearAddress(address) {
 }
 
 const handleProposal = () => {
-    if (isEmpty(state.dao) || !isNearAddress(state.dao)) {
-        State.update({
-            error: "Please select a house"
-        });
-        return;
-    }
-    if (isEmpty(state.member) || !isNearAddress(state.member)) {
-        State.update({
-            error: "Please enter a valid member ID"
-        });
-        return;
-    }
-
-    if (isEmpty(state.description)) {
-        State.update({
-            error: "Please enter a description"
-        });
-        return;
-    }
-
-    if (isEmpty(state.proposalQueue)) {
-        State.update({
-            error: "Please select proposal queue"
-        });
-        return;
-    }
-
+    let error;
+    let args;
     const gas = 20000000000000;
     const deposit = state.attachDeposit
         ? Big(state.attachDeposit)
         : 100000000000000000000000;
 
-    const args = JSON.stringify({
-        description: state.description,
-        kind: { Dismiss: { dao: state.dao, member: state.member } },
-        caller: accountId
-    });
+    if (!isHookCall) {
+        if (isEmpty(state.dao) || !isNearAddress(state.dao))
+            error = "Please select a house";
+        if (isEmpty(state.member) || !isNearAddress(state.member))
+            error = "Please enter a valid member ID";
+        if (isEmpty(state.description)) error = "Please enter a description";
+        if (!state.proposalQueue) error = "Please select proposal queue";
 
-    Near.call([
-        {
-            contractName: registry,
-            methodName: "is_human_call",
-            args: {
-                ctr: daoId,
-                function: "create_proposal",
-                payload: args
-            },
-            gas: gas,
-            deposit: deposit
+        if (error) {
+            State.update({ error });
+            return;
         }
-    ]);
+    }
+
+    if (isHookCall) {
+        const fc_args = Buffer.from(
+            JSON.stringify({ member: state.member }),
+            "utf-8"
+        ).toString("base64");
+
+        args = {
+            kind: {
+                FunctionCall: {
+                    receiver_id: state.dao,
+                    actions: [
+                        {
+                            method_name: "dismiss_hook",
+                            args: fc_args,
+                            deposit: "100000000000000000000000",
+                            gas: "300000000000000"
+                        }
+                    ]
+                }
+            },
+            description: state.description
+        };
+        Near.call([
+            {
+                contractName: daoId,
+                methodName: "create_proposal",
+                args: args,
+                deposit: 100000000000000000000000,
+                gas: 20000000000000
+            }
+        ]);
+    } else {
+        const args = JSON.stringify({
+            description: state.description,
+            kind: { Dismiss: { dao: state.dao, member: state.member } },
+            caller: accountId
+        });
+
+        Near.call([
+            {
+                contractName: registry,
+                methodName: "is_human_call",
+                args: {
+                    ctr: daoId,
+                    function: "create_proposal",
+                    payload: args
+                },
+                gas: gas,
+                deposit: deposit
+            }
+        ]);
+    }
 };
 
 const onChangeDao = (dao) => {
@@ -118,14 +141,16 @@ const defaultDescription =
 
 return (
     <>
-        <Widget
-            src="/*__@appAccount__*//widget/DAO.Proposal.Common.ProposalQueue"
-            props={{
-                daoId: daoId,
-                onUpdate: onChangeQueue,
-                dev: props.dev
-            }}
-        />
+        {!isHookCall && (
+            <Widget
+                src="/*__@appAccount__*//widget/DAO.Proposal.Common.ProposalQueue"
+                props={{
+                    daoId: daoId,
+                    onUpdate: onChangeQueue,
+                    dev: props.dev
+                }}
+            />
+        )}
         <Widget
             src="/*__@appAccount__*//widget/DAO.Proposal.Common.CongressHouseDropdown"
             props={{

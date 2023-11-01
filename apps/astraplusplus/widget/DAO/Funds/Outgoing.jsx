@@ -30,8 +30,6 @@ const labels = outgoing.body.slice(0, 20).map((d) => {
     return d.receiver;
 });
 
-console.log(data);
-
 // fill the rest of colors if balanceData.length > colors.length
 if (data.length > colors.length) {
     for (let i = colors.length; i < data.length; i++) {

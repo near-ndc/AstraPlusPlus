@@ -38,7 +38,7 @@ State.init({
     error: undefined,
     receiver_id: null,
     description: null,
-    powerType: powerType,
+    powerType,
     member: null, // for dismiss and ban hook
     house: null, // for dismiss and ban hook
     accounts: null, // for unban hook
@@ -48,41 +48,6 @@ State.init({
     attachDeposit: 0,
     proposalQueue: null
 });
-
-if (props.powerType === "Veto") {
-    State.update({
-        method_name: "veto_hook",
-        args: JSON.stringify({
-            id: props.proposalId
-        }),
-        receiver_id: HoMDaoId,
-        disableReceiverField: true
-    });
-}
-
-// only for UI
-const powerTypes =
-    daoId === CoADaoId
-        ? [
-              {
-                  text: "Veto House of Merit motion",
-                  value: "Veto"
-              },
-              {
-                  text: "Unban member previously banned",
-                  value: "Unban"
-              }
-          ]
-        : daoId === TCDaoId
-        ? [
-              {
-                  text: "Dismiss member from an house",
-                  value: "Dismiss"
-              }
-          ]
-        : daoId === VotingBodyDaoId
-        ? [] // TODO :  after VB contract is ready
-        : [];
 
 const fc_args = Buffer.from(state.args, "utf-8").toString("base64");
 
@@ -394,52 +359,6 @@ const onChangeQueue = ({ amount, queue }) => {
     });
 };
 
-const onChangePowerType = (power) => {
-    switch (power?.value) {
-        case "Dismiss": {
-            State.update({
-                method_name: "dismiss_hook",
-                args: JSON.stringify({
-                    member: null
-                }),
-                showReceiverAsOptions: true
-            });
-            break;
-        }
-        case "Veto": {
-            State.update({
-                method_name: "veto_hook",
-                args: JSON.stringify({
-                    id: null
-                }),
-                receiver_id: HoMDaoId,
-                disableReceiverField: true
-            });
-            break;
-        }
-        case "Ban": {
-            break;
-        }
-        case "Unban": {
-            State.update({
-                accounts: null,
-                memo: null
-            });
-            break;
-        }
-        case "DismissAndBan": {
-            State.update({
-                house: null,
-                member: null
-            });
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-};
-
 const defaultDescription =
     "### [Your Title Here]\n\n#### Description\n\n[Detailed description of what the proposal is about.]\n\n#### Why This Proposal?\n\n[Explanation of why this proposal is necessary or beneficial.]\n\n#### Execution Plan\n\n[Description of how the proposal will be implemented.]\n\n#### Budget\n\n[If applicable, outline the budget required to execute this proposal.]\n\n#### Timeline\n\n[Proposed timeline for the execution of the proposal.]";
 
@@ -453,29 +372,6 @@ return (
                 dev: props.dev
             }}
         />
-        {(daoId === CoADaoId || daoId === TCDaoId) && showPowers && (
-            <div className="mb-3">
-                <Widget
-                    src={`sking.near/widget/Common.Inputs.Select`}
-                    props={{
-                        label: "Power",
-                        noLabel: false,
-                        placeholder: "Can propose motion",
-                        options: powerTypes,
-                        value: state.powerType,
-                        onChange: (powerType) => {
-                            State.update({
-                                ...state,
-                                powerType: powerType.value
-                            });
-                            onChangePowerType(powerType);
-                        },
-
-                        error: undefined
-                    }}
-                />
-            </div>
-        )}
 
         {state.powerType === "DismissAndBan" ? (
             <>
@@ -524,8 +420,8 @@ return (
                                 props={{
                                     value: state.memo,
                                     onChange: (value) => onChangeMemo(value),
-                                    height: "270px",
-                                    initialText: defaultDescription
+                                    height: "160px",
+                                    initialText: ""
                                 }}
                             />
                         </div>

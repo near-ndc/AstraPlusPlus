@@ -1,6 +1,7 @@
 const accountId = props.accountId ?? context.accountId;
 const daoId = props.daoId ?? "multi.sputnik-dao.near";
 const onClose = props.onClose;
+const powerType = props.powerType;
 const isCongressDaoID = props.isCongressDaoID;
 const isVotingBodyDao = props.isVotingBodyDao;
 const registry = props.registry;
@@ -16,22 +17,9 @@ if (!accountId) {
 State.init({
     description: state.description,
     error: state.error,
-    powerType: null,
     attachDeposit: 0,
     proposalQueue: null
 });
-
-// only for UI
-const powerTypes = [
-    {
-        text: "Propose Budget",
-        value: "Budget"
-    },
-    {
-        text: "Propose Motion",
-        value: "Motion"
-    }
-];
 
 const handleProposal = () => {
     if (!state.description) {
@@ -126,26 +114,6 @@ return (
                 dev: props.dev
             }}
         />
-        {daoId === HoMDaoId && (
-            <div className="mb-3">
-                <Widget
-                    src={`sking.near/widget/Common.Inputs.Select`}
-                    props={{
-                        label: "Power",
-                        noLabel: false,
-                        placeholder: "Can propose motion",
-                        options: powerTypes,
-                        value: state.powerType,
-                        onChange: (powerType) =>
-                            State.update({
-                                ...state,
-                                powerType: powerType.value
-                            }),
-                        error: undefined
-                    }}
-                />
-            </div>
-        )}
         <div className="mb-3">
             <h5>Proposal Description</h5>
             <Widget

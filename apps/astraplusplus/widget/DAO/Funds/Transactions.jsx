@@ -29,8 +29,6 @@ if (!transfers.body) {
     );
 }
 
-console.log("transfers", transfers.body);
-
 const Table = styled.div`
     & > div {
         padding: 1.61rem 0.61rem;
