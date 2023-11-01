@@ -35,7 +35,7 @@ function itemIsInArray(item, array) {
     return array.includes(item);
 }
 
-if (VotingBodyDaoId) {
+if (isVotingBodyDao || daoId === HoMDaoId) {
     currentuserCongressHouse = useCache(
         () =>
             Near.asyncView(HoMDaoId, "get_members").then((res) =>
@@ -45,23 +45,27 @@ if (VotingBodyDaoId) {
         { subscribe: false }
     );
 
-    currentuserCongressHouse = useCache(
-        () =>
-            Near.asyncView(CoADaoId, "get_members").then((res) =>
-                itemIsInArray(accountId, res?.members) ? CoADaoId : null
-            ),
-        CoADaoId + "-is-coa-member",
-        { subscribe: false }
-    );
+    if (!currentuserCongressHouse) {
+        currentuserCongressHouse = useCache(
+            () =>
+                Near.asyncView(CoADaoId, "get_members").then((res) =>
+                    itemIsInArray(accountId, res?.members) ? CoADaoId : null
+                ),
+            CoADaoId + "-is-coa-member",
+            { subscribe: false }
+        );
+    }
 
-    currentuserCongressHouse = useCache(
-        () =>
-            Near.asyncView(TCDaoId, "get_members").then((res) =>
-                itemIsInArray(accountId, res?.members) ? TCDaoId : null
-            ),
-        TCDaoId + "-is-tc-member",
-        { subscribe: false }
-    );
+    if (!currentuserCongressHouse) {
+        currentuserCongressHouse = useCache(
+            () =>
+                Near.asyncView(TCDaoId, "get_members").then((res) =>
+                    itemIsInArray(accountId, res?.members) ? TCDaoId : null
+                ),
+            TCDaoId + "-is-tc-member",
+            { subscribe: false }
+        );
+    }
 }
 
 const isHuman = useCache(
@@ -550,7 +554,10 @@ return (
             handlePreVoteAction,
             isHuman,
             currentuserCongressHouse,
-            dev: props.dev
+            dev: props.dev,
+            HoMDaoId,
+            CoADaoId,
+            registry
         }}
     />
 );

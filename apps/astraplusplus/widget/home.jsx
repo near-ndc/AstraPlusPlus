@@ -187,6 +187,15 @@ const pages = [
         onClick: (daoId, tab) => router.navigate({ page: "votinghistory" }),
         widgetName: "VotingHistory.index",
         hidden: true
+    },
+    {
+        title: "Community Voice",
+        icon: <i class="bi bi-chat-dots"></i>,
+        active: page === "communityVoice",
+        href: currentLink + "?page=communityVoice",
+        onClick: () => router.navigate({ page: "communityVoice" }),
+        widgetName: "CommunityVoice",
+        defaultProps: {}
     }
 ];
 

@@ -1,6 +1,7 @@
 const label = props.label;
 const placeholder = props.placeholder;
 const onUpdate = props.onUpdate;
+const house = props.house;
 
 const CoADaoId = props.dev
     ? "/*__@replace:CoADaoIdTesting__*/"
@@ -16,7 +17,7 @@ const HoMDaoId = props.dev
     : "/*__@replace:HoMDaoId__*/";
 
 State.init({
-    house: null
+    house: house ? { text: house, value: house } : null
 });
 
 return (
@@ -35,7 +36,9 @@ return (
                 value: state.house,
                 onChange: (house) => {
                     onUpdate(house.value);
-                    State.update({ house: house.value });
+                    State.update({
+                        house: house
+                    });
                 },
                 error: undefined
             }}

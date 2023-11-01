@@ -6,6 +6,8 @@ const registry = props.registry;
 const HoMDaoId = props.dev
     ? "/*__@replace:HoMDaoIdTesting__*/"
     : "/*__@replace:HoMDaoId__*/";
+const house = props.house;
+const proposalID = props.proposalID;
 
 if (!accountId) {
     return "Please connect your NEAR wallet :)";
@@ -26,8 +28,8 @@ function isNearAddress(address) {
 }
 
 State.init({
-    prop_id: null, // proposal id
-    dao: null,
+    prop_id: proposalID, // proposal id
+    dao: house,
     error: null,
     attachDeposit: 0,
     proposalQueue: null,
@@ -165,7 +167,8 @@ return (
                         daoId: daoId,
                         label: "House",
                         placeholder: "Select house account",
-                        onUpdate: onChangeDao
+                        onUpdate: onChangeDao,
+                        dev: props.dev
                     }}
                 />
             </>
