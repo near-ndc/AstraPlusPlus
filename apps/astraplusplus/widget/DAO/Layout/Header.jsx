@@ -313,7 +313,7 @@ return (
                 />
                 <div className="d-flex gap-2 mb-4">
                     <Widget
-                        src="nearui.near/widget/Layout.Modal"
+                        src="/*__@appAccount__*//widget/Layout.Modal"
                         props={{
                             toggleContainerProps: {
                                 className: "w-100"

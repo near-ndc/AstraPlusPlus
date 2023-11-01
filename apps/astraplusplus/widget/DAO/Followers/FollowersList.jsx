@@ -307,7 +307,7 @@ return (
                         />
 
                         <Widget
-                            src="nearui.near/widget/Layout.Modal"
+                            src="/*__@appAccount__*//widget/Layout.Modal"
                             props={{
                                 open: state.filtersOpen,
                                 onOpenChange: (open) => {
