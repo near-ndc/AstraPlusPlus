@@ -45,23 +45,27 @@ if (isVotingBodyDao || daoId === HoMDaoId) {
         { subscribe: false }
     );
 
-    currentuserCongressHouse = useCache(
-        () =>
-            Near.asyncView(CoADaoId, "get_members").then((res) =>
-                itemIsInArray(accountId, res?.members) ? CoADaoId : null
-            ),
-        CoADaoId + "-is-coa-member",
-        { subscribe: false }
-    );
+    if (!currentuserCongressHouse) {
+        currentuserCongressHouse = useCache(
+            () =>
+                Near.asyncView(CoADaoId, "get_members").then((res) =>
+                    itemIsInArray(accountId, res?.members) ? CoADaoId : null
+                ),
+            CoADaoId + "-is-coa-member",
+            { subscribe: false }
+        );
+    }
 
-    currentuserCongressHouse = useCache(
-        () =>
-            Near.asyncView(TCDaoId, "get_members").then((res) =>
-                itemIsInArray(accountId, res?.members) ? TCDaoId : null
-            ),
-        TCDaoId + "-is-tc-member",
-        { subscribe: false }
-    );
+    if (!currentuserCongressHouse) {
+        currentuserCongressHouse = useCache(
+            () =>
+                Near.asyncView(TCDaoId, "get_members").then((res) =>
+                    itemIsInArray(accountId, res?.members) ? TCDaoId : null
+                ),
+            TCDaoId + "-is-tc-member",
+            { subscribe: false }
+        );
+    }
 }
 
 const isHuman = useCache(
