@@ -232,15 +232,26 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                 <p className="mb-1">{typeName}</p>
                                 <h6 className="text-secondary">{daoId}</h6>
                             </div>
-
-                            <Widget
-                                src="/*__@replace:nui__*//widget/Element.Badge"
-                                props={{
-                                    children: `Proposal ID #${id}`,
-                                    variant: `outline info round`,
-                                    size: "md"
-                                }}
-                            />
+                            <div className="d-flex flex-column gap-1">
+                                <Widget
+                                    src="/*__@replace:nui__*//widget/Element.Badge"
+                                    props={{
+                                        children: `Proposal ID #${id}`,
+                                        variant: `outline info round`,
+                                        size: "md"
+                                    }}
+                                />
+                                {proposal.typeName === "Function Call" && (
+                                    <Widget
+                                        src="/*__@replace:nui__*//widget/Element.Badge"
+                                        props={{
+                                            children: `Method : ${kind.FunctionCall.actions?.[0]?.method_name}`,
+                                            variant: `disabled round`,
+                                            size: "md"
+                                        }}
+                                    />
+                                )}
+                            </div>
                             {(isCongressDaoID || isVotingBodyDao) &&
                                 statusName === "Approved" &&
                                 proposal?.submission_time +
@@ -314,7 +325,9 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                     />
 
                     {(isCongressDaoID || isVotingBodyDao) &&
-                        statusName === "In Progress" && (
+                        statusName === "In Progress" &&
+                        proposal?.submission_time + daoConfig?.voting_duration >
+                            Date.now() && (
                             <Widget
                                 src="/*__@replace:nui__*//widget/Element.Badge"
                                 props={{
@@ -510,8 +523,6 @@ function renderVoteButtons({
 
     &.spam {
       --vote-button-bg: 245, 197, 24;
-      display :flex;
-      justify-content: center;
     }
 
     &.abstain {
@@ -620,12 +631,10 @@ function renderVoteButtons({
             className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
             style={{
                 gridTemplateColumns: showVeto
-                    ? "1fr 1fr 1fr 120px"
+                    ? "repeat(3,1fr) 120px"
                     : isVotingBodyDao
-                    ? "1fr 1fr 1fr 120px"
-                    : isCongressDaoID
-                    ? "1fr 1fr 1fr"
-                    : "1fr 1fr 120px"
+                    ? "repeat(4,1fr)"
+                    : "repeat(3,1fr)"
             }}
         >
             <div className="w-100">
@@ -758,7 +767,7 @@ function renderVoteButtons({
 
                     <VoteButton
                         className="spam"
-                        // percentage={percentages.spam}
+                        percentage={percentages.spam}
                         finsihed={finsihed}
                         wins={wins.spam}
                         myVote={voted.spam}
@@ -771,10 +780,16 @@ function renderVoteButtons({
                             alreadyVoted || finsihed || !isAllowedToVote[2]
                         }
                     >
-                        <div>
+                        <div className="d-flex gap-2 align-items-center">
                             <span>Spam</span>
                         </div>
-                        <div></div>
+                        <div>
+                            <span>
+                                {percentages.spam}
+                                <i className="bi bi-percent"></i>
+                            </span>
+                            <span>{totalVotes.spam} Votes</span>
+                        </div>
                     </VoteButton>
                 </div>
             )}

@@ -54,33 +54,36 @@ return (
                             maxWidth: "100vw"
                         }}
                     >
+                        <Widget
+                            src="/*__@replace:nui__*//widget/Element.Badge"
+                            props={{
+                                size: "lg",
+                                variant: "info outline mb-3",
+                                children:
+                                    "Please make sure there is no existing Veto proposal with same proposal ID created to avoid spam."
+                            }}
+                        />
+
                         {currentuserCongressHouse === CoADaoId ? (
                             <Widget
-                                src="/*__@appAccount__*//widget/DAO.Proposal.Create.FunctionCall"
+                                src="/*__@appAccount__*//widget/DAO.Proposal.Create.Veto"
                                 props={{
                                     daoId: CoADaoId,
-                                    onClose: () =>
-                                        State.update({
-                                            isProposalModalOpen:
-                                                !state.isProposalModalOpen
-                                        }),
-                                    isCongressDaoID,
-                                    registry,
-                                    isVotingBodyDao,
                                     dev: props.dev,
-                                    powerType: "Veto",
-                                    proposalId: proposal.id,
-                                    showPowers: false
+                                    registry,
+                                    isHookCall: true,
+                                    proposalID: proposal.id
                                 }}
                             />
                         ) : (
                             <Widget
                                 src="/*__@appAccount__*//widget/DAO.Proposal.Create.Veto"
                                 props={{
-                                    daoId,
+                                    daoId: CoADaoId,
                                     dev: props.dev,
                                     registry,
-                                    house: daoId,
+                                    isHookCall: false,
+                                    house: HoMDaoId,
                                     proposalID: proposal.id
                                 }}
                             />
