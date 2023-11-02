@@ -155,6 +155,7 @@ return (
                         <th scope="col" className="text-center">
                             Type
                         </th>
+                        <th scope="col">Votes</th>
                         <th scope="col" className="text-center">
                             Status
                         </th>
