@@ -68,7 +68,7 @@ const isAllowedToVote = isVotingBodyDao
 // --- end check user permissions
 
 const formatDate = (date) => {
-    date = new Date(Date(date));
+    date = new Date(parseInt(`${date}`.slice(0, 13)));
     return `${
         [
             "January",
