@@ -97,17 +97,12 @@ return (
                 title={direction == "out" ? transfer.receiver : transfer.sender}
             >
                 <Widget
-                    src="nearui.near/widget/Element.User"
+                    src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
                         accountId:
                             direction == "out"
                                 ? transfer.receiver
-                                : transfer.sender,
-                        options: {
-                            size: "sm",
-                            showSocialName: true,
-                            showImage: false
-                        }
+                                : transfer.sender
                     }}
                 />
             </span>

@@ -210,7 +210,6 @@ const Content = {
 
 const Container = styled.div`
     background: rgba(217, 217, 217, 0.3);
-    color: #464c50;
     font-size: 14px;
     line-height: 24px;
     display: flex;

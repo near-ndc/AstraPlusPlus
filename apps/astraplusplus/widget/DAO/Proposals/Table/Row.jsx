@@ -71,18 +71,18 @@ const formatDate = (date) => {
     date = new Date(parseInt(`${date}`.slice(0, 13)));
     return `${
         [
-            "January",
-            "February",
-            "March",
-            "April",
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
             "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December"
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
         ][date.getMonth()]
     } ${date.getDate()}, ${date.getFullYear()}`;
 };
@@ -172,10 +172,10 @@ function renderStatus(statusName) {
                         <i
                             className={statusicon}
                             style={{
-                                fontSize: "18px",
+                                fontSize: "16px",
                                 marginRight: "5px",
                                 borderWidth: "2px",
-                                animationDuration: "8s"
+                                animationDuration: "3s"
                             }}
                         ></i>
                         {statustext}
@@ -207,18 +207,15 @@ return (
         <td>{formatDate(proposal.submission_time)}</td>
         <td>
             <Widget
-                src="nearui.near/widget/Element.User"
+                src="mob.near/widget/Profile.ShortInlineBlock"
                 props={{
                     accountId: proposal.proposer,
-                    options: {
-                        showImage: false,
-                        fontSize: 13
-                    }
+                    tooltip: true
                 }}
             />
         </td>
         <td className="text-center">{kindName}</td>
-        <td>{Object.keys(proposal.votes).length}</td>
+        <td className="text-center">{Object.keys(proposal.votes).length}</td>
         <td className="text-center">{renderStatus(proposal.status)}</td>
 
         {multiSelectMode && (

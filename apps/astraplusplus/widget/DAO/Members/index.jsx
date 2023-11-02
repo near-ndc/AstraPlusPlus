@@ -138,14 +138,14 @@ function processCongressMembers(members) {
     let group = "";
     switch (daoId) {
         case HoMDaoId:
-            group = "HoM Member";
+            group = "HoM Members";
             break;
         case CoADaoId:
-            group = "CoA Member";
+            group = "CoA Members";
             break;
 
         case TCDaoId:
-            group = "Transparency Commission Member";
+            group = "Transparency Commission Members";
             break;
     }
     const obj = {

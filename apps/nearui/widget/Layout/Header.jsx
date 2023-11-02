@@ -203,13 +203,14 @@ const MobileToggle = styled.div`
   background: #4498e0;
   color: #fff;
   border-radius: 6px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 return (
   <>
-    <Header className=" d-flex justify-content-between align-items-center py-3 px-md-3 m-0 flex-row">
+    <Header className="d-flex justify-content-between align-items-center py-3 px-md-3 m-0 flex-row">
       <MobileToggle
         className="sidebar-toggle btn btn-outline-light"
         onClick={() =>

@@ -70,7 +70,8 @@ return (
                                 <Widget
                                     src="mob.near/widget/Profile.ShortInlineBlock"
                                     props={{
-                                        accountId: voterId
+                                        accountId: voterId,
+                                        tooltip: true
                                     }}
                                 />
                             </div>

@@ -31,8 +31,7 @@ if (isHuman === null) {
 }
 
 const Table = styled.div`
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
     max-width: 100%;
     overflow-x: auto;
     height: 100%;

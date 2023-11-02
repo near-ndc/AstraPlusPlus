@@ -51,7 +51,9 @@ const Wrapper = styled.div`
     min-height: 500px;
     width: 100%;
     border: 1px solid #fff;
-
+    a {
+        color: rgb(68, 152, 224) !important;
+    }
     .word-wrap {
         word-wrap: break-word;
     }
@@ -73,10 +75,6 @@ const Wrapper = styled.div`
         `
     border-color: #C23F38;
   `}
-
-  .text-muted {
-        color: #8c8c8c !important;
-    }
 
     /* Tooltip container */
     .custom-tooltip {
@@ -138,6 +136,20 @@ const Wrapper = styled.div`
         text-align: center;
     }
 
+    .info_section {
+        border-right: 1px solid #dee2e6;
+        padding-right: 15px;
+        margin: 10px 15px 10px 0;
+
+        &.no-border {
+            border: 0;
+        }
+
+        @media (max-width: 768px) {
+            border: 0;
+        }
+    }
+
     .veto-btn {
         padding: 10px;
         padding-inline: 40px;
@@ -180,38 +192,38 @@ function renderHeader({ typeName, id, daoId, statusName }) {
         case "Approved":
         case "Accepted":
             statusicon = "bi bi-check-circle";
-            statustext = "Proposal " + statusName;
+            statustext = statusName;
             statusvariant = "success";
             break;
         case "Executed":
             statusicon = "bi bi-play-fill";
-            statustext = "Proposal " + statusName;
+            statustext = statusName;
             statusvariant = "success";
             break;
         case "In Progress":
         case "InProgress":
             statusicon = "spinner-border spinner-border-sm";
-            statustext = "Proposal In Progress";
+            statustext = "In Progress";
             statusvariant = "primary";
             break;
         case "Vetoed":
             statusicon = "bi bi-x-circle";
-            statustext = "Proposal Vetoed";
+            statustext = statusName;
             statusvariant = "black";
             break;
         case "Expired":
             statusicon = "bi bi-clock";
-            statustext = "Proposal Expired";
+            statustext = statusName;
             statusvariant = "black";
             break;
         case "Failed":
             statusicon = "bi bi-x-circle";
-            statustext = "Proposal Failed";
+            statustext = statusName;
             statusvariant = "black";
             break;
         case "Rejected":
             statusicon = "bi bi-ban";
-            statustext = "Proposal Rejected";
+            statustext = statusName;
             statusvariant = "danger";
             break;
         case "PreVote":
@@ -224,84 +236,66 @@ function renderHeader({ typeName, id, daoId, statusName }) {
 
     return (
         <div className="card__header">
-            <div className="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                <div>
-                    <div className="d-flex gap-2">
-                        <h4 className="h4 d-flex align-items-center gap-2">
-                            <div>
-                                <p className="mb-1">{typeName}</p>
-                                <h6 className="text-secondary">{daoId}</h6>
-                            </div>
-                            <div className="d-flex flex-column gap-1">
+            <div className="d-flex flex-column gap-2">
+                <div className="d-flex align-items-center justify-content-between">
+                    <h4>{typeName}</h4>
+                    <div className="d-flex align-items-center gap-2">
+                        {(isCongressDaoID || isVotingBodyDao) &&
+                            statusName === "Approved" &&
+                            proposal?.submission_time +
+                                daoConfig?.voting_duration +
+                                (daoConfig?.cooldown ?? 0) < // cooldown is not available in vb
+                                Date.now() && (
                                 <Widget
-                                    src="/*__@replace:nui__*//widget/Element.Badge"
+                                    src="nearui.near/widget/Input.Button"
                                     props={{
-                                        children: `Proposal ID #${id}`,
-                                        variant: `outline info round`,
-                                        size: "md"
+                                        variant: "primary icon",
+                                        children: (
+                                            <i class="bi bi-caret-right-fill" />
+                                        ),
+                                        onClick: () =>
+                                            execProposal({ daoId, id })
                                     }}
                                 />
-                                {proposal.typeName === "Function Call" && (
-                                    <Widget
-                                        src="/*__@replace:nui__*//widget/Element.Badge"
-                                        props={{
-                                            children: `Method : ${kind.FunctionCall.actions?.[0]?.method_name}`,
-                                            variant: `disabled round`,
-                                            size: "md"
-                                        }}
-                                    />
-                                )}
-                            </div>
-                            {(isCongressDaoID || isVotingBodyDao) &&
-                                statusName === "Approved" &&
-                                proposal?.submission_time +
-                                    daoConfig?.voting_duration +
-                                    (daoConfig?.cooldown ?? 0) < // cooldown is not available in vb
-                                    Date.now() && (
-                                    <Widget
-                                        src="nearui.near/widget/Input.Button"
-                                        props={{
-                                            variant: "primary icon",
-                                            children: (
-                                                <i class="bi bi-caret-right-fill" />
-                                            ),
-                                            onClick: () =>
-                                                execProposal({ daoId, id })
-                                        }}
-                                    />
-                                )}
-                            {isVotingBodyDao && statusName === "Spam" && (
+                            )}
+                        {isVotingBodyDao && statusName === "Spam" && (
+                            <Widget
+                                src="nearui.near/widget/Input.Button"
+                                props={{
+                                    variant: "danger",
+                                    children: "Slash",
+                                    onClick: () => execProposal({ daoId, id })
+                                }}
+                            />
+                        )}
+                        {isVotingBodyDao &&
+                            statusName === "PreVote" &&
+                            proposal?.submission_time +
+                                daoConfig?.pre_vote_duration <
+                                Date.now() && (
                                 <Widget
                                     src="nearui.near/widget/Input.Button"
                                     props={{
                                         variant: "danger",
                                         children: "Slash",
                                         onClick: () =>
-                                            execProposal({ daoId, id })
+                                            slashPreVoteProposal({
+                                                id
+                                            })
                                     }}
                                 />
                             )}
-                            {isVotingBodyDao &&
-                                statusName === "PreVote" &&
-                                proposal?.submission_time +
-                                    daoConfig?.pre_vote_duration <
-                                    Date.now() && (
-                                    <Widget
-                                        src="nearui.near/widget/Input.Button"
-                                        props={{
-                                            variant: "danger",
-                                            children: "Slash",
-                                            onClick: () =>
-                                                slashPreVoteProposal({
-                                                    id
-                                                })
-                                        }}
-                                    />
-                                )}
-                        </h4>
                     </div>
                 </div>
                 <div className="d-flex gap-2 flex-wrap align-items-center">
+                    <Widget
+                        src="/*__@replace:nui__*//widget/Element.Badge"
+                        props={{
+                            children: `Proposal ID #${id}`,
+                            variant: `outline info round`,
+                            size: "lg"
+                        }}
+                    />
                     <Widget
                         src="/*__@replace:nui__*//widget/Element.Badge"
                         props={{
@@ -310,10 +304,10 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                     <i
                                         className={statusicon}
                                         style={{
-                                            fontSize: "18px",
+                                            fontSize: "16px",
                                             marginRight: "5px",
                                             borderWidth: "2px",
-                                            animationDuration: "8s"
+                                            animationDuration: "3s"
                                         }}
                                     ></i>
                                     {statustext}
@@ -390,15 +384,15 @@ function renderData({
     totalVotesNeeded
 }) {
     return (
-        <div className="d-flex gap-3 flex-column">
-            <div className="d-flex gap-3">
+        <div className="d-flex gap-2 flex-column">
+            <div className="d-flex gap-2">
                 <div className="w-50">
                     <div className="mb-2">
                         <b>Proposer</b>
                     </div>
                     <Widget
-                        src="/*__@replace:nui__*//widget/Element.User"
-                        props={{ accountId: proposer }}
+                        src="mob.near/widget/Profile.ShortInlineBlock"
+                        props={{ accountId: proposer, tooltip: true }}
                     />
                 </div>
                 {category && (
@@ -415,25 +409,22 @@ function renderData({
                     </div>
                 )}
             </div>
-            <div className="mt-4 word-wrap">
+            <div className="mt-3 word-wrap">
                 <b>Description</b>
                 <Markdown text={description} />
             </div>
-            <div>
-                <Widget
-                    src="/*__@appAccount__*//widget/Common.Modals.ProposalArguments"
-                    props={{
-                        daoId,
-                        proposal
-                    }}
-                />
-            </div>
-            <div className="d-flex gap-5 flex-wrap">
+
+            <Widget
+                src="/*__@appAccount__*//widget/Common.Modals.ProposalArguments"
+                props={{ daoId, proposal }}
+            />
+
+            <div className="d-flex flex-wrap">
                 {submission_time && (
-                    <div>
-                        <b>Submission date</b>
-                        <p>
-                            <small>
+                    <div className="info_section">
+                        <b>Submitted at</b>
+                        <div>
+                            <small className="text-muted">
                                 {isCongressDaoID || isVotingBodyDao
                                     ? new Date(submission_time).toLocaleString()
                                     : new Date(
@@ -442,27 +433,29 @@ function renderData({
                                           )
                                       ).toLocaleString()}
                             </small>
-                        </p>
+                        </div>
                     </div>
                 )}
                 {(isCongressDaoID || isVotingBodyDao) && (
-                    <div>
-                        <b>Expiration date</b>
-                        <p>
-                            <small>
+                    <div className="info_section">
+                        <b>Expired at</b>
+                        <div>
+                            <small className="text-muted">
                                 {new Date(
                                     submission_time + daoConfig?.voting_duration
                                 ).toLocaleString()}
                             </small>
-                        </p>
+                        </div>
                     </div>
                 )}
                 {totalVotesNeeded && (
-                    <div>
-                        <b>Total Votes Required</b>
-                        <p>
-                            <small>{totalVotesNeeded}</small>
-                        </p>
+                    <div className="info_section no-border">
+                        <b>Required Votes</b>
+                        <div>
+                            <small className="text-muted">
+                                {totalVotesNeeded}
+                            </small>
+                        </div>
                     </div>
                 )}
             </div>

@@ -138,7 +138,7 @@ const Wrapper = styled.div`
 
     table {
         overflow-x: auto;
-        font-size: 13px;
+        font-size: 14px;
         width: 100%;
         box-sizing: border-box;
     }
@@ -379,14 +379,10 @@ const Table = ({ title, tableData, showExpand }) => {
                                 <tr>
                                     <td>
                                         <Widget
-                                            src="nearui.near/widget/Element.User"
+                                            src="mob.near/widget/Profile.ShortInlineBlock"
                                             props={{
                                                 accountId: item.account,
-                                                options: {
-                                                    showHumanBadge: true,
-                                                    showImage: true,
-                                                    showSocialName: true
-                                                }
+                                                tooltip: true
                                             }}
                                         />
                                     </td>
@@ -406,8 +402,7 @@ const Table = ({ title, tableData, showExpand }) => {
                                         {item.acceptedProposals} /{" "}
                                         {item.totalProposals}
                                     </td>
-                                    <td className="d-flex gap-2 align-items-center">
-                                        <FollowBtn itemDetails={item} />
+                                    <td className="align-items-center">
                                         <Widget
                                             src="nearui.near/widget/Input.Button"
                                             props={{
@@ -972,15 +967,11 @@ return (
                                                 <div className="ndc-card p-4 d-flex flex-column gap-2">
                                                     <div className="d-flex justify-content-between align-items-center">
                                                         <Widget
-                                                            src="nearui.near/widget/Element.User"
+                                                            src="mob.near/widget/Profile.ShortInlineBlock"
                                                             props={{
                                                                 accountId:
-                                                                    item.account,
-                                                                options: {
-                                                                    showHumanBadge: true,
-                                                                    showImage: true,
-                                                                    showSocialName: true
-                                                                }
+                                                                    account,
+                                                                tooltip: true
                                                             }}
                                                         />
                                                         <FollowBtn

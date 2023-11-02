@@ -54,7 +54,7 @@ const Wrapper = styled.div`
     }
 
     table {
-        font-size: 13px;
+        font-size: 14px;
         width: 100%;
         box-sizing: border-box;
     }
@@ -174,14 +174,10 @@ const Table = ({ tableData }) => {
                             <tr className="word-wrap">
                                 <td>
                                     <Widget
-                                        src="nearui.near/widget/Element.User"
+                                        src="mob.near/widget/Profile.ShortInlineBlock"
                                         props={{
                                             accountId: item.account,
-                                            options: {
-                                                showHumanBadge: true,
-                                                showImage: true,
-                                                showSocialName: true
-                                            }
+                                            tooltip: true
                                         }}
                                     />
                                 </td>
@@ -422,14 +418,10 @@ return (
                                         <div className="ndc-card p-4 d-flex flex-column gap-2">
                                             <div className="d-flex justify-content-between align-items-center word-wrap gap-2">
                                                 <Widget
-                                                    src="nearui.near/widget/Element.User"
+                                                    src="mob.near/widget/Profile.ShortInlineBlock"
                                                     props={{
                                                         accountId: item.account,
-                                                        options: {
-                                                            showHumanBadge: true,
-                                                            showImage: true,
-                                                            showSocialName: true
-                                                        }
+                                                        tooltip: true
                                                     }}
                                                 />
                                                 <FollowBtn itemDetails={item} />

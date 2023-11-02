@@ -180,10 +180,6 @@ const Root = styled.div`
         font-size: 20px;
     }
 
-    h4 {
-        font-size: 16px;
-    }
-
     h5 {
         font-size: 14px;
     }

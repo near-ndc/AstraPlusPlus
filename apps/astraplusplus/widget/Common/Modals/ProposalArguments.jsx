@@ -19,6 +19,14 @@ const Wrapper = styled.div`
         color: #555;
         margin-bottom: 0.4em;
     }
+
+    pre {
+        margin-bottom: 0;
+
+        div {
+            border-radius: 5px;
+        }
+    }
 `;
 
 const MarkdownContainer = styled.div`
@@ -81,17 +89,13 @@ const MarkdownContainer = styled.div`
     }
 `;
 
-const content = <></>;
-
-if (proposal_type === "Vote") {
-    content = "";
-}
+const content = null;
 
 if (proposal_type === "DismissAndBan") {
     content = (
         <>
             <div>
-                <h5>Member</h5>
+                <b>Member</b>
                 <Widget
                     src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
@@ -101,7 +105,7 @@ if (proposal_type === "DismissAndBan") {
                 />
             </div>
             <div>
-                <h5>House</h5>
+                <b>House</b>
                 <Widget
                     src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
@@ -118,11 +122,11 @@ if (proposal_type === "ApproveBudget" || proposal_type === "Veto") {
     content = (
         <>
             <div>
-                <h5>Proposal ID</h5>
+                <b>Proposal ID</b>
                 <p>{kind[proposal_type].prop_id}</p>
             </div>
             <div>
-                <h5>House</h5>
+                <b>House</b>
                 <Widget
                     src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
@@ -139,7 +143,7 @@ if (proposal_type === "Dismiss") {
     content = (
         <>
             <div>
-                <h5>Member</h5>
+                <b>Member</b>
                 <Widget
                     src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
@@ -149,7 +153,7 @@ if (proposal_type === "Dismiss") {
                 />
             </div>
             <div>
-                <h5>House</h5>
+                <b>House</b>
                 <Widget
                     src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
@@ -166,7 +170,7 @@ if (proposal_type === "Dissolve") {
     content = (
         <>
             <div>
-                <h5>House</h5>
+                <b>House</b>
                 <Widget
                     src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
@@ -183,17 +187,19 @@ if (proposal_type === "Transfer")
     content = (
         <>
             <div>
-                <h5>Amount</h5>
-                <Widget
-                    src="sking.near/widget/Common.TokenAmount"
-                    props={{
-                        amountWithoutDecimals: kind.Transfer.amount,
-                        address: kind.Transfer.token_id
-                    }}
-                />
+                <b>Amount</b>
+                <div>
+                    <Widget
+                        src="sking.near/widget/Common.TokenAmount"
+                        props={{
+                            amountWithoutDecimals: kind.Transfer.amount,
+                            address: kind.Transfer.token_id
+                        }}
+                    />
+                </div>
             </div>
             <div>
-                <h5>Receiver</h5>
+                <b>Receiver</b>
                 <Widget
                     src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
@@ -212,14 +218,16 @@ if (
     content = (
         <>
             <div>
-                <h5>Amount</h5>
-                <Widget
-                    src="sking.near/widget/Common.TokenAmount"
-                    props={{
-                        amountWithoutDecimals: kind[proposal_type],
-                        address: kind.Transfer.token_id
-                    }}
-                />
+                <b>Amount</b>
+                <div>
+                    <Widget
+                        src="sking.near/widget/Common.TokenAmount"
+                        props={{
+                            amountWithoutDecimals: kind[proposal_type],
+                            address: kind.Transfer.token_id
+                        }}
+                    />
+                </div>
             </div>
         </>
     );
@@ -230,33 +238,38 @@ if (proposal_type === "FunctionCall") {
             {kind.FunctionCall.actions.reduce(
                 (acc, { method_name, args, deposit }) => {
                     return acc.concat(
-                        <div
-                            className="d-flex flex-wrap align-items-start w-100"
-                            style={{
-                                columnGap: "48px",
-                                rowGap: "16px"
-                            }}
-                        >
-                            <div>
-                                <h5>Smart Contract Address</h5>
-                                <p>{kind.FunctionCall.receiver_id}</p>
+                        <div className="d-flex flex-wrap align-items-start w-100 gap-2">
+                            <div className="info_section">
+                                <b>Smart Contract Address</b>
+                                <div>
+                                    <small className="text-muted">
+                                        {kind.FunctionCall.receiver_id}
+                                    </small>
+                                </div>
                             </div>
-                            <div>
-                                <h5>Method Name</h5>
-                                <p>{method_name}</p>
+                            <div className="info_section">
+                                <b>Method Name</b>
+                                <div>
+                                    <small className="text-muted">
+                                        {method_name}
+                                    </small>
+                                </div>
                             </div>
-                            <div>
-                                <h5>Deposit</h5>
-                                <Widget
-                                    src="sking.near/widget/Common.TokenAmount"
-                                    props={{
-                                        amountWithoutDecimals: deposit,
-                                        address: ""
-                                    }}
-                                />
+
+                            <div className="info_section no-border">
+                                <b>Deposit</b>
+                                <div style={{ zoom: 0.7 }}>
+                                    <Widget
+                                        src="sking.near/widget/Common.TokenAmount"
+                                        props={{
+                                            amountWithoutDecimals: deposit,
+                                            address: ""
+                                        }}
+                                    />
+                                </div>
                             </div>
                             <div className="w-100">
-                                <h5>Arguments</h5>
+                                <b>Arguments</b>
                                 <Markdown
                                     // Decode the args (Base64) to String then Parse the Json then format it and display it as markdown code
                                     text={
@@ -291,7 +304,7 @@ if (
     content = (
         <>
             <div>
-                <h5>Member</h5>
+                <b>Member</b>
                 <Widget
                     src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
@@ -301,7 +314,7 @@ if (
                 />
             </div>
             <div>
-                <h5>Role</h5>
+                <b>Role</b>
                 <p>{kind[proposal_type].role}</p>
             </div>
         </>
@@ -311,21 +324,23 @@ if (proposal_type === "AddBounty")
     content = (
         <>
             <div>
-                <h5>Amount</h5>
-                <Widget
-                    src="sking.near/widget/Common.TokenAmount"
-                    props={{
-                        amountWithoutDecimals: kind.AddBounty.bounty.amount,
-                        address: kind.AddBounty.bounty.token
-                    }}
-                />
+                <b>Amount</b>
+                <div>
+                    <Widget
+                        src="sking.near/widget/Common.TokenAmount"
+                        props={{
+                            amountWithoutDecimals: kind.AddBounty.bounty.amount,
+                            address: kind.AddBounty.bounty.token
+                        }}
+                    />
+                </div>
             </div>
             <div>
-                <h5>Times</h5>
+                <b>Times</b>
                 <p>{kind.AddBounty.bounty.times}</p>
             </div>
             <div>
-                <h5>Deadline</h5>
+                <b>Deadline</b>
                 <p>
                     {new Date(
                         kind.AddBounty.bounty.max_deadline
@@ -333,7 +348,7 @@ if (proposal_type === "AddBounty")
                 </p>
             </div>
             <div className="w-100">
-                <h5>Bounty Description</h5>
+                <b>Bounty Description</b>
                 <MarkdownContainer>
                     <Markdown text={kind.AddBounty.bounty.description} />
                 </MarkdownContainer>
@@ -345,7 +360,7 @@ if (proposal_type === "BountyDone")
     content = (
         <>
             <div>
-                <h5>Receiver</h5>
+                <b>Receiver</b>
                 <Widget
                     src="mob.near/widget/Profile.ShortInlineBlock"
                     props={{
@@ -355,7 +370,7 @@ if (proposal_type === "BountyDone")
                 />
             </div>
             <div>
-                <h5>Bounty ID</h5>
+                <b>Bounty ID</b>
                 <p>{kind.BountyDone.bounty_id}</p>
             </div>
         </>
@@ -392,7 +407,7 @@ if (proposal_type === "ChangePolicy") {
     content = (
         <>
             <div className="w-100">
-                <h5>Policy Changes</h5>
+                <b>Policy Changes</b>
                 <div
                     className="w-100"
                     style={{
@@ -422,22 +437,26 @@ if (proposal_type === "ChangePolicy") {
 }
 
 return (
-    <Wrapper className={showCard && "ndc-card p-4"}>
-        <div
-            className={
-                "d-flex flex-wrap " +
-                (showCard ? " align-items-start " : "gap-5")
-            }
-            style={
-                showCard
-                    ? {
-                          rowGap: "16px",
-                          columnGap: "48px"
-                      }
-                    : {}
-            }
-        >
-            {content}
-        </div>
-    </Wrapper>
+    <>
+        {content && (
+            <Wrapper className={showCard && "ndc-card p-4"}>
+                <div
+                    className={
+                        "d-flex flex-wrap " +
+                        (showCard ? " align-items-start " : "gap-5")
+                    }
+                    style={
+                        showCard
+                            ? {
+                                  rowGap: "16px",
+                                  columnGap: "48px"
+                              }
+                            : {}
+                    }
+                >
+                    {content}
+                </div>
+            </Wrapper>
+        )}
+    </>
 );
