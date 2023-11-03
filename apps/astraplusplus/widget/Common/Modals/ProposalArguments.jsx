@@ -200,13 +200,15 @@ if (proposal_type === "Transfer")
             </div>
             <div>
                 <b>Receiver</b>
-                <Widget
-                    src="mob.near/widget/Profile.ShortInlineBlock"
-                    props={{
-                        accountId: kind.Transfer.receiver_id,
-                        tooltip: true
-                    }}
-                />
+                <div>
+                    <Widget
+                        src="mob.near/widget/Profile.ShortInlineBlock"
+                        props={{
+                            accountId: kind.Transfer.receiver_id,
+                            tooltip: true
+                        }}
+                    />
+                </div>
             </div>
         </>
     );
