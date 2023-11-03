@@ -16,7 +16,7 @@ const HoMDaoId = props.dev
     : "/*__@replace:HoMDaoId__*/";
 
 const registry = props.dev
-    ? "registry-v1.gwg-testing.near"
+    ? "registry-unstable-v2.i-am-human.testnet"
     : "registry.i-am-human.near";
 const isCongressDaoID =
     daoId === HoMDaoId || daoId === CoADaoId || daoId === TCDaoId;
@@ -506,10 +506,7 @@ const handlePreVoteAction = ({ action, proposalId }) => {
                     args: {
                         ctr: daoId,
                         function: "support_proposal",
-                        payload: JSON.stringify({
-                            caller: accountId,
-                            prop_id: parseInt(proposalId)
-                        })
+                        payload: JSON.stringify(parseInt(proposalId))
                     },
                     gas: 200000000000000
                 }

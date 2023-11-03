@@ -2,7 +2,7 @@ const view = props.view ?? "multiVote";
 const isCongressDaoID = props.isCongressDaoID;
 const isVotingBodyDao = props.isVotingBodyDao;
 const registry = props.dev
-    ? "registry-v1.gwg-testing.near"
+    ? "registry-unstable-v2.i-am-human.testnet"
     : "registry.i-am-human.near";
 const daoId = props.daoId;
 

@@ -343,6 +343,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                             />
                         )}
                     {isCongressDaoID &&
+                        daoConfig?.cooldown !== 0 &&
                         statusName !== "In Progress" &&
                         proposal?.submission_time +
                             daoConfig?.voting_duration +

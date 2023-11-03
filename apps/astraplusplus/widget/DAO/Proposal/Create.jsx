@@ -15,7 +15,7 @@ const HoMDaoId = props.dev
     ? "/*__@replace:HoMDaoIdTesting__*/"
     : "/*__@replace:HoMDaoId__*/";
 const registry = props.dev
-    ? "registry-v1.gwg-testing.near"
+    ? "registry-unstable-v2.i-am-human.testnet"
     : "registry.i-am-human.near";
 
 const isCongressDaoID =
