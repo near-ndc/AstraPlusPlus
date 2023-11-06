@@ -451,6 +451,7 @@ const handleVote = ({ action, proposalId, daoId }) => {
         args["prop_id"] = parseInt(proposalId);
         args["caller"] = accountId;
         args["vote"] = action.replace("Vote", "");
+
         Near.call([
             {
                 contractName: registry,
@@ -458,7 +459,12 @@ const handleVote = ({ action, proposalId, daoId }) => {
                 args: {
                     ctr: daoId,
                     function: "vote",
-                    payload: JSON.stringify(args)
+                    payload: JSON.stringify(args),
+                    lock_duration:
+                        proposal?.submission_time +
+                        daoConfig?.voting_duration +
+                        1,
+                    with_proof: false
                 },
                 gas: 200000000000000,
                 deposit: 170000000000000000000
@@ -506,7 +512,12 @@ const handlePreVoteAction = ({ action, proposalId }) => {
                     args: {
                         ctr: daoId,
                         function: "support_proposal",
-                        payload: JSON.stringify(parseInt(proposalId))
+                        payload: JSON.stringify(parseInt(proposalId)),
+                        lock_duration:
+                            proposal?.submission_time +
+                            daoConfig?.pre_vote_duration +
+                            1,
+                        with_proof: false
                     },
                     gas: 200000000000000
                 }
