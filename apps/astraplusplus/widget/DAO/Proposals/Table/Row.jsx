@@ -215,7 +215,9 @@ return (
             />
         </td>
         <td className="text-center">{kindName}</td>
-        <td className="text-center">{Object.keys(proposal.votes).length}</td>
+        <td className="text-center">
+            {Object.keys(proposal.votes ?? {}).length}
+        </td>
         <td className="text-center">{renderStatus(proposal.status)}</td>
 
         {multiSelectMode && (

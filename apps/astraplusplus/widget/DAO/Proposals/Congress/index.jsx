@@ -215,8 +215,9 @@ return (
                                 </div>
                                 <div>|</div>
                                 <div>
-                                    {Object.keys(proposal.votes).length}{" "}
-                                    {Object.keys(proposal.votes).length === 1
+                                    {Object.keys(proposal.votes ?? {}).length}{" "}
+                                    {Object.keys(proposal.votes ?? {})
+                                        .length === 1
                                         ? "vote"
                                         : "votes"}
                                 </div>
@@ -268,6 +269,9 @@ return (
                                                     proposalString:
                                                         JSON.stringify({
                                                             ...proposal,
+                                                            votes:
+                                                                proposal.votes ??
+                                                                {},
                                                             vote_counts: {}
                                                         }),
                                                     multiSelectMode: false,
