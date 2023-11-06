@@ -125,7 +125,7 @@ if (!proposalString && proposalId && daoId) {
                 votes:
                     resp.status === "PreVote"
                         ? getPreVoteVotes(resp.supported)
-                        : resp.votes,
+                        : resp.votes ?? {},
                 status: resp.status,
                 proposer: resp?.proposer,
                 description: resp.description,
@@ -454,7 +454,7 @@ const handleVote = ({ action, proposalId, daoId }) => {
         Near.call([
             {
                 contractName: registry,
-                methodName: "is_human_call",
+                methodName: "is_human_call_lock",
                 args: {
                     ctr: daoId,
                     function: "vote",
@@ -502,7 +502,7 @@ const handlePreVoteAction = ({ action, proposalId }) => {
             Near.call([
                 {
                     contractName: registry,
-                    methodName: "is_human_call",
+                    methodName: "is_human_call_lock",
                     args: {
                         ctr: daoId,
                         function: "support_proposal",

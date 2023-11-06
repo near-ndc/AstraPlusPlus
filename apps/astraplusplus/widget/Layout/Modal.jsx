@@ -5,6 +5,7 @@ const content = props.content ?? (
 );
 const open = props.open;
 const onOpenChange = props.onOpenChange;
+const modalWidth = props.modalWidth ?? "700px";
 
 const Overlay = styled.div`
     position: fixed;
@@ -24,7 +25,7 @@ const Overlay = styled.div`
 
 const Content = styled.div`
     width: 100%;
-    max-width: 700px;
+    max-width: ${modalWidth};
     max-height: 100%;
     overflow-y: auto;
     margin-top: 20px;

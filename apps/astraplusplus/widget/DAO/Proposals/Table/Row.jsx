@@ -268,10 +268,11 @@ return (
                                 }}
                             />
                         ),
+                        modalWidth: "1000px",
                         content: (
                             <div
                                 style={{
-                                    width: 700,
+                                    width: 1000,
                                     maxWidth: "100%"
                                 }}
                             >

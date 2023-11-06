@@ -71,12 +71,13 @@ function processProposals(proposals) {
                 votes:
                     item.status === "PreVote"
                         ? getPreVoteVotes(item.supported)
-                        : item.votes,
+                        : item.votes ?? {},
                 status: item.status,
                 proposer: item?.proposer,
                 description: item.description,
                 vote_counts: {},
-                submission_time: item?.submission_time ?? item?.start // for vb it's start
+                submission_time: item?.submission_time ?? item?.start, // for vb it's start
+                supported: item?.supported ?? [] // for vb
             },
             proposal_type: item?.kind,
             proposal_id: item.id,
@@ -172,7 +173,7 @@ if (isCongressDaoID || isVotingBodyDao) {
         // fetch pre vote proposals
         if (state.filters.status?.includes("PreVote") && isVotingBodyDao) {
             const data = fetchVBPreVoteProposals();
-            res.body.push(...data);
+            res.body.push(...data.body);
         }
     }
 }
