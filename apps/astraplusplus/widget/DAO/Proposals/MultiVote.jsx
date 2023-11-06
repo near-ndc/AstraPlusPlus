@@ -2,8 +2,8 @@ const view = props.view ?? "multiVote";
 const isCongressDaoID = props.isCongressDaoID;
 const isVotingBodyDao = props.isVotingBodyDao;
 const registry = props.dev
-    ? "registry-unstable-v2.i-am-human.testnet"
-    : "registry.i-am-human.near";
+    ? "/*__@replace:RegistryIdTesting__*/"
+    : "/*__@replace:RegistryId__*/";
 const daoId = props.daoId;
 
 const STORAGE_KEY = "proposalsMultiVote";

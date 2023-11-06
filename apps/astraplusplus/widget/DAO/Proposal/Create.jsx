@@ -15,8 +15,8 @@ const HoMDaoId = props.dev
     ? "/*__@replace:HoMDaoIdTesting__*/"
     : "/*__@replace:HoMDaoId__*/";
 const registry = props.dev
-    ? "registry-unstable-v2.i-am-human.testnet"
-    : "registry.i-am-human.near";
+    ? "/*__@replace:RegistryIdTesting__*/"
+    : "/*__@replace:RegistryId__*/";
 
 const isCongressDaoID =
     props.daoId === HoMDaoId ||
@@ -25,7 +25,6 @@ const isCongressDaoID =
 
 let permissions = [];
 const isVotingBodyDao = props.daoId === VotingBodyDaoId;
-
 const defaultProposalTypes = [
     {
         text: "Text",
