@@ -131,7 +131,11 @@ if (!proposalString && proposalId && daoId) {
                 description: resp.description,
                 vote_counts: {},
                 submission_time: resp?.submission_time ?? resp?.start, // for vb it's start
-                supported: resp?.supported ?? [] // for vb
+                supported: resp?.supported ?? [], // for vb
+                approve: resp?.approve ?? 0,
+                reject: resp?.reject ?? 0,
+                spam: resp?.spam ?? 0,
+                abstain: resp?.abstain ?? 0
             };
         }
     } else {
@@ -374,10 +378,10 @@ const expensiveWork = () => {
     });
 
     if (isVotingBodyDao) {
-        totalVotes.yes = my_proposal.approve;
-        totalVotes.no = my_proposal.reject;
-        totalVotes.abstain = my_proposal.abstain;
-        totalVotes.spam = my_proposal.spam;
+        totalVotes.yes = my_proposal?.approve ?? 0;
+        totalVotes.no = my_proposal?.reject ?? 0;
+        totalVotes.abstain = my_proposal?.abstain ?? 0;
+        totalVotes.spam = my_proposal?.spam ?? 0;
     }
 
     if (isCongressDaoID) {
@@ -397,7 +401,7 @@ const expensiveWork = () => {
         totalVotes.yes + totalVotes.no + totalVotes.spam + totalVotes.abstain;
 
     if (my_proposal.status === "PreVote") {
-        totalVotes.total = my_proposal?.supported?.length;
+        totalVotes.total = my_proposal?.support ?? 0;
     }
 
     my_proposal.totalVotesNeeded = totalVotesNeeded;
@@ -455,7 +459,7 @@ const handleVote = ({ action, proposalId, daoId }) => {
                     payload: JSON.stringify(args),
                     lock_duration:
                         proposal?.submission_time +
-                        daoConfig?.voting_duration +
+                        daoConfig?.vote_duration +
                         1,
                     with_proof: false
                 },
@@ -512,8 +516,7 @@ const handlePreVoteAction = ({ action, proposalId }) => {
                             1,
                         with_proof: false
                     },
-                    gas: 200000000000000,
-                    deposit: 700000000000000000000
+                    gas: 200000000000000
                 }
             ]);
             break;

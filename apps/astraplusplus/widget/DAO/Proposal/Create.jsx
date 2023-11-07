@@ -128,6 +128,10 @@ const congressProposalTypes = {
         {
             text: "Update Bonds",
             value: "UpdateBonds"
+        },
+        {
+            text: "Update Vote Duration",
+            value: "UpdateVoteDuration"
         }
     ]
 };
@@ -372,6 +376,16 @@ return (
             {state.proposalType.value === "UpdateBonds" && (
                 <Widget
                     src="/*__@appAccount__*//widget/DAO.Proposal.Create.UpdateBonds"
+                    props={{
+                        daoId,
+                        dev: props.dev,
+                        registry
+                    }}
+                />
+            )}
+            {state.proposalType.value === "UpdateVoteDuration" && (
+                <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposal.Create.UpdateVoteDuration"
                     props={{
                         daoId,
                         dev: props.dev,

@@ -11,7 +11,7 @@
         "TCDaoIdTesting": "tc.gwg-testing.near",
         "CoADaoId": "congress-coa-v1.ndc-gwg.near",
         "CoADaoIdTesting": "coa.gwg-testing.near",
-        "VotingBodyDaoId": "",
+        "VotingBodyDaoId": "voting-body-v1.ndc-gwg.near",
         "VotingBodyDaoIdTesting": "voting-body-v1.gwg-testing.near"
     }
 }

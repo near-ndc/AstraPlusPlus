@@ -243,7 +243,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                         {(isCongressDaoID || isVotingBodyDao) &&
                             statusName === "Approved" &&
                             proposal?.submission_time +
-                                daoConfig?.voting_duration +
+                                daoConfig?.vote_duration +
                                 (daoConfig?.cooldown ?? 0) < // cooldown is not available in vb
                                 Date.now() && (
                                 <Widget
@@ -269,7 +269,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                             />
                         )}
                         {isVotingBodyDao &&
-                            statusName === "PreVote" &&
+                            statusName === "Pre Vote" &&
                             proposal?.submission_time +
                                 daoConfig?.pre_vote_duration <
                                 Date.now() && (
@@ -320,7 +320,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
 
                     {(isCongressDaoID || isVotingBodyDao) &&
                         statusName === "In Progress" &&
-                        proposal?.submission_time + daoConfig?.voting_duration >
+                        proposal?.submission_time + daoConfig?.vote_duration >
                             Date.now() && (
                             <Widget
                                 src="/*__@replace:nui__*//widget/Element.Badge"
@@ -332,7 +332,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                                 props={{
                                                     timeToCheck:
                                                         proposal?.submission_time +
-                                                        daoConfig?.voting_duration
+                                                        daoConfig?.vote_duration
                                                 }}
                                             />
                                         </div>
@@ -346,7 +346,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                         daoConfig?.cooldown !== 0 &&
                         statusName !== "In Progress" &&
                         proposal?.submission_time +
-                            daoConfig?.voting_duration +
+                            daoConfig?.vote_duration +
                             daoConfig?.cooldown >
                             Date.now() && (
                             <Widget
@@ -360,7 +360,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                                                 props={{
                                                     timeToCheck:
                                                         proposal?.submission_time +
-                                                        daoConfig?.voting_duration +
+                                                        daoConfig?.vote_duration +
                                                         daoConfig?.cooldown
                                                 }}
                                             />
@@ -443,7 +443,7 @@ function renderData({
                         <div>
                             <small className="text-muted">
                                 {new Date(
-                                    submission_time + daoConfig?.voting_duration
+                                    submission_time + daoConfig?.vote_duration
                                 ).toLocaleString()}
                             </small>
                         </div>

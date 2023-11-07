@@ -5,6 +5,10 @@ const showCard = props.showCard ?? false;
 
 if (!kind) return "";
 
+function convertMillisecondsToHours(milliseconds) {
+    return milliseconds / (60 * 60 * 1000);
+}
+
 const proposal_type = typeof kind === "string" ? kind : Object.keys(kind)?.[0];
 
 const Wrapper = styled.div`
@@ -231,6 +235,60 @@ if (
                             address: kind.Transfer.token_id
                         }}
                     />
+                </div>
+            </div>
+        </>
+    );
+
+if (proposal_type === "UpdateBonds")
+    content = (
+        <>
+            <div>
+                <b>Pre Vote Bond Amount</b>
+                <div>
+                    <Widget
+                        src="sking.near/widget/Common.TokenAmount"
+                        props={{
+                            amountWithoutDecimals:
+                                kind[proposal_type].pre_vote_bond,
+                            address: ""
+                        }}
+                    />
+                </div>
+            </div>
+            <div>
+                <b>Active Queue Bond Amount</b>
+                <div>
+                    <Widget
+                        src="sking.near/widget/Common.TokenAmount"
+                        props={{
+                            amountWithoutDecimals:
+                                kind[proposal_type].active_queue_bond,
+                            address: ""
+                        }}
+                    />
+                </div>
+            </div>
+        </>
+    );
+
+if (proposal_type === "UpdateVoteDuration")
+    content = (
+        <>
+            <div>
+                <b>Pre Vote Duration (in hours)</b>
+                <div>
+                    {convertMillisecondsToHours(
+                        kind[proposal_type].pre_vote_duration
+                    ) ?? 0}
+                </div>
+            </div>
+            <div>
+                <b>Vote Duration (in hours)</b>
+                <div>
+                    {convertMillisecondsToHours(
+                        kind[proposal_type].vote_duration ?? 0
+                    )}
                 </div>
             </div>
         </>

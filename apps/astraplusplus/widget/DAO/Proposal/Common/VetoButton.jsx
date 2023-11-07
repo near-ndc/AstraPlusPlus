@@ -18,7 +18,7 @@ State.init({
 
 const proposalPastCooldown =
     proposal?.submission_time +
-        daoConfig?.voting_duration +
+        daoConfig?.vote_duration +
         (daoConfig?.cooldown ?? 0) <
     Date().now;
 

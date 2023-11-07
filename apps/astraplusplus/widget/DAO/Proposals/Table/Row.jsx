@@ -216,7 +216,14 @@ return (
         </td>
         <td className="text-center">{kindName}</td>
         <td className="text-center">
-            {Object.keys(proposal.votes ?? {}).length}
+            {isVotingBodyDao
+                ? proposal.status === "PreVote"
+                    ? proposal?.support ?? 0
+                    : (proposal?.approve ?? 0) +
+                      (proposal?.reject ?? 0) +
+                      (proposal?.spam ?? 0) +
+                      (proposal?.abstain ?? 0)
+                : Object.keys(proposal.votes ?? {}).length}
         </td>
         <td className="text-center">{renderStatus(proposal.status)}</td>
 
@@ -241,7 +248,7 @@ return (
                 {(isCongressDaoID || isVotingBodyDao) &&
                     proposal.status === "Approved" &&
                     proposal?.submission_time +
-                        daoConfig?.voting_duration +
+                        daoConfig?.vote_duration +
                         (daoConfig?.cooldown ?? 0) < // cooldown is not available in vb
                         Date.now() && (
                         <Widget

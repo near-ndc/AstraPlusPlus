@@ -77,7 +77,12 @@ function processProposals(proposals) {
                 description: item.description,
                 vote_counts: {},
                 submission_time: item?.submission_time ?? item?.start, // for vb it's start
-                supported: item?.supported ?? [] // for vb
+                supported: item?.supported ?? [], // for vb
+                approve: item?.approve ?? 0,
+                reject: item?.reject ?? 0,
+                spam: item?.spam ?? 0,
+                abstain: item?.abstain ?? 0,
+                support: item?.support ?? 0
             },
             proposal_type: item?.kind,
             proposal_id: item.id,
