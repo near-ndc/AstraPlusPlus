@@ -127,13 +127,15 @@ if (proposal_type === "ApproveBudget" || proposal_type === "Veto") {
             </div>
             <div>
                 <b>House</b>
-                <Widget
-                    src="mob.near/widget/Profile.ShortInlineBlock"
-                    props={{
-                        accountId: kind[proposal_type].dao,
-                        tooltip: true
-                    }}
-                />
+                <p>
+                    <Widget
+                        src="mob.near/widget/Profile.ShortInlineBlock"
+                        props={{
+                            accountId: kind[proposal_type].dao,
+                            tooltip: true
+                        }}
+                    />
+                </p>
             </div>
         </>
     );

@@ -374,17 +374,10 @@ const expensiveWork = () => {
     });
 
     if (isVotingBodyDao) {
-        for (const value of Object.values(my_proposal.votes)) {
-            if (value === "Approve") {
-                totalVotes.yes++;
-            } else if (value === "Reject") {
-                totalVotes.no++;
-            } else if (value === "Abstain") {
-                totalVotes.abstain++;
-            } else if (value === "Spam") {
-                totalVotes.spam++;
-            }
-        }
+        totalVotes.yes = my_proposal.approve;
+        totalVotes.no = my_proposal.reject;
+        totalVotes.abstain = my_proposal.abstain;
+        totalVotes.spam = my_proposal.spam;
     }
 
     if (isCongressDaoID) {

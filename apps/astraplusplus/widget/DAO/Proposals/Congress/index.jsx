@@ -214,13 +214,26 @@ return (
                                     </span>
                                 </div>
                                 <div>|</div>
-                                <div>
-                                    {Object.keys(proposal.votes ?? {}).length}{" "}
-                                    {Object.keys(proposal.votes ?? {})
-                                        .length === 1
-                                        ? "vote"
-                                        : "votes"}
-                                </div>
+                                {isVotingBodyDao ? (
+                                    <div>
+                                        {proposal.approve +
+                                            proposal.reject +
+                                            proposal.abstain +
+                                            proposal.spam}{" "}
+                                        votes
+                                    </div>
+                                ) : (
+                                    <div>
+                                        {
+                                            Object.keys(proposal.votes ?? {})
+                                                .length
+                                        }{" "}
+                                        {Object.keys(proposal.votes ?? {})
+                                            .length === 1
+                                            ? "vote"
+                                            : "votes"}
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="d-flex gap-2">
