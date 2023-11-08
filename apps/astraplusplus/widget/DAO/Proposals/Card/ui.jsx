@@ -465,7 +465,8 @@ function renderData({
                         <div>
                             <small className="text-muted">
                                 {new Date(
-                                    submission_time + daoConfig?.vote_duration
+                                    submission_time +
+                                        (daoConfig?.vote_duration ?? 0)
                                 ).toLocaleString()}
                             </small>
                         </div>

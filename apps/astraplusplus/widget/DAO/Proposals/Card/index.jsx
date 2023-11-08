@@ -345,18 +345,18 @@ const expensiveWork = () => {
             }
         });
     }
-
+    my_proposal.typeName = kindName.replace(/([A-Z])/g, " $1").trim(); // Add spaces between camelCase
     if (isCongressDaoID) {
         totalVotesNeeded = daoConfig?.threshold;
     }
 
     if (isVotingBodyDao) {
         if (
-            my_proposal.status === "ApproveBudget" ||
-            my_proposal.status === "Dissolve"
+            my_proposal.typeName === "Approve Budget" ||
+            my_proposal.typeName === "Dissolve"
         ) {
             totalVotesNeeded = daoConfig?.super_consent?.threshold;
-        } else if (my_proposal.status === "PreVote") {
+        } else if (my_proposal.typeName === "Pre Vote") {
             totalVotesNeeded = daoConfig?.pre_vote_support;
         } else {
             totalVotesNeeded = daoConfig?.simple_consent?.threshold;
@@ -408,7 +408,6 @@ const expensiveWork = () => {
     my_proposal.totalVotes = totalVotes;
     // --- end Votes required
 
-    my_proposal.typeName = kindName.replace(/([A-Z])/g, " $1").trim(); // Add spaces between camelCase
     my_proposal.statusName = my_proposal.status
         .replace(/([A-Z])/g, " $1")
         .trim();
