@@ -294,6 +294,7 @@ return (
                             filtersOpen: open
                         });
                     },
+                    modalWidth: "1000px",
                     toggle: (
                         <Widget
                             src="nearui.near/widget/Input.Button"
