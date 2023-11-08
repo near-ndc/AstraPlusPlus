@@ -33,9 +33,18 @@ const accountId = context.accountId;
 function checkVotesForCongressDao(value) {
     if (isCongressDaoID) {
         return votes[accountId]?.vote === value;
-    } else {
-        return votes[accountId || ";;;"] === value;
-    }
+    } else if (isVotingBodyDao) {
+        const userVote = useCache(
+            () =>
+                Near.asyncView(daoId, "get_vote", {
+                    id: proposal.id,
+                    voter: accountId
+                }).then((vote) => vote),
+            proposal.id + "vote",
+            { subscribe: false }
+        );
+        return userVote.vote === value;
+    } else return votes[accountId || ";;;"] === value;
 }
 
 // TODO: implement category
@@ -161,6 +170,19 @@ const Wrapper = styled.div`
 `;
 
 const cls = (c) => c.join(" ");
+
+const YouVotedBadge = () => {
+    return (
+        <Widget
+            src="/*__@replace:nui__*//widget/Element.Badge"
+            props={{
+                size: "sm",
+                variant: "info outline mb-1",
+                children: "You voted"
+            }}
+        />
+    );
+};
 
 function renderPermission({ isAllowedToVote }) {
     return (
@@ -632,16 +654,7 @@ function renderVoteButtons({
             }}
         >
             <div className="w-100">
-                {voted.yes && (
-                    <Widget
-                        src="/*__@replace:nui__*//widget/Element.Badge"
-                        props={{
-                            size: "sm",
-                            variant: "info outline mb-1",
-                            children: "You voted"
-                        }}
-                    />
-                )}
+                {voted.yes && <YouVotedBadge />}
                 <VoteButton
                     className="yes"
                     percentage={percentages.yes}
@@ -671,16 +684,7 @@ function renderVoteButtons({
                 </VoteButton>
             </div>
             <div className="w-100">
-                {voted.no && (
-                    <Widget
-                        src="/*__@replace:nui__*//widget/Element.Badge"
-                        props={{
-                            size: "sm",
-                            variant: "info outline mb-1",
-                            children: "You voted"
-                        }}
-                    />
-                )}
+                {voted.no && <YouVotedBadge />}
                 <VoteButton
                     className="no"
                     percentage={percentages.no}
@@ -711,16 +715,7 @@ function renderVoteButtons({
             </div>
             {(isVotingBodyDao || isCongressDaoID) && (
                 <div className="w-100">
-                    {voted.abstain && (
-                        <Widget
-                            src="/*__@replace:nui__*//widget/Element.Badge"
-                            props={{
-                                size: "sm",
-                                variant: "info outline mb-1",
-                                children: "You voted"
-                            }}
-                        />
-                    )}
+                    {voted.abstain && <YouVotedBadge />}
 
                     <VoteButton
                         className="abstain"
@@ -748,16 +743,7 @@ function renderVoteButtons({
             )}
             {!isCongressDaoID && (
                 <div className="w-100">
-                    {voted.spam && (
-                        <Widget
-                            src="/*__@replace:nui__*//widget/Element.Badge"
-                            props={{
-                                size: "sm",
-                                variant: "info outline mb-1",
-                                children: "You voted"
-                            }}
-                        />
-                    )}
+                    {voted.spam && <YouVotedBadge />}
 
                     <VoteButton
                         className="spam"
@@ -854,16 +840,7 @@ function renderPreVoteButtons({ proposal }) {
             </button>
             <div className="d-flex flex-column gap-1">
                 <div style={{ width: "fit-content" }}>
-                    {voted && (
-                        <Widget
-                            src="/*__@replace:nui__*//widget/Element.Badge"
-                            props={{
-                                size: "sm",
-                                variant: "info outline mb-1",
-                                children: "You voted"
-                            }}
-                        />
-                    )}
+                    {voted && <YouVotedBadge />}
                 </div>
                 <button
                     class="custom-tooltip btn btn-primary"
@@ -919,19 +896,7 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
                 }
             }
         },
-        {
-            title: "Voters",
-            icon: "bi bi-people",
-            count: totalVotes.total,
-            widget: "Common.Modals.Voters",
-            props: {
-                daoId,
-                votes,
-                totalVotes,
-                isCongressDaoID,
-                dev: props.dev
-            }
-        },
+
         {
             title: "Share",
             icon: "bi bi-share",
@@ -944,6 +909,22 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
             }
         }
     ];
+
+    if (!isVotingBodyDao) {
+        items.push({
+            title: "Voters",
+            icon: "bi bi-people",
+            count: totalVotes.total,
+            widget: "Common.Modals.Voters",
+            props: {
+                daoId,
+                votes,
+                totalVotes,
+                isCongressDaoID,
+                dev: props.dev
+            }
+        });
+    }
 
     if (proposal.typeName !== "Text") {
         items.push({

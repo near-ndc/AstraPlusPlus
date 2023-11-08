@@ -458,8 +458,8 @@ const handleVote = ({ action, proposalId, daoId }) => {
                     function: "vote",
                     payload: JSON.stringify(args),
                     lock_duration:
-                        proposal?.submission_time +
-                        daoConfig?.vote_duration +
+                        Date.now() -
+                        (proposal?.submission_time + daoConfig?.vote_duration) +
                         1,
                     with_proof: false
                 },
@@ -511,8 +511,9 @@ const handlePreVoteAction = ({ action, proposalId }) => {
                         function: "support_proposal",
                         payload: JSON.stringify(parseInt(proposalId)),
                         lock_duration:
-                            proposal?.submission_time +
-                            daoConfig?.pre_vote_duration +
+                            Date.now() -
+                            (proposal?.submission_time +
+                                daoConfig?.pre_vote_duration) +
                             1,
                         with_proof: false
                     },
