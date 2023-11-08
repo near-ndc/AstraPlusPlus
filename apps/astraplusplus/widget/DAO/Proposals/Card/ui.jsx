@@ -636,7 +636,9 @@ function renderVoteButtons({
         abstain: checkVotesForCongressDao("Abstain")
     };
 
-    const alreadyVoted = voted.yes || voted.no || voted.spam || voted.abstain;
+    const alreadyVoted = isVotingBodyDao
+        ? false // allow revote
+        : voted.yes || voted.no || voted.spam || voted.abstain;
     const showVeto =
         daoId === HoMDaoId && currentuserCongressHouse === CoADaoId
             ? // (isHuman && proposal.typeName === "Recurrent Funding Request")) // add after voting body contract is ready

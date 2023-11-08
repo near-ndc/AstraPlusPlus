@@ -11,15 +11,15 @@ function convertHoursToMilliseconds(hours) {
     return hours * 60 * 60 * 1000;
 }
 
-function convertMinutesToMilliseconds(minutes) {
-    return minutes * 60 * 1000;
+function convertDaysToMilliseconds(days) {
+    return days * 24 * 60 * 60 * 1000;
 }
 
 State.init({
     pre_vote_hours: 0,
-    pre_vote_minutes: 0,
+    pre_vote_days: 0,
     vote_hours: 0,
-    vote_minutes: 0,
+    vote_days: 0,
     error: null,
     attachDeposit: 0,
     proposalQueue: null,
@@ -31,13 +31,13 @@ function isEmpty(value) {
 }
 
 const handleProposal = () => {
-    if (isEmpty(state.pre_vote_hours) && isEmpty(state.pre_vote_minutes)) {
+    if (isEmpty(state.pre_vote_hours) && isEmpty(state.pre_vote_days)) {
         State.update({
             error: "Please specify pre vote duration"
         });
         return;
     }
-    if (isEmpty(state.vote_hours) && isEmpty(state.vote_minutes)) {
+    if (isEmpty(state.vote_hours) && isEmpty(state.vote_days)) {
         State.update({
             error: "Please specify vote duration"
         });
@@ -62,10 +62,10 @@ const handleProposal = () => {
             UpdateVoteDuration: {
                 vote_duration:
                     convertHoursToMilliseconds(state.vote_hours) +
-                    convertMinutesToMilliseconds(state.vote_minutes),
+                    convertDaysToMilliseconds(state.vote_days),
                 pre_vote_duration:
                     convertHoursToMilliseconds(state.pre_vote_hours) +
-                    convertMinutesToMilliseconds(state.pre_vote_minutes)
+                    convertDaysToMilliseconds(state.pre_vote_days)
             }
         },
         caller: accountId
@@ -93,9 +93,9 @@ const onChangePreVoteHours = (pre_vote_hours) => {
     });
 };
 
-const onChangePreVoteMinutes = (pre_vote_minutes) => {
+const onChangePreVoteDays = (pre_vote_days) => {
     State.update({
-        pre_vote_minutes,
+        pre_vote_days,
         error: undefined
     });
 };
@@ -107,9 +107,9 @@ const onChangeVoteHours = (vote_hours) => {
     });
 };
 
-const onChangeVoteMinutes = (vote_minutes) => {
+const onChangeVoteDays = (vote_days) => {
     State.update({
-        vote_minutes,
+        vote_days,
         error: undefined
     });
 };
@@ -147,13 +147,13 @@ return (
             <div className="d-flex gap-2">
                 <input
                     type="number"
-                    placeholder="Hours"
-                    onChange={(e) => onChangePreVoteHours(e.target.value)}
+                    placeholder="Days"
+                    onChange={(e) => onChangePreVoteDays(e.target.value)}
                 />
                 <input
                     type="number"
-                    placeholder="Minutes"
-                    onChange={(e) => onChangePreVoteMinutes(e.target.value)}
+                    placeholder="Hours"
+                    onChange={(e) => onChangePreVoteHours(e.target.value)}
                 />
             </div>
         </div>
@@ -162,13 +162,13 @@ return (
             <div className="d-flex gap-2">
                 <input
                     type="number"
-                    placeholder="Hours"
-                    onChange={(e) => onChangeVoteHours(e.target.value)}
+                    placeholder="Days"
+                    onChange={(e) => onChangeVoteDays(e.target.value)}
                 />
                 <input
                     type="number"
-                    placeholder="Minutes"
-                    onChange={(e) => onChangeVoteMinutes(e.target.value)}
+                    placeholder="Hours"
+                    onChange={(e) => onChangeVoteHours(e.target.value)}
                 />
             </div>
         </div>
