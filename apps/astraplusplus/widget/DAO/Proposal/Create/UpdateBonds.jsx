@@ -41,13 +41,6 @@ const handleProposal = () => {
         return;
     }
 
-    if (isEmpty(state.proposalQueue)) {
-        State.update({
-            error: "Please select proposal queue"
-        });
-        return;
-    }
-
     const gas = 20000000000000;
     const deposit = state.attachDeposit
         ? Big(state.attachDeposit)
@@ -108,8 +101,7 @@ const onChangeDescription = (description) => {
 const onChangeQueue = ({ amount, queue }) => {
     State.update({
         attachDeposit: amount,
-        proposalQueue: queue,
-        error: undefined
+        proposalQueue: queue
     });
 };
 

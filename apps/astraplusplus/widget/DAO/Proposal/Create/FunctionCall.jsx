@@ -354,8 +354,7 @@ const onChangeMemo = (memo) => {
 const onChangeQueue = ({ amount, queue }) => {
     State.update({
         attachDeposit: amount,
-        proposalQueue: queue,
-        error: undefined
+        proposalQueue: queue
     });
 };
 

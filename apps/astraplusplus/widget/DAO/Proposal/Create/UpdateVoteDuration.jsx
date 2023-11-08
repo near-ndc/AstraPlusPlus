@@ -11,9 +11,15 @@ function convertHoursToMilliseconds(hours) {
     return hours * 60 * 60 * 1000;
 }
 
+function convertMinutesToMilliseconds(minutes) {
+    return minutes * 60 * 1000;
+}
+
 State.init({
-    pre_vote_duration: 0,
-    vote_duration: 0,
+    pre_vote_hours: 0,
+    pre_vote_minutes: 0,
+    vote_hours: 0,
+    vote_minutes: 0,
     error: null,
     attachDeposit: 0,
     proposalQueue: null,
@@ -25,13 +31,13 @@ function isEmpty(value) {
 }
 
 const handleProposal = () => {
-    if (isEmpty(state.pre_vote_duration)) {
+    if (isEmpty(state.pre_vote_hours) && isEmpty(state.pre_vote_minutes)) {
         State.update({
             error: "Please specify pre vote duration"
         });
         return;
     }
-    if (isEmpty(state.vote_duration)) {
+    if (isEmpty(state.vote_hours) && isEmpty(state.vote_minutes)) {
         State.update({
             error: "Please specify vote duration"
         });
@@ -45,13 +51,6 @@ const handleProposal = () => {
         return;
     }
 
-    if (isEmpty(state.proposalQueue)) {
-        State.update({
-            error: "Please select proposal queue"
-        });
-        return;
-    }
-
     const gas = 20000000000000;
     const deposit = state.attachDeposit
         ? Big(state.attachDeposit)
@@ -61,10 +60,12 @@ const handleProposal = () => {
         description: state.description,
         kind: {
             UpdateVoteDuration: {
-                vote_duration: convertHoursToMilliseconds(state.vote_duration),
-                pre_vote_duration: convertHoursToMilliseconds(
-                    state.pre_vote_duration
-                )
+                vote_duration:
+                    convertHoursToMilliseconds(state.vote_hours) +
+                    convertMinutesToMilliseconds(state.vote_minutes),
+                pre_vote_duration:
+                    convertHoursToMilliseconds(state.pre_vote_hours) +
+                    convertMinutesToMilliseconds(state.pre_vote_minutes)
             }
         },
         caller: accountId
@@ -85,16 +86,30 @@ const handleProposal = () => {
     ]);
 };
 
-const onChangePreVoteDuration = (pre_vote_duration) => {
+const onChangePreVoteHours = (pre_vote_hours) => {
     State.update({
-        pre_vote_duration,
+        pre_vote_hours,
         error: undefined
     });
 };
 
-const onChangeVoteDuration = (vote_duration) => {
+const onChangePreVoteMinutes = (pre_vote_minutes) => {
     State.update({
-        vote_duration,
+        pre_vote_minutes,
+        error: undefined
+    });
+};
+
+const onChangeVoteHours = (vote_hours) => {
+    State.update({
+        vote_hours,
+        error: undefined
+    });
+};
+
+const onChangeVoteMinutes = (vote_minutes) => {
+    State.update({
+        vote_minutes,
         error: undefined
     });
 };
@@ -109,8 +124,7 @@ const onChangeDescription = (description) => {
 const onChangeQueue = ({ amount, queue }) => {
     State.update({
         attachDeposit: amount,
-        proposalQueue: queue,
-        error: undefined
+        proposalQueue: queue
     });
 };
 
@@ -129,18 +143,34 @@ return (
         />
 
         <div className="mb-3">
-            <h5>Pre Vote Duration (in hours)</h5>
-            <input
-                type="number"
-                onChange={(e) => onChangePreVoteDuration(e.target.value)}
-            />
+            <h5>Pre Vote Duration</h5>
+            <div className="d-flex gap-2">
+                <input
+                    type="number"
+                    placeholder="Hours"
+                    onChange={(e) => onChangePreVoteHours(e.target.value)}
+                />
+                <input
+                    type="number"
+                    placeholder="Minutes"
+                    onChange={(e) => onChangePreVoteMinutes(e.target.value)}
+                />
+            </div>
         </div>
         <div className="mb-3">
-            <h5>Vote Duration (in hours)</h5>
-            <input
-                type="number"
-                onChange={(e) => onChangeVoteDuration(e.target.value)}
-            />
+            <h5>Vote Duration</h5>
+            <div className="d-flex gap-2">
+                <input
+                    type="number"
+                    placeholder="Hours"
+                    onChange={(e) => onChangeVoteHours(e.target.value)}
+                />
+                <input
+                    type="number"
+                    placeholder="Minutes"
+                    onChange={(e) => onChangeVoteMinutes(e.target.value)}
+                />
+            </div>
         </div>
         <div className="mb-3">
             <h5>Proposal Description</h5>
@@ -153,6 +183,7 @@ return (
                 }}
             />
         </div>
+        {console.log(state.error)}
         {state.error && <div className="text-danger">{state.error}</div>}
         <div className="ms-auto">
             <Widget

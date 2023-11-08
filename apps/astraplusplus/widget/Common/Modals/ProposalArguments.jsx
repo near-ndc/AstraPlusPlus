@@ -6,7 +6,10 @@ const showCard = props.showCard ?? false;
 if (!kind) return "";
 
 function convertMillisecondsToHours(milliseconds) {
-    return milliseconds / (60 * 60 * 1000);
+    const hours = Math.floor(milliseconds / (1000 * 60 * 60)); // Convert milliseconds to hours
+    const remainingMilliseconds = milliseconds % (1000 * 60 * 60); // Remaining milliseconds after extracting hours
+    const minutes = Math.floor(remainingMilliseconds / (1000 * 60)); // Convert remaining milliseconds to minutes
+    return `${hours} hours and ${minutes} minutes`;
 }
 
 const proposal_type = typeof kind === "string" ? kind : Object.keys(kind)?.[0];
@@ -276,7 +279,7 @@ if (proposal_type === "UpdateVoteDuration")
     content = (
         <>
             <div>
-                <b>Pre Vote Duration (in hours)</b>
+                <b>Pre Vote Duration</b>
                 <div>
                     {convertMillisecondsToHours(
                         kind[proposal_type].pre_vote_duration
@@ -284,7 +287,7 @@ if (proposal_type === "UpdateVoteDuration")
                 </div>
             </div>
             <div>
-                <b>Vote Duration (in hours)</b>
+                <b>Vote Duration</b>
                 <div>
                     {convertMillisecondsToHours(
                         kind[proposal_type].vote_duration ?? 0
