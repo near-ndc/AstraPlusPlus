@@ -24,9 +24,7 @@ const COA_IMG =
 const TC_IMG =
     "https://ipfs.near.social/ipfs/bafkreif3aql3iceqrmbkyvoxnvh3elo3sodbvxsaok6qzpjxaqnzuejwni";
 const VB_IMG =
-    "https://ipfs.near.social/ipfs/bafkreigbn55gk57jzzuvae3rbdeoqzvhy2ikggjhwc6dcfwlbx74s4u5v4";
-const VB_TRUST_IMG =
-    "https://ipfs.near.social/ipfs/bafkreiegx5ygl7vpp5fblgyapnhgevqdpyh3lrucw6d5boqi7bikt4q7iq";
+    "https://ipfs.near.social/ipfs/bafkreieix4zbi2pmmlj37nybdtfr4fjko2b2nsmvur53dlcmpflcypa5om";
 
 const Content = {
     hom: {
