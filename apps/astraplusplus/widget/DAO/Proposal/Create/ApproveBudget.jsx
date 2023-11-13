@@ -53,9 +53,10 @@ const handleProposal = () => {
     }
 
     const gas = 20000000000000;
-    const deposit = state.attachDeposit
-        ? Big(state.attachDeposit)
-        : 100000000000000000000000;
+    // const deposit = state.attachDeposit
+    //     ? Big(state.attachDeposit)
+    //     : 100000000000000000000000;
+    const deposit = 100000000000000000000000;
 
     const args = JSON.stringify({
         description: state.description,
