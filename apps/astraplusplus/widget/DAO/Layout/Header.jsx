@@ -218,6 +218,25 @@ mailtoUrl.searchParams.set(
     `Take a look at this DAO. \n https://near.org/${currentLink}`
 );
 
+const daoImageMapping = {
+    "voting-body-v1.ndc-gwg.near": {
+        bg: "https://ipfs.near.social/ipfs/bafkreie4lmqqbejuk2ajyh27oisufsbtr5okozq6qrvjqg4crorj7v5q2i",
+        logo: "https://ipfs.near.social/ipfs/bafkreiauj65shmnvbhtqldx6apkb6rj6kcunp5ldjwe5urd4pi2mc2vzhi"
+    },
+    "congress-hom-v1.ndc-gwg.near": {
+        bg: "https://ipfs.near.social/ipfs/bafkreigsbznuktrxqad3zfci6cwk5xhmdbtr6dndjuy22fsoewmxgktaky",
+        logo: "https://ipfs.near.social/ipfs/bafkreidbveybpm7lwd27hbi3cwwlho2khilkpqflmomq3sq75jtqtt4mfq"
+    },
+    "congress-coa-v1.ndc-gwg.near": {
+        bg: "https://ipfs.near.social/ipfs/bafkreigy6rhzup4l5cokxousukfptmwhlpffsgj3jqakal43rkagspvobq",
+        logo: "https://ipfs.near.social/ipfs/bafkreibhzo5hsx6v5epdrizc5v66fygas6b44xep7c3s4kvcxdu4ieovn4"
+    },
+    "congress-tc-v1.ndc-gwg.near": {
+        bg: "https://ipfs.near.social/ipfs/bafkreif2gbfyv5kt4t3q7xe2uc6aywed4k4h5ns6a6avktqlsdjzw73wu4",
+        logo: "https://ipfs.near.social/ipfs/bafkreia7zwjqzd4htab7be6nx3ys26q5pd3l7hww3jw6jlnbszmk74w6si"
+    }
+};
+
 return (
     <Root>
         <BG
@@ -225,7 +244,9 @@ return (
             style={{
                 backgroundImage: profile?.backgroundImage.ipfs_cid
                     ? `url(https://ipfs.near.social/ipfs/${profile?.backgroundImage.ipfs_cid})`
-                    : `url(${profile?.backgroundImage})`
+                    : `url(${
+                          daoImageMapping[daoId]?.bg || profile?.backgroundImage
+                      })`
             }}
             aria-label="DAO Cover Image"
             role="img"
@@ -238,7 +259,9 @@ return (
                     style={{
                         backgroundImage: profile?.image.ipfs_cid
                             ? `url(https://ipfs.near.social/ipfs/${profile?.image.ipfs_cid})`
-                            : `url(${profile?.image})`
+                            : `url(${
+                                  daoImageMapping[daoId]?.logo || profile?.image
+                              })`
                     }}
                 ></Avatar>
                 <div>
