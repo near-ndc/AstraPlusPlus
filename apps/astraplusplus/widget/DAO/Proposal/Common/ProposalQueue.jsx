@@ -9,7 +9,7 @@ const VotingBodyDaoId = props.dev
 const isVotingBodyDao = props.daoId === VotingBodyDaoId;
 
 State.init({
-    proposalQueue: "active", // for vb
+    proposalQueue: "draft", // for vb
     attachDeposit: 0,
     vbConfig: null
 });
@@ -43,6 +43,17 @@ if (isVotingBodyDao) {
 if (isVotingBodyDao) {
     return (
         <div className="mb-3">
+            <div>
+                Draft Proposals are not in active queue. For more{" "}
+                <a
+                    href={`https://github.com/near-ndc/voting-v1/tree/master/voting_body#pre-vote-queue`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "rgb(68, 152, 224)" }}
+                >
+                    details.
+                </a>
+            </div>
             <Widget
                 src="nearui.near/widget/Input.Checkbox"
                 props={{
@@ -51,7 +62,7 @@ if (isVotingBodyDao) {
                         checked
                             ? onChangeProposalQueue("draft")
                             : onChangeProposalQueue("active"),
-                    label: "Draft Proposal",
+                    label: "Draft",
                     id: "draft-proposal"
                 }}
             />
