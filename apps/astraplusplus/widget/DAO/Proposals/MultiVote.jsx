@@ -62,7 +62,7 @@ if (view === "submit") {
                         payload: JSON.stringify(args)
                     },
                     gas: 200000000000000,
-                    deposit: 100000000000000000000000
+                    deposit: 20000000000000000000000
                 });
             } else {
                 args["id"] = parseInt(id);

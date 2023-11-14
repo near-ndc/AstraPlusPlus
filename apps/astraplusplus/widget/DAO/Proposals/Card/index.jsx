@@ -461,7 +461,7 @@ const handleVote = ({ action, proposalId, daoId }) => {
                     with_proof: false
                 },
                 gas: 200000000000000,
-                deposit: 100000000000000000000000
+                deposit: 20000000000000000000000
             }
         ]);
     } else {
