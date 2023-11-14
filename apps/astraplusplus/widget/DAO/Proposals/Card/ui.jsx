@@ -513,7 +513,6 @@ function renderVoteButtons({
 
     &.no {
       --vote-button-bg: 194, 63, 56;
-      --vote-button-color: 255, 255, 255;
     }
 
     &.no > div:last-child {
@@ -557,9 +556,7 @@ function renderVoteButtons({
       z-index: 0;
       background-color: rgb(var(--vote-button-bg));
       ${({ percentage }) => `
-        min-width: ${
-            percentage && percentage > 25 ? `${percentage}%` : "120px" // with less than 25% the width is less than 120px
-        };
+        min-width: ${percentage && percentage > 5 ? `${percentage}%` : "5px"};
       `}
     }
 
@@ -575,7 +572,7 @@ function renderVoteButtons({
       background-color: var(--vote-button-bg);
 
       min-width: ${({ percentage }) =>
-          percentage && percentage > 25 ? `${percentage}%` : "120px"};
+          percentage && percentage > 5 ? `${percentage}%` : "5px"};
 
       ${({ finsihed, wins }) =>
           finsihed &&
@@ -612,11 +609,16 @@ function renderVoteButtons({
     }
   `;
 
+    const getPercentage = (vote) => {
+        const percentage = Math.round((vote / totalVotesNeeded) * 100);
+        return percentage > 100 ? 100 : percentage || 0;
+    };
+
     const percentages = {
-        yes: Math.round((totalVotes.yes / totalVotesNeeded) * 100) || 0,
-        no: Math.round((totalVotes.no / totalVotesNeeded) * 100) || 0,
-        spam: Math.round((totalVotes.spam / totalVotesNeeded) * 100) || 0,
-        abstain: Math.round((totalVotes.abstain / totalVotesNeeded) * 100) || 0
+        yes: getPercentage(totalVotes.yes),
+        no: getPercentage(totalVotes.no),
+        spam: getPercentage(totalVotes.spam),
+        abstain: getPercentage(totalVotes.abstain)
     };
 
     const wins = {
@@ -645,6 +647,19 @@ function renderVoteButtons({
             ? // (isHuman && proposal.typeName === "Recurrent Funding Request")) // add after voting body contract is ready
               true
             : false;
+
+    const VotePercentage = ({ vote }) => (
+        <div>
+            <span>
+                {percentages[vote]}
+                <i className="bi bi-percent"></i>
+            </span>
+            <span>
+                {totalVotes[vote]} {totalVotes[vote] === 1 ? "Vote" : "Votes"}
+            </span>
+        </div>
+    );
+
     return (
         <div
             className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
@@ -674,16 +689,8 @@ function renderVoteButtons({
                             </span>
                         )}
                         <span className="text-sm">Approve</span>
-                        <i className="bi bi-hand-thumbs-up"></i>
                     </div>
-
-                    <div>
-                        <span>
-                            {percentages.yes}
-                            <i className="bi bi-percent"></i>
-                        </span>
-                        <span>{totalVotes.yes} Votes</span>
-                    </div>
+                    <VotePercentage vote="yes" />
                 </VoteButton>
             </div>
             <div className="w-100">
@@ -704,16 +711,8 @@ function renderVoteButtons({
                             </span>
                         )}
                         <span className="text-sm">Reject</span>
-                        <i className="bi bi-hand-thumbs-down"></i>
                     </div>
-
-                    <div>
-                        <span>
-                            {percentages.no}
-                            <i className="bi bi-percent"></i>
-                        </span>
-                        <span>{totalVotes.no} Votes</span>
-                    </div>
+                    <VotePercentage vote="no" />
                 </VoteButton>
             </div>
             {(isVotingBodyDao || isCongressDaoID) && (
@@ -734,13 +733,7 @@ function renderVoteButtons({
                         <div className="d-flex gap-2 align-items-center">
                             <span>Abstain</span>
                         </div>
-                        <div>
-                            <span>
-                                {percentages.abstain}
-                                <i className="bi bi-percent"></i>
-                            </span>
-                            <span>{totalVotes.abstain} Votes</span>
-                        </div>
+                        <VotePercentage vote="abstain" />
                     </VoteButton>
                 </div>
             )}
@@ -766,13 +759,7 @@ function renderVoteButtons({
                         <div className="d-flex gap-2 align-items-center">
                             <span>Spam</span>
                         </div>
-                        <div>
-                            <span>
-                                {percentages.spam}
-                                <i className="bi bi-percent"></i>
-                            </span>
-                            <span>{totalVotes.spam} Votes</span>
-                        </div>
+                        <VotePercentage vote="spam" />
                     </VoteButton>
                 </div>
             )}
