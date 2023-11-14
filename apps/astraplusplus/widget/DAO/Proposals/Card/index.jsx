@@ -351,15 +351,12 @@ const expensiveWork = () => {
     }
 
     if (isVotingBodyDao) {
-        if (
-            my_proposal.typeName === "Approve Budget" ||
-            my_proposal.typeName === "Dissolve"
-        ) {
-            totalVotesNeeded = daoConfig?.super_consent?.threshold;
+        if (my_proposal.typeName === "Dissolve") {
+            totalVotesNeeded = daoConfig?.super_consent?.quorum;
         } else if (my_proposal.typeName === "Pre Vote") {
             totalVotesNeeded = daoConfig?.pre_vote_support;
         } else {
-            totalVotesNeeded = daoConfig?.simple_consent?.threshold;
+            totalVotesNeeded = daoConfig?.simple_consent?.quorum;
         }
     }
 
