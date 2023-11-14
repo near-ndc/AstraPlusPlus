@@ -18,11 +18,11 @@ const HoMDaoId = props.dev
     : "/*__@replace:HoMDaoId__*/";
 
 const HOM_IMG =
-    "https://ipfs.near.social/ipfs/bafkreidqibol2yjcaja7hdivezfumbb323niqz6csntmeyrscl2iym5vrm";
+    "https://ipfs.near.social/ipfs/bafkreiaboucpddch7d6bqdkmztfacyv3ivcfetmxqjz4yug3zcjmbnsn24";
 const COA_IMG =
-    "https://ipfs.near.social/ipfs/bafkreifh4j3tc5klc3mjkfx7prced4rbxm2xel2qoz2sr3ekoxez53ik2m";
+    "https://ipfs.near.social/ipfs/bafkreifhix4zg6fso7nqvp4dqg2o2diwf3umnavn7kbysaoiffknkhgqz4";
 const TC_IMG =
-    "https://ipfs.near.social/ipfs/bafkreif3aql3iceqrmbkyvoxnvh3elo3sodbvxsaok6qzpjxaqnzuejwni";
+    "https://ipfs.near.social/ipfs/bafkreifel6rda6vqd2fxot2lqzdl2vmpsrpffz32z5nbb6hlxjy22x7gle";
 const VB_IMG =
     "https://ipfs.near.social/ipfs/bafkreieix4zbi2pmmlj37nybdtfr4fjko2b2nsmvur53dlcmpflcypa5om";
 
