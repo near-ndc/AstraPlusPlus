@@ -108,16 +108,14 @@ return (
     <>
         {isVotingBodyDao && (
             <div className="mb-3">
-                For the proposal approval, Near{" "}
-                {kind === "TextSuper" && "Supermajority"} Consent is required.
-                Read{" "}
+                This proposal requires
                 <a
                     href={`https://github.com/near-ndc/voting-v1/blob/master/voting_body/README.md?#quorums-and-thresholds`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ color: "rgb(68, 152, 224)" }}
                 >
-                    more.
+                    Near {kind === "TextSuper" && " Super"} Consent.
                 </a>
             </div>
         )}
