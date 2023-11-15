@@ -5,6 +5,7 @@ const powerType = props.powerType;
 const isCongressDaoID = props.isCongressDaoID;
 const isVotingBodyDao = props.isVotingBodyDao;
 const registry = props.registry;
+const kind = props.kind;
 
 const HoMDaoId = props.dev
     ? "/*__@replace:HoMDaoIdTesting__*/"
@@ -46,7 +47,7 @@ const handleProposal = () => {
     if (isVotingBodyDao) {
         const args = JSON.stringify({
             description: state.description,
-            kind: "Text",
+            kind: kind,
             caller: accountId
         });
 
@@ -105,6 +106,21 @@ const defaultDescription =
 
 return (
     <>
+        {isVotingBodyDao && (
+            <div className="mb-3">
+                For the proposal approval, Near{" "}
+                {kind === "TextSuper" && "Supermajority"} Consent is required.
+                Read{" "}
+                <a
+                    href={`https://github.com/near-ndc/voting-v1/blob/master/voting_body/README.md?#quorums-and-thresholds`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "rgb(68, 152, 224)" }}
+                >
+                    more.
+                </a>
+            </div>
+        )}
         <Widget
             src="/*__@appAccount__*//widget/DAO.Proposal.Common.ProposalQueue"
             props={{

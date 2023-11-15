@@ -102,8 +102,12 @@ const congressProposalTypes = {
     ],
     [VotingBodyDaoId]: [
         {
-            text: "Text",
+            text: "Text (Near Consent)",
             value: "Text"
+        },
+        {
+            text: "Text Super (Near Supermajority Consent)",
+            value: "TextSuper"
         },
         {
             text: "Dismiss",
@@ -272,7 +276,7 @@ return (
         />
 
         <div className="d-flex flex-column gap-2">
-            {["Text", "Vote", "Budget", "Motion"].includes(
+            {["Text", "TextSuper", "Vote", "Budget", "Motion"].includes(
                 state.proposalType.value
             ) && (
                 <Widget
@@ -284,7 +288,8 @@ return (
                         isVotingBodyDao,
                         registry,
                         dev: props.dev,
-                        powerType: state.proposalType.powerType
+                        powerType: state.proposalType.powerType,
+                        kind: state.proposalType.value
                     }}
                 />
             )}
