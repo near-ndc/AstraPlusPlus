@@ -44,14 +44,14 @@ if (isVotingBodyDao) {
     return (
         <div className="mb-3">
             <div>
-                Draft Proposals are not in active queue. For more{" "}
+                Draft Proposals are not in active queue.
                 <a
                     href={`https://github.com/near-ndc/voting-v1/tree/master/voting_body#pre-vote-queue`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ color: "rgb(68, 152, 224)" }}
                 >
-                    details.
+                    More details.
                 </a>
             </div>
             <Widget
