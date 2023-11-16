@@ -894,7 +894,21 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
                 }
             }
         },
-
+        {
+            title: "Voters",
+            icon: "bi bi-people",
+            count: totalVotes.total,
+            widget: "Common.Modals.Voters",
+            props: {
+                daoId,
+                votes,
+                totalVotes,
+                isCongressDaoID,
+                dev: props.dev,
+                isVotingBodyDao,
+                proposalId: proposal.id
+            }
+        },
         {
             title: "Share",
             icon: "bi bi-share",
@@ -907,22 +921,6 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
             }
         }
     ];
-
-    if (!isVotingBodyDao) {
-        items.push({
-            title: "Voters",
-            icon: "bi bi-people",
-            count: totalVotes.total,
-            widget: "Common.Modals.Voters",
-            props: {
-                daoId,
-                votes,
-                totalVotes,
-                isCongressDaoID,
-                dev: props.dev
-            }
-        });
-    }
 
     if (proposal.typeName !== "Text" && proposal.typeName !== "TextSuper") {
         items.push({
