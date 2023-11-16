@@ -119,7 +119,7 @@ return (
                 <div className={vote + " radius"}>
                     <li className={vote}>
                         <div className="d-flex items-center justify-content-between">
-                            <div>
+                            <div className="text-truncate w-70">
                                 <Widget
                                     src="mob.near/widget/Profile.ShortInlineBlock"
                                     props={{
@@ -128,16 +128,18 @@ return (
                                     }}
                                 />
                             </div>
-                            <Widget
-                                src="/*__@replace:nui__*//widget/Element.Badge"
-                                props={{
-                                    children: (
-                                        <span className="vote">{vote}</span>
-                                    ),
-                                    variant: `round`,
-                                    size: "md"
-                                }}
-                            />
+                            <div className="w-30">
+                                <Widget
+                                    src="/*__@replace:nui__*//widget/Element.Badge"
+                                    props={{
+                                        children: (
+                                            <span className="vote">{vote}</span>
+                                        ),
+                                        variant: `round`,
+                                        size: "md"
+                                    }}
+                                />
+                            </div>
                         </div>
                         {((isCongressDaoID && votes[voterId].timestamp > 0) ||
                             isVotingBodyDao) &&
