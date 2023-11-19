@@ -248,7 +248,8 @@ return (
                 {(isCongressDaoID || isVotingBodyDao) &&
                     proposal.status === "Approved" &&
                     proposal?.submission_time +
-                        daoConfig?.vote_duration +
+                        (daoConfig?.vote_duration ??
+                            daoConfig?.voting_duration) +
                         (daoConfig?.cooldown ?? 0) < // cooldown is not available in vb
                         Date.now() && (
                         <Widget

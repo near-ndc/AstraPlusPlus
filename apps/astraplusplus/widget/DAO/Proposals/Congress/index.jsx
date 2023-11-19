@@ -239,7 +239,8 @@ return (
                         <div className="d-flex gap-2">
                             {proposal.status === "Approved" &&
                                 proposal?.submission_time +
-                                    state.daoConfig?.vote_duration +
+                                    (state.daoConfig?.vote_duration ??
+                                        state.daoConfig?.voting_duration) +
                                     (state.daoConfig?.cooldown ?? 0) < // cooldown is not available in vb
                                     Date.now() && (
                                     <Widget

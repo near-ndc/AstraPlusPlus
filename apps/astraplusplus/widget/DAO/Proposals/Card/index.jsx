@@ -450,7 +450,8 @@ const handleVote = ({ action, proposalId, daoId }) => {
                     payload: JSON.stringify(args),
                     lock_duration:
                         proposal?.submission_time +
-                        daoConfig?.vote_duration -
+                        (daoConfig?.vote_duration ??
+                            daoConfig?.voting_duration) -
                         Date.now() +
                         1,
                     with_proof: false
