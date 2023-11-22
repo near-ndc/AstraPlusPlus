@@ -1,6 +1,7 @@
 const data = props.data;
 const currentPage = props.page ?? 1;
 const resPerPage = props.resPerPage ?? 20;
+const accountId = props.accountId ?? context.accountId;
 
 const viewTypes = {
     CARD: "Card",
@@ -416,15 +417,22 @@ return (
                                 {paginatedFollowers?.map((item) => {
                                     return (
                                         <div className="ndc-card p-4 d-flex flex-column gap-2">
-                                            <div className="d-flex justify-content-between align-items-center word-wrap gap-2">
-                                                <Widget
-                                                    src="mob.near/widget/Profile.ShortInlineBlock"
-                                                    props={{
-                                                        accountId: item.account,
-                                                        tooltip: true
-                                                    }}
-                                                />
-                                                <FollowBtn itemDetails={item} />
+                                            <div className="d-flex justify-content-between align-items-center gap-2">
+                                                <div className="text-truncate w-75">
+                                                    <Widget
+                                                        src="mob.near/widget/Profile.ShortInlineBlock"
+                                                        props={{
+                                                            accountId:
+                                                                item.account,
+                                                            tooltip: true
+                                                        }}
+                                                    />
+                                                </div>
+                                                {accountId !== item.account && (
+                                                    <FollowBtn
+                                                        itemDetails={item}
+                                                    />
+                                                )}
                                             </div>
                                         </div>
                                     );

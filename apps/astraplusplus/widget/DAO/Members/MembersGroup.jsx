@@ -4,6 +4,7 @@ const currentPage = props.page ?? 1;
 const resPerPage = props.resPerPage ?? 20;
 const isCongressDaoID = props.isCongressDaoID ?? false;
 const isVotingBodyDao = props.isVotingBodyDao ?? false;
+const accountId = props.accountId ?? context.accountId;
 
 const EVERYONE = "Everyone";
 
@@ -970,13 +971,18 @@ return (
                                                             src="mob.near/widget/Profile.ShortInlineBlock"
                                                             props={{
                                                                 accountId:
-                                                                    account,
+                                                                    item.account,
                                                                 tooltip: true
                                                             }}
                                                         />
-                                                        <FollowBtn
-                                                            itemDetails={item}
-                                                        />
+                                                        {accountId !==
+                                                            item.account && (
+                                                            <FollowBtn
+                                                                itemDetails={
+                                                                    item
+                                                                }
+                                                            />
+                                                        )}
                                                     </div>
                                                     <div className="mt-3">
                                                         <RoleTag

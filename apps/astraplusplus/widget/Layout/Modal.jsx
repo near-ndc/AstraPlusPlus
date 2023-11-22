@@ -24,7 +24,6 @@ const Overlay = styled.div`
 `;
 
 const Content = styled.div`
-    width: 100%;
     max-width: ${modalWidth};
     max-height: 100%;
     overflow-y: auto;
