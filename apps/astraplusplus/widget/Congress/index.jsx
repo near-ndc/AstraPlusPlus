@@ -376,7 +376,7 @@ const DropdownContainer = styled.div`
 `;
 State.init({
     selectedHouse: router.params.house ?? "hom",
-    selectedTab: "powers",
+    selectedTab: "proposals",
     copied: false,
     proposals: [],
     members: [],
@@ -399,7 +399,7 @@ const getProposalsCount = () => {
 const changeHouse = (house) => {
     State.update({
         selectedHouse: house,
-        selectedTab: "powers",
+        selectedTab: "proposals",
         showPowerChecksDescription: false
     });
 };
