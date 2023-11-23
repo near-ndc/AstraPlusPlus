@@ -206,6 +206,19 @@ const Wrapper = styled.div`
     .gap-y-3 {
         row-gap: 1rem !important;
     }
+
+    .opacity-low {
+        opacity: 0.4;
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+
+    .overlay-head {
+        position: absolute;
+        top: 45%;
+        left: 45%;
+        font-size: 28px;
+        zindex: 1000;
+    }
 `;
 
 function followUser(user, isFollowing) {
@@ -374,10 +387,16 @@ const Table = ({ title, tableData, showExpand }) => {
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody style={{ position: "relative" }}>
+                        {isCongressDaoID && (
+                            <div className="overlay-head">Coming Soon</div>
+                        )}
+
                         {tableData?.map((item) => {
                             return (
-                                <tr>
+                                <tr
+                                    className={isCongressDaoID && "opacity-low"}
+                                >
                                     <td>
                                         <Widget
                                             src="mob.near/widget/Profile.ShortInlineBlock"
@@ -403,7 +422,7 @@ const Table = ({ title, tableData, showExpand }) => {
                                         {item.acceptedProposals} /{" "}
                                         {item.totalProposals}
                                     </td>
-                                    <td className="align-items-center">
+                                    <td className="d-flex gap-2 align-items-center">
                                         <Widget
                                             src="nearui.near/widget/Input.Button"
                                             props={{
