@@ -1,4 +1,4 @@
-const { id, name, description, amount, token } = props;
+const { bounty, proposal } = props;
 
 const shorten = (str, len) => {
     if (str.length <= len) {
@@ -7,32 +7,27 @@ const shorten = (str, len) => {
     return str.slice(0, len) + "...";
 };
 
-const Wrapper = styled.div`
-  border: 1px solid transparent;
-  width:max-content;
-
-  &:hover {
-    border: 1px solid #4498e0;
-  }
-
-  a {
-    color: #4498e0;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-decoration: none;
-
-    &:hover {
-      color: #4498e0cc;
-  }
+const Claims = styled.div`
+    background: #f0f0f087;
+    padding: 15px;
+    border-radius: 10px;
 `;
 
-const Tag = styled.div`
-    background-color: rgba(68, 152, 224, 0.1);
-    padding: 10px;
-    border-radius: 15%;
-    color: #4498e0;
-    font-size: 12px;
-    font-weight: 700;
+const Wrapper = styled.div`
+    border: 1px solid transparent;
+    width: max-content;
+
+    &:hover {
+        border: 1px solid #4498e0;
+    }
+
+    a {
+        color: #4498e0;
+        text-decoration: none;
+
+        &:hover {
+        color: #4498e0cc;
+    }
 `;
 
 const Icon = ({ success }) => {
@@ -92,61 +87,235 @@ const NEARSym = () => {
     );
 };
 
+const getTokenInfo = (bounty) => {
+    let token;
+    let value;
+    let icon;
+
+    switch (bounty?.token) {
+        case "":
+            token = "NEAR";
+            value = Big(bounty.amount).div(Big(10).pow(24)).toFixed();
+            icon = <NEARSym />;
+            break;
+        case "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near":
+            token = "USDC.e";
+            value = Big(bounty.amount).div(Big(10).pow(6)).toFixed();
+            icon = "";
+            break;
+    }
+
+    return { token, value, icon };
+};
+
+const getStatusVariant = (bounty, claim) => {
+    let statusicon;
+    let statustext;
+    let statusvariant;
+
+    const prop = bounty?.bountyDoneProposals.find(
+        (doneProp) => doneProp.bountyClaimId === claim.id
+    );
+
+    switch (prop.status) {
+        case "Approved":
+            statusicon = "bi bi-check-circle";
+            statustext = prop.status;
+            statusvariant = "success";
+            break;
+        case "InProgress":
+            statusicon = "spinner-border spinner-border-sm";
+            statustext = "In Progress";
+            statusvariant = "primary";
+            break;
+        default:
+            statusicon = "spinner-border spinner-border-sm";
+            statustext = "In Progress";
+            statusvariant = "primary";
+            break;
+    }
+
+    return {
+        statusicon,
+        statustext,
+        statusvariant
+    };
+};
+
+const formatDate = (date, short) => {
+    date = new Date(date);
+    return `${
+        [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ][date.getMonth()]
+    } ${date.getDate()}, ${
+        short ? date.getFullYear().toString().slice(-2) : date.getFullYear()
+    }`;
+};
+
 return (
-    <Wrapper className="ndc-card p-4 d-flex flex-column gap-3 h-100">
-        <div className="d-flex justify-content-between">
-            <p className="text-muted small">Bounty Name</p>
-            <Tag>Added days ago</Tag>
+    <Wrapper className="ndc-card p-4 d-flex flex-column gap-2 h-100 w-100">
+        <div className="d-flex gap-3 justify-content-between align-items-center">
+            <Widget
+                src="/*__@replace:nui__*//widget/Element.Badge"
+                props={{
+                    children: <>Bounty ID #{bounty?.bountyId}</>,
+                    variant: `info round outline`,
+                    size: "lg"
+                }}
+            />
+            <Widget
+                src="/*__@replace:nui__*//widget/Element.Badge"
+                props={{
+                    children: formatDate(bounty?.createdAt),
+                    variant: `info round`,
+                    size: "lg"
+                }}
+            />
         </div>
 
-        <p className="fw-bold" style={{ fontSize: "2rem" }}>
-            {name ?? "-"}
-        </p>
-        <p className="text-muted small">Proposer</p>
-        <div className="d-flex gap-2">
-            <p className="fw-bold">{token}</p>
-            <i class="bi-box-arrow-up-right"></i>
+        <div className="w-50">
+            <div className="text-muted small">Proposer</div>
+            <Widget
+                src="mob.near/widget/Profile.ShortInlineBlock"
+                props={{ accountId: proposal?.proposer, tooltip: true }}
+            />
         </div>
-        <div className="d-flex justify-content-center gap-4">
+        <div className="d-flex justify-content-between gap-4 my-3">
             <IconWrapper>
-                <Icon success={true} />
-                <p style={{ fontSize: "11px" }}>
-                    {" "}
+                <Icon success={proposal?.createdAt} />
+                <small className="text-center">
                     Proposal <br /> Phase
-                </p>
+                </small>
             </IconWrapper>
             <IconWrapper>
-                <Icon success={true} />
-                <p style={{ fontSize: "11px" }}>
-                    {" "}
-                    Available
-                    <br /> Bounty
-                </p>
+                <Icon success={bounty?.createdAt} />
+                <small className="text-center">
+                    Available <br /> Bounty
+                </small>
             </IconWrapper>
             <IconWrapper>
-                <Icon success={false} />
-                <p style={{ fontSize: "11px" }}> In Progress</p>
+                <Icon
+                    success={
+                        !(
+                            new Date(parseInt(bounty?.maxDeadline) / 1000) >
+                                new Date() &&
+                            bounty?.bountyDoneProposals?.filter(
+                                (prop) => prop.kind.type === "BountyDone"
+                            ).length === 0
+                        )
+                    }
+                />
+                <small className="text-center"> In Progress</small>
             </IconWrapper>
             <IconWrapper>
-                <Icon success={false} />
-                <p style={{ fontSize: "11px" }}> Completed</p>
+                <Icon
+                    success={
+                        bounty?.bountyDoneProposals?.filter(
+                            (prop) => prop.kind.type === "BountyDone"
+                        ).length > 0
+                    }
+                />
+                <small> Completed</small>
             </IconWrapper>
         </div>
-        <p className="text-muted small">Description</p>
-        <p className="overflow-hidden small">
-            {shorten(description || "", 80)}
-        </p>
+        <div className="text-muted small">Description</div>
+        <div className="small">
+            <Markdown text={bounty?.description?.replace(/\${4,}/, "\n")} />
+        </div>
         <div className="d-flex justify-content-between">
-            <p className="text-muted small">Amount</p>
+            <div className="text-muted small">Amount</div>
             <div>
-                {Big(amount ?? 0)
-                    .div(Big(10).pow(24))
-                    .toString()}
-
-                <span className="symbol">
-                    <NEARSym />
-                </span>
+                <span className="symbol">{getTokenInfo(bounty).icon}</span>
+                <b>{getTokenInfo(bounty).value}</b>
+                {getTokenInfo(bounty).token}
             </div>
         </div>
+        <div className="d-flex justify-content-between gap-3">
+            <Widget
+                src="nearui.near/widget/Input.Button"
+                props={{
+                    children: (
+                        <>
+                            <i className="bi bi-chat-left"></i>
+                            {props.commentsCount} comments
+                        </>
+                    ),
+                    variant: "outline info w-100"
+                }}
+            />
+            <Widget
+                src="nearui.near/widget/Input.Button"
+                props={{
+                    children: (
+                        <>
+                            <i className="bi bi-ok"></i>
+                            Claim
+                        </>
+                    ),
+                    variant: "info w-100"
+                }}
+            />
+        </div>
+
+        <div className="d-flex justify-content-between align-items-center">
+            <div className="text-muted">Claimers</div>
+            <p>
+                {bounty?.numberOfClaims} / {bounty?.times}
+            </p>
+        </div>
+        {bounty?.bountyClaims?.map((claim) => (
+            <Claims className="d-flex justify-content-between align-items-center">
+                <div className="d-flex flex-column gap-2">
+                    <div className="text-muted small">Claimed by</div>
+                    <small>
+                        <b>{claim.accountId}</b>
+                    </small>
+                </div>
+                <div className="d-flex flex-column gap-2">
+                    <Widget
+                        src="/*__@replace:nui__*//widget/Element.Badge"
+                        props={{
+                            children: (
+                                <>
+                                    <i
+                                        className={
+                                            getStatusVariant(bounty, claim)
+                                                .statusicon
+                                        }
+                                        style={{
+                                            fontSize: "16px",
+                                            marginRight: "5px",
+                                            borderWidth: "2px",
+                                            animationDuration: "3s"
+                                        }}
+                                    ></i>
+                                    {getStatusVariant(bounty, claim).statustext}
+                                </>
+                            ),
+                            variant: `${
+                                getStatusVariant(bounty, claim).statusvariant
+                            } round`,
+                            size: "md"
+                        }}
+                    />
+                    <div className="small">
+                        {formatDate(parseInt(claim.startTime) / 1000000, true)}{" "}
+                        - {formatDate(parseInt(claim.endTime) / 1000000, true)}
+                    </div>
+                </div>
+            </Claims>
+        ))}
     </Wrapper>
 );

@@ -1,25 +1,23 @@
 const defaultFilters = props.defaultFilters ?? {};
 const daoId = props.accountId;
 const bountiesLink = "#//*__@appAccount__*//widget/home?tab=bounties";
-const publicApiKey = "/*__@replace:pikespeakApiKey__*/";
-const resPerPage = 10;
-const baseApi = "https://api.pikespeak.ai";
+const publicApiKey = "/*__@replace:astrodaoApiKey__*/";
+const baseApi = "https://api.app.astrodao.com/api/v1/bounty-contexts";
+let offset = 0;
+const limit = 50;
 
-State.init({
-    bounties: []
-});
+State.init({ bounties: [] });
 
 function fetchBounties() {
-    const res = fetch(`${baseApi}/daos/bounties/${daoId}`, {
-        method: "GET",
-        mode: "cors",
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": publicApiKey
+    asyncFetch(
+        `${baseApi}?accountId=${daoId}&limit=${limit}&offset=${offset}&s=%7B%20%22%24and%22%3A%20%5B%7B%20%22daoId%22%3A%20%22${daoId}%22%20%7D%5D%20%7D`,
+        {
+            method: "GET",
+            headers: { "x-api-key": publicApiKey }
         }
+    ).then((res) => {
+        if (res?.body?.data) State.update({ bounties: res.body.data });
     });
-
-    if (res?.body?.length) State.update({ bounties: res.body });
 }
 
 fetchBounties();

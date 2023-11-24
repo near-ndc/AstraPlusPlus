@@ -2,6 +2,8 @@ const bounties = props.bounties;
 const currentPage = props.page ?? 1;
 const resPerPage = props.resPerPage ?? 6;
 
+console.log(bounties);
+
 const bountieslink = "#//*__@appAccount__*//widget/home?tab=bounties";
 
 State.init({
@@ -119,7 +121,7 @@ if (bounties && !state.isTyping) {
         if (state.search == null) {
             return true;
         }
-        return d.name.toLowerCase().includes(state.search.toLowerCase());
+        return d.daoId.toLowerCase().includes(state.search.toLowerCase());
     });
     paginatedBounties = filteredBounties.slice(
         (state.currentPage - 1) * resPerPage,
