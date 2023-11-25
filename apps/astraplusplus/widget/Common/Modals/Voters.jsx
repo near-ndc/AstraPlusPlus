@@ -6,7 +6,7 @@ const proposalId = props.proposalId;
 const QUERYAPI_ENDPOINT = `https://near-queryapi.api.pagoda.co/v1/graphql/`;
 
 const query = `query MyQuery {
-    strachu_near_vb_prod_vote(where: {proposal_id: {_eq: ${proposalId}}}) {
+    strachu_near_vb_prod_v2_vote(where: {proposal_id: {_eq: ${proposalId}}}) {
       vote
       voter
       timestamp
@@ -32,7 +32,7 @@ if (isVotingBodyDao) {
                 if (result.status === 200) {
                     if (result.body.data) {
                         const data =
-                            result.body.data["strachu_near_vb_prod_vote"];
+                            result.body.data["strachu_near_vb_prod_v2_vote"];
 
                         if (data?.length > 0) {
                             for (const a of data) {
