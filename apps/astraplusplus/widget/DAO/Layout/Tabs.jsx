@@ -1,6 +1,7 @@
 const tabs = props.tabs;
 const selected = props.tab;
 const update = props.update;
+const allowHref = props.allowHref ?? true;
 
 const Container = styled.div`
     display: flex;
@@ -34,6 +35,7 @@ const Item = styled.a`
     outline: none;
     text-align: center;
     text-decoration: none !important;
+    cursor: pointer;
 
     &:hover {
         color: #11181c;
@@ -53,15 +55,25 @@ const Item = styled.a`
 
 return (
     <Container>
-        {Object.keys(tabs).map((id) => (
-            <Item
-                selected={selected === id}
-                href={tabs[id].href}
-                key={id}
-                onClick={() => update({ tab: id })}
-            >
-                {tabs[id].name}
-            </Item>
-        ))}
+        {Object.keys(tabs).map((id) =>
+            allowHref ? (
+                <Item
+                    selected={selected === id}
+                    href={tabs[id].href}
+                    key={id}
+                    onClick={() => update({ tab: id })}
+                >
+                    {tabs[id].name}
+                </Item>
+            ) : (
+                <Item
+                    selected={selected === id}
+                    key={id}
+                    onClick={() => update({ tab: id })}
+                >
+                    {tabs[id].name}
+                </Item>
+            )
+        )}
     </Container>
 );

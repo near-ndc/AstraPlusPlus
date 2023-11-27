@@ -47,7 +47,8 @@ State.init({
     filtersOpen: false,
     multiSelectMode: defaultMultiSelectMode ?? false,
     tableView: defaultTableView ?? false,
-    daoConfig: null
+    daoConfig: null,
+    tab: "active"
 });
 
 function getPreVoteVotes(supported) {
@@ -139,7 +140,7 @@ function fetchVBPreVoteProposals() {
     return data;
 }
 
-const res =
+let res =
     isCongressDaoID || isVotingBodyDao
         ? fetchCongressDaoProposals()
         : fetch(
@@ -181,6 +182,13 @@ if (isCongressDaoID || isVotingBodyDao) {
             res.body.push(...data.body);
         }
     }
+}
+
+console.log("called", state.tab);
+if (state.tab === "draft") {
+    res = fetchVBPreVoteProposals();
+} else {
+    res = fetchCongressDaoProposals();
 }
 
 function hasNextHandler() {
@@ -339,7 +347,26 @@ return (
                 Couldn't fetch proposals from API. Please try again later.
             </div>
         )}
-
+        {isVotingBodyDao && (
+            <div className="w-100 mt-2">
+                <Widget
+                    src={`/*__@appAccount__*//widget/DAO.Layout.Tabs`}
+                    props={{
+                        allowHref: false,
+                        tabs: {
+                            active: {
+                                name: "Active"
+                            },
+                            draft: {
+                                name: "Draft"
+                            }
+                        },
+                        tab: state.tab,
+                        update: (state) => update(state)
+                    }}
+                />
+            </div>
+        )}
         <div>
             {state.tableView ? (
                 <Widget
