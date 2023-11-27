@@ -49,6 +49,10 @@ const Wrapper = styled.div`
     .text-wrap {
         text-wrap: wrap;
     }
+
+    .bold {
+        font-weight: 600;
+    }
 `;
 
 const ProposalCard = styled.div`
@@ -149,16 +153,26 @@ function renderHeader({ id, statusName }) {
 }
 
 const proposalsCount = Near.view(daoId, "number_of_proposals");
-const proposals = Near.view(daoId, "get_proposals", {
-    from_index: proposalsCount,
-    limit: resPerPage,
-    reverse: true
-});
-
-State.update({
-    proposals: proposals ?? [],
-    proposalsCount: proposalsCount ?? 0
-});
+if (isVotingBodyDao) {
+    const proposals = Near.view(daoId, "get_proposals", {
+        from_index: 0,
+        limit: resPerPage
+    });
+    State.update({
+        proposals: proposals ?? [],
+        proposalsCount: proposalsCount ?? 0
+    });
+} else {
+    const proposals = Near.view(daoId, "get_proposals", {
+        from_index: proposalsCount,
+        limit: resPerPage,
+        reverse: true
+    });
+    State.update({
+        proposals: proposals ?? [],
+        proposalsCount: proposalsCount ?? 0
+    });
+}
 
 function getDaoConfig() {
     const daoConfig = Near.view(daoId, "config", {});
@@ -170,6 +184,9 @@ getDaoConfig();
 return (
     <Wrapper>
         <div>
+            {isVotingBodyDao && (
+                <h6 className="mb-2 bold">Active Queue Proposals:</h6>
+            )}
             {state.proposals.map((proposal) => {
                 if (!proposal.submission_time) {
                     proposal.submission_time = proposal.start;

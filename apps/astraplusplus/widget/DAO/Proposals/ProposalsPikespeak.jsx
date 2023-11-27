@@ -184,7 +184,6 @@ if (isCongressDaoID || isVotingBodyDao) {
     }
 }
 
-console.log("called", state.tab);
 if (state.tab === "draft") {
     res = fetchVBPreVoteProposals();
 } else {

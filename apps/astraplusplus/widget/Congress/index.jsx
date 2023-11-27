@@ -226,7 +226,7 @@ const Container = styled.div`
 `;
 
 const ImgPanel = styled.div`
-    width: 60%;
+    width: 50%;
 
     @media (max-width: 768px) {
         width: 100%;
@@ -235,7 +235,7 @@ const ImgPanel = styled.div`
 
 const HousePanel = styled.div`
     background-color: #fff;
-    width: 40%;
+    width: 50%;
     min-width: 500px;
 
     @media (max-width: 768px) {
@@ -384,7 +384,8 @@ State.init({
     proposalsCount: 0,
     showOptions: false,
     showHouses: false,
-    isDissolved: false
+    isDissolved: false,
+    config: {}
 });
 
 const getProposalsCount = () => {
@@ -419,7 +420,7 @@ const getProposals = () => {
         "get_proposals",
         { from_index: 0, limit: 20 }
     );
-
+    console.log(proposals);
     State.update({ proposals: proposals ?? [] });
 };
 
@@ -476,9 +477,35 @@ const getMenuItems = () => {
     return base;
 };
 
+const getDaoConfig = () => {
+    const resp = Near.view(Content[state.selectedHouse].address, "config", {});
+    if (resp !== null) {
+        State.update({ config: resp });
+    }
+};
+
+function convertToTitleCase(inputString) {
+    return inputString
+        .split("_")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+}
+
+function convertMillisecondsToDays(milliseconds) {
+    const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+    const days = Math.floor(milliseconds / oneDayInMilliseconds);
+    return `${days} days`;
+}
+
+function convertYoctoToNear(yoctoNear) {
+    return `${Big(yoctoNear).div(Big(10).pow(24)).toFixed()} NEAR`;
+}
+
 State.update({ selectedHouse: router.params.house ?? state.selectedHouse });
 getProposalsCount();
 getProposals();
+getDaoConfig();
+
 if (state.selectedHouse !== "vb") {
     getDissolvedStatus();
     getMembers();
@@ -617,7 +644,7 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                 </div>
             </div>
             <Tabs className="flex-column mb-4">
-                <div className="d-flex flex-column flex-sm-row gap-3">
+                <div className="d-flex flex-column flex-sm-row gap-2">
                     <Tab
                         onClick={() =>
                             State.update({ selectedTab: "proposals" })
@@ -637,6 +664,12 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                         <div className="circle d-flex justify-content-center align-items-center">
                             <div>{metadata.powers.length}</div>
                         </div>
+                    </Tab>
+                    <Tab
+                        onClick={() => State.update({ selectedTab: "config" })}
+                        selected={state.selectedTab === "config"}
+                    >
+                        <div>Configurations</div>
                     </Tab>
                     {metadata.checks && (
                         <Tab
@@ -684,6 +717,47 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                                 dev: props.dev
                             }}
                         />
+                    )}
+                    {state.selectedTab === "config" && (
+                        <div>
+                            {Object.keys(state.config ?? {}).map((item) => {
+                                const value = state.config[item];
+                                return (
+                                    <div
+                                        style={{
+                                            fontSize: "16px",
+                                            paddingBlock: 10
+                                        }}
+                                    >
+                                        <span style={{ fontWeight: "bold" }}>
+                                            {convertToTitleCase(item)}
+                                        </span>{" "}
+                                        :
+                                        {typeof value === "object"
+                                            ? Object.keys(value ?? {}).map(
+                                                  (i) => (
+                                                      <span>
+                                                          {convertToTitleCase(
+                                                              i
+                                                          )}{" "}
+                                                          : {value[i]} <br />
+                                                      </span>
+                                                  )
+                                              )
+                                            : item?.includes("time")
+                                            ? new Date(value).toLocaleString()
+                                            : item?.includes("duration") ||
+                                              item?.includes("cooldown")
+                                            ? convertMillisecondsToDays(value)
+                                            : item?.includes("budget") ||
+                                              item?.includes("funding") ||
+                                              item?.includes("bond")
+                                            ? convertYoctoToNear(value)
+                                            : value}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     )}
                 </div>
             </Tabs>
