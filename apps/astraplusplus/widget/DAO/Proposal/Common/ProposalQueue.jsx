@@ -44,10 +44,9 @@ if (isVotingBodyDao) {
     return (
         <div className="mb-3">
             <div>
-                Normally, proposals require pre-vote community support, or a one
-                congress member support, to move a proposal to the active queue,
-                to reduce a risk of spam. You can bond 300N if you want to skip
-                the community support and do a "fast track".{" "}
+                To reduce a risk of spam, proposals require pre-vote community
+                support, or one congress member support, to move a proposal to
+                the active queue.{" "}
                 <a
                     href={`https://github.com/near-ndc/voting-v1/tree/master/voting_body#pre-vote-queue`}
                     target="_blank"
@@ -56,18 +55,16 @@ if (isVotingBodyDao) {
                 >
                     More details
                 </a>{" "}
-                bond 300N for a fast track [not set by default]. Draft Proposals
-                are not in active queue.
             </div>
             <Widget
                 src="nearui.near/widget/Input.Checkbox"
                 props={{
-                    checked: state.proposalQueue === "draft",
+                    checked: state.proposalQueue === "active",
                     onChange: (checked) =>
                         checked
-                            ? onChangeProposalQueue("draft")
-                            : onChangeProposalQueue("active"),
-                    label: "Draft",
+                            ? onChangeProposalQueue("active")
+                            : onChangeProposalQueue("draft"),
+                    label: "Bond 300N for a fast track ",
                     id: "draft-proposal"
                 }}
             />
