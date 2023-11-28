@@ -914,7 +914,8 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
                 isCongressDaoID,
                 dev: props.dev,
                 isVotingBodyDao,
-                proposalId: proposal.id
+                proposalId: proposal.id,
+                votersCount: totalVotes.total
             }
         },
         {
