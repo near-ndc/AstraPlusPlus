@@ -44,9 +44,9 @@ if (isVotingBodyDao) {
     return (
         <div className="mb-3">
             <div>
-                To reduce a risk of spam, proposals require pre-vote community
-                support, or one congress member support, to move a proposal to
-                the active queue.{" "}
+                Proposals usually need community support or one congressional
+                member's support to move from "Draft" to "Active." You can also
+                bond 300N to skip the "Draft" queue and go straight to "Active."{" "}
                 <a
                     href={`https://github.com/near-ndc/voting-v1/tree/master/voting_body#pre-vote-queue`}
                     target="_blank"

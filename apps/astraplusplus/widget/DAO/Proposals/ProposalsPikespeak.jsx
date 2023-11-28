@@ -184,10 +184,12 @@ if (isCongressDaoID || isVotingBodyDao) {
     }
 }
 
-if (state.tab === "draft") {
-    res = fetchVBPreVoteProposals();
-} else {
-    res = fetchCongressDaoProposals();
+if (isVotingBodyDao) {
+    if (state.tab === "draft") {
+        res = fetchVBPreVoteProposals();
+    } else {
+        res = fetchCongressDaoProposals();
+    }
 }
 
 function hasNextHandler() {
