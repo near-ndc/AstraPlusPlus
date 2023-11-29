@@ -118,9 +118,9 @@ let filteredBounties = [];
 let paginatedBounties = [];
 if (bounties && !state.isTyping) {
     filteredBounties = bounties.filter((d) => {
-        if (state.search == null) {
-            return true;
-        }
+        if (!d.bounty) return false;
+        if (state.search == null) return true;
+
         return d.daoId.toLowerCase().includes(state.search.toLowerCase());
     });
     paginatedBounties = filteredBounties.slice(
