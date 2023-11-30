@@ -58,6 +58,11 @@ const Wrapper = styled.div`
 const ProposalCard = styled.div`
     .type {
         line-height: 18px;
+        width: 350px;
+
+        @media (max-width: 768px) {
+            width: 250px;
+        }
     }
 
     .created_at {
@@ -65,8 +70,13 @@ const ProposalCard = styled.div`
     }
 `;
 
-function renderHeader({ id, statusName }) {
-    statusName = statusName.replace(/([A-Z])/g, " $1").trim();
+function RenderHeader({ proposal }) {
+    const statusName = proposal.status.replace(/([A-Z])/g, " $1").trim();
+    const kindName =
+        typeof proposal.kind === "string"
+            ? proposal.kind
+            : Object.keys(proposal.kind)[0];
+
     let statusicon;
     let statustext;
     let statusvariant;
@@ -122,12 +132,32 @@ function renderHeader({ id, statusName }) {
             <Widget
                 src="/*__@replace:nui__*//widget/Element.Badge"
                 props={{
-                    children: `#${id}`,
+                    children: `#${proposal.id}`,
                     variant: `outline info round`,
                     size: "md"
                 }}
             />
-
+            <Widget
+                src="/*__@replace:nui__*//widget/Element.Badge"
+                props={{
+                    children: (
+                        <>
+                            {proposal.kind.FunctionCall ? (
+                                <>
+                                    <span className="font-monospace">
+                                        {proposal.kind.FunctionCall.actions
+                                            .map((a) => a.method_name)
+                                            .join(",")}
+                                    </span>
+                                </>
+                            ) : (
+                                <>{kindName}</>
+                            )}
+                        </>
+                    ),
+                    variant: `disabled round`
+                }}
+            />
             <Widget
                 src="/*__@replace:nui__*//widget/Element.Badge"
                 props={{
@@ -191,35 +221,14 @@ return (
                 if (!proposal.submission_time) {
                     proposal.submission_time = proposal.start;
                 }
-                const kindName =
-                    typeof proposal.kind === "string"
-                        ? proposal.kind
-                        : Object.keys(proposal.kind)[0];
-
                 if (proposal.status === "Removed") return <></>;
 
                 return (
                     <ProposalCard className="d-flex py-3 justify-content-between border-bottom align-items-center">
                         <div className="d-flex flex-column">
-                            {renderHeader({
-                                id: proposal.id,
-                                statusName: proposal.status
-                            })}
-                            <div class="type">
-                                {proposal.kind.FunctionCall ? (
-                                    <>
-                                        <b>Function Call: </b>
-                                        <span className="font-monospace">
-                                            {proposal.kind.FunctionCall.actions
-                                                .map((a) => a.method_name)
-                                                .join(",")}
-                                        </span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <b>{kindName}</b> proposal
-                                    </>
-                                )}
+                            <RenderHeader proposal={proposal} />
+                            <div class="text-truncate type">
+                                {proposal.description}
                             </div>
                             <div className="created_at text-secondary d-flex gap-2">
                                 <div className="gap-1 d-flex">
