@@ -242,7 +242,7 @@ return (
                 {getTokenInfo(bounty).token}
             </div>
         </div>
-        <div className="d-flex justify-content-between gap-3">
+        {/* <div className="d-flex justify-content-between gap-3">
             <Widget
                 src="nearui.near/widget/Input.Button"
                 props={{
@@ -267,13 +267,13 @@ return (
                     variant: "info w-100"
                 }}
             />
-        </div>
+        </div> */}
 
-        <div className="d-flex justify-content-between align-items-center">
-            <div className="text-muted">Claimers</div>
-            <p>
+        <div className="d-flex justify-content-between align-items-center mb-2">
+            <div className="text-muted small">Claimers</div>
+            <div>
                 {bounty?.numberOfClaims} / {bounty?.times}
-            </p>
+            </div>
         </div>
         {bounty?.bountyClaims?.map((claim) => (
             <Claims className="d-flex justify-content-between align-items-center">
