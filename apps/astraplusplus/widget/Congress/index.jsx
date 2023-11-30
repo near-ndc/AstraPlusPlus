@@ -418,9 +418,9 @@ const getProposals = () => {
     const proposals = Near.view(
         Content[state.selectedHouse].address,
         "get_proposals",
-        { from_index: 0, limit: 20 }
+        { from_index: 0, limit: 1000, reverse: true }
     );
-    console.log(proposals);
+
     State.update({ proposals: proposals ?? [] });
 };
 
@@ -661,9 +661,6 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                         selected={state.selectedTab === "powers"}
                     >
                         <div>Powers</div>
-                        <div className="circle d-flex justify-content-center align-items-center">
-                            <div>{metadata.powers.length}</div>
-                        </div>
                     </Tab>
                     {metadata.checks && (
                         <Tab
@@ -673,9 +670,6 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                             selected={state.selectedTab === "checks"}
                         >
                             <div>Checks</div>
-                            <div className="circle d-flex justify-content-center align-items-center">
-                                <div>{metadata.checks.length}</div>
-                            </div>
                         </Tab>
                     )}
                     <Tab
@@ -685,7 +679,7 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
                         <div>Configurations</div>
                     </Tab>
                 </div>
-                <div className="d-flex flex-column gap-4 p-3">
+                <div className="d-flex flex-column gap-4 p-2">
                     {state.selectedTab === "powers" &&
                         metadata.powers.map((r, i) => (
                             <PowerChecksDescription
@@ -773,17 +767,6 @@ const ContentBlock = ({ title, abbr, address, description, metadata }) => (
         </div>
 
         <div className="d-flex justify-content-end gap-2">
-            <Widget
-                src="nearui.near/widget/Input.Button"
-                props={{
-                    children: <>See Proposals</>,
-                    variant: "info outline",
-                    href: `#//*__@appAccount__*//widget/home?page=dao&daoId=${
-                        Content[state.selectedHouse].address
-                    }${props.dev && "&dev=true"}`,
-                    size: "sm"
-                }}
-            />
             {!state.hideProposalBtn && (
                 <Widget
                     src="/*__@appAccount__*//widget/Common.Layout.CardModal"

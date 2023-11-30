@@ -39,7 +39,7 @@ const execProposal = (proposal) =>
 
 const Wrapper = styled.div`
     .border-bottom {
-        border-bottom: 2px solid lightgray;
+        border-bottom: 1px solid #eee;
     }
 
     .text-center {
@@ -58,10 +58,10 @@ const Wrapper = styled.div`
 const ProposalCard = styled.div`
     .type {
         line-height: 18px;
-        width: 350px;
+        width: 370px;
 
         @media (max-width: 768px) {
-            width: 250px;
+            width: 300px;
         }
     }
 
@@ -332,7 +332,8 @@ return (
                 <Widget
                     src="/*__@replace:nui__*//widget/Input.Button"
                     props={{
-                        variant: "info outline",
+                        variant: "info",
+                        size: "sm",
                         children: (
                             <a
                                 href={`#//*__@appAccount__*//widget/home?page=dao&daoId=${daoId}${
@@ -340,9 +341,9 @@ return (
                                 }`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                style={{ color: "rgb(68, 152, 224)" }}
+                                style={{ color: "white" }}
                             >
-                                View All
+                                View All Proposals
                             </a>
                         )
                     }}
