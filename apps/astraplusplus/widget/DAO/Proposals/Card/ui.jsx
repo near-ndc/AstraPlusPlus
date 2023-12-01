@@ -98,7 +98,7 @@ const Wrapper = styled.div`
         background-color: #555;
         color: #fff;
         text-align: center;
-        padding: 5px 0;
+        padding: 5px;
         border-radius: 6px;
 
         /* Position the tooltip text */
@@ -157,15 +157,6 @@ const Wrapper = styled.div`
         @media (max-width: 768px) {
             border: 0;
         }
-    }
-
-    .veto-btn {
-        padding: 10px;
-        padding-inline: 40px;
-        background-color: red;
-        color: white;
-        border-radius: 10px;
-        line-height: 23px;
     }
 `;
 
@@ -655,11 +646,7 @@ function renderVoteButtons({
     const alreadyVoted = isVotingBodyDao
         ? false // allow revote
         : voted.yes || voted.no || voted.spam || voted.abstain;
-    const showVeto =
-        daoId === HoMDaoId && currentuserCongressHouse === CoADaoId
-            ? // (isHuman && proposal.typeName === "Recurrent Funding Request")) // add after voting body contract is ready
-              true
-            : false;
+    const showVeto = daoId === HoMDaoId;
 
     const VotePercentage = ({ vote }) => (
         <div>
@@ -675,7 +662,7 @@ function renderVoteButtons({
 
     return (
         <div
-            className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
+            className="d-lg-grid d-flex flex-wrap gap-2"
             style={{
                 gridTemplateColumns: showVeto
                     ? "repeat(3,1fr) 120px"
@@ -824,7 +811,7 @@ function renderPreVoteButtons({ proposal }) {
         proposal?.submission_time + daoConfig?.pre_vote_duration < Date.now();
     return (
         <div
-            className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
+            className="d-lg-grid d-flex flex-wrap gap-2"
             style={{ gridTemplateColumns: "repeat(3,1fr)" }}
         >
             <button

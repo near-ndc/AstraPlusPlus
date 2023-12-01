@@ -188,6 +188,12 @@ function renderStatus(statusName) {
     );
 }
 
+const DescriptionContainer = styled.td`
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 3;
+`;
+
 const execProposal = ({ daoId, proposal_id }) =>
     Near.call(daoId, "execute", { id: proposal_id }, 300000000000000);
 
@@ -215,6 +221,13 @@ return (
             />
         </td>
         <td className="text-center">{kindName}</td>
+        <DescriptionContainer
+            style={{
+                display: proposal.description?.length < 200 ? "" : "-webkit-box"
+            }}
+        >
+            {proposal.description}
+        </DescriptionContainer>
         <td className="text-center">
             {isVotingBodyDao
                 ? proposal.status === "PreVote"

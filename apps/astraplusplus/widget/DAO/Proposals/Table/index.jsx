@@ -40,10 +40,11 @@ const Table = styled.div`
     td,
     th {
         vertical-align: middle;
+        padding-block: 5px;
     }
 
     tr {
-        height: 58px;
+        height: 65px;
     }
 
     .id-value {
@@ -154,6 +155,7 @@ return (
                         <th scope="col" className="text-center">
                             Type
                         </th>
+                        <th scope="col">Description</th>
                         <th scope="col">Votes</th>
                         <th scope="col" className="text-center">
                             Status
