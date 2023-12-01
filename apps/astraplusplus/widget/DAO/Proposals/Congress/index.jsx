@@ -227,7 +227,7 @@ return (
                     <ProposalCard className="d-flex py-3 justify-content-between border-bottom align-items-center">
                         <div className="d-flex flex-column">
                             <RenderHeader proposal={proposal} />
-                            <div class="text-truncate type">
+                            <div class="text-truncate type w-90">
                                 {proposal.description}
                             </div>
                             <div className="created_at text-secondary d-flex gap-2">

@@ -226,7 +226,7 @@ const Container = styled.div`
 `;
 
 const ImgPanel = styled.div`
-    width: 60%;
+    width: 50%;
 
     @media (max-width: 768px) {
         width: 100%;
