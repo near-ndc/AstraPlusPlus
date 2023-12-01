@@ -1,8 +1,9 @@
-const daoId = props.daoId;
+const { daoId, proposals } = props;
 
 const apiUrl = `https://api.pikespeak.ai/daos/proposals`;
 const publicApiKey = "/*__@replace:pikespeakApiKey__*/";
 const resPerPage = 20; // Number of proposals to fetch at a time
+const accountId = context.accountId;
 
 const defaultMultiSelectMode = Storage.privateGet("multiSelectMode");
 const defaultTableView = Storage.privateGet("tableView");
@@ -36,7 +37,6 @@ if (proposalsCount === null) {
 
 State.init({
     daoId,
-    daos: [daoId],
     page: 0,
     filters: {
         proposal_types: [],
@@ -117,10 +117,31 @@ function fetchCongressDaoProposals() {
         reverse: true
     });
 
-    if (resp) {
-        data = processProposals(resp);
-    }
+    if (resp) data = processProposals(resp);
+
     return data;
+}
+
+function fetchDaoProposals() {
+    const resp = fetch(
+        forgeUrl(apiUrl, {
+            offset: state.page * resPerPage,
+            limit: resPerPage,
+            daos: [daoId],
+            proposal_types: state.filters.proposal_types,
+            status: state.filters.status,
+            time_start: state.filters.time_start,
+            time_end: state.filters.time_end
+        }),
+        {
+            mode: "cors",
+            headers: {
+                "x-api-key": publicApiKey
+            }
+        }
+    );
+
+    return resp;
 }
 
 function fetchVBPreVoteProposals() {
@@ -141,54 +162,41 @@ function fetchVBPreVoteProposals() {
 }
 
 let res =
-    isCongressDaoID || isVotingBodyDao
+    proposals ??
+    (isCongressDaoID || isVotingBodyDao
         ? fetchCongressDaoProposals()
-        : fetch(
-              forgeUrl(apiUrl, {
-                  offset: state.page * resPerPage,
-                  limit: resPerPage,
-                  daos: state.daos,
-                  proposal_types: state.filters.proposal_types,
-                  status: state.filters.status,
-                  time_start: state.filters.time_start,
-                  time_end: state.filters.time_end
-              }),
-              {
-                  mode: "cors",
-                  headers: {
-                      "x-api-key": publicApiKey
-                  }
-              }
-          );
+        : fetchDaoProposals());
 
 // filtering for congress daos
-if (isCongressDaoID || isVotingBodyDao) {
-    if (state.filters.proposal_types?.length > 0) {
-        res.body = res.body?.filter((item) => {
-            const type =
-                typeof item.proposal_type === "string"
-                    ? item.proposal_type
-                    : Object.keys(item.proposal_type)[0];
-            return state.filters.proposal_types.includes(type);
-        });
-    }
-    if (state.filters.status?.length > 0) {
-        res.body = res.body?.filter((item) =>
-            state.filters.status.includes(item.status)
-        );
-        // fetch pre vote proposals
-        if (state.filters.status?.includes("PreVote") && isVotingBodyDao) {
-            const data = fetchVBPreVoteProposals();
-            res.body.push(...data.body);
+if (!proposals) {
+    if (isCongressDaoID || isVotingBodyDao) {
+        if (state.filters.proposal_types?.length > 0) {
+            res.body = res.body?.filter((item) => {
+                const type =
+                    typeof item.proposal_type === "string"
+                        ? item.proposal_type
+                        : Object.keys(item.proposal_type)[0];
+                return state.filters.proposal_types.includes(type);
+            });
+        }
+        if (state.filters.status?.length > 0) {
+            res.body = res.body?.filter((item) =>
+                state.filters.status.includes(item.status)
+            );
+            // fetch pre vote proposals
+            if (state.filters.status?.includes("PreVote") && isVotingBodyDao) {
+                const data = fetchVBPreVoteProposals();
+                res.body.push(...data.body);
+            }
         }
     }
-}
 
-if (isVotingBodyDao) {
-    if (state.tab === "draft") {
-        res = fetchVBPreVoteProposals();
-    } else {
-        res = fetchCongressDaoProposals();
+    if (isVotingBodyDao) {
+        if (state.tab === "draft") {
+            res = fetchVBPreVoteProposals();
+        } else {
+            res = fetchCongressDaoProposals();
+        }
     }
 }
 
@@ -213,8 +221,8 @@ function getDaoConfig() {
     }
 }
 
-getDaoConfig();
-
+if (!proposals) getDaoConfig();
+console.log(res);
 return (
     <>
         <div
