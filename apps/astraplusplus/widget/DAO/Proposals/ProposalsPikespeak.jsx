@@ -31,9 +31,7 @@ const isVotingBodyDao = daoId === VotingBodyDaoId;
 
 const proposalsCount = Near.view(daoId, "number_of_proposals");
 
-if (proposalsCount === null) {
-    return;
-}
+if (proposalsCount === null) return;
 
 State.init({
     daoId,
@@ -168,35 +166,34 @@ let res =
         : fetchDaoProposals());
 
 // filtering for congress daos
-if (!proposals) {
-    if (isCongressDaoID || isVotingBodyDao) {
-        if (state.filters.proposal_types?.length > 0) {
-            res.body = res.body?.filter((item) => {
-                const type =
-                    typeof item.proposal_type === "string"
-                        ? item.proposal_type
-                        : Object.keys(item.proposal_type)[0];
-                return state.filters.proposal_types.includes(type);
-            });
-        }
-        if (state.filters.status?.length > 0) {
-            res.body = res.body?.filter((item) =>
-                state.filters.status.includes(item.status)
-            );
-            // fetch pre vote proposals
-            if (state.filters.status?.includes("PreVote") && isVotingBodyDao) {
-                const data = fetchVBPreVoteProposals();
-                res.body.push(...data.body);
-            }
+
+if (isCongressDaoID || isVotingBodyDao) {
+    if (state.filters.proposal_types?.length > 0) {
+        res.body = res.body?.filter((item) => {
+            const type =
+                typeof item.proposal_type === "string"
+                    ? item.proposal_type
+                    : Object.keys(item.proposal_type)[0];
+            return state.filters.proposal_types.includes(type);
+        });
+    }
+    if (state.filters.status?.length > 0) {
+        res.body = res.body?.filter((item) =>
+            state.filters.status.includes(item.status)
+        );
+        // fetch pre vote proposals
+        if (state.filters.status?.includes("PreVote") && isVotingBodyDao) {
+            const data = fetchVBPreVoteProposals();
+            res.body.push(...data.body);
         }
     }
+}
 
-    if (isVotingBodyDao) {
-        if (state.tab === "draft") {
-            res = fetchVBPreVoteProposals();
-        } else {
-            res = fetchCongressDaoProposals();
-        }
+if (isVotingBodyDao) {
+    if (state.tab === "draft") {
+        res = fetchVBPreVoteProposals();
+    } else {
+        res = fetchCongressDaoProposals();
     }
 }
 
@@ -221,8 +218,8 @@ function getDaoConfig() {
     }
 }
 
-if (!proposals) getDaoConfig();
-console.log(res);
+getDaoConfig();
+
 return (
     <>
         <div

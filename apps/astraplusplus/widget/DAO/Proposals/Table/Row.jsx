@@ -210,7 +210,7 @@ return (
         <th scope="row">
             <span className="id-value">#{proposal_id}</span>
         </th>
-        <td>{formatDate(proposal.submission_time)}</td>
+        <td className="w-100">{formatDate(proposal.submission_time)}</td>
         <td>
             <Widget
                 src="mob.near/widget/Profile.ShortInlineBlock"
