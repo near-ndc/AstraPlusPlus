@@ -281,7 +281,10 @@ return (
         {activePage.widgetName === "Congress.index" ? (
             <div className="col">{pageContent}</div>
         ) : (
-            <div className="col ms-sm-4 ps-lg-5 py-3 py-md-5">
+            <div
+                className="col ms-sm-4 ps-lg-5 py-3 py-md-5"
+                style={{ width: "65%" }}
+            >
                 {pageContent}
             </div>
         )}

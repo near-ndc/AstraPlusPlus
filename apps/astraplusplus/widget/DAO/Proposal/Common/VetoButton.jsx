@@ -23,9 +23,23 @@ const proposalPastCooldown =
     Date().now;
 
 const disableVetoButton =
-    currentuserCongressHouse === CoADaoId
-        ? proposalPastCooldown
+    currentuserCongressHouse !== CoADaoId
+        ? true
+        : proposalPastCooldown
+        ? true
         : proposal.status === "Vetoed" || proposal.status === "Rejected";
+
+const VetoButton = styled.button`
+    padding: 10px;
+    padding-inline: 40px;
+    background-color: red;
+    color: white;
+    border-radius: 10px;
+    line-height: 23px;
+`;
+
+const description = `### Veto HoM Proposal ID ${proposal.id} \n
+Vote "Approve" = "Veto"; Vote "Reject" = "Do not support veto" \n\n${proposal.description}`;
 
 return (
     <div className="w-100">
@@ -39,12 +53,20 @@ return (
                     }),
                 isOpen: state.isProposalModalOpen,
                 toggle: (
-                    <button
-                        className="veto-btn text-center"
+                    <VetoButton
+                        className="custom-tooltip veto-btn"
                         disabled={disableVetoButton}
                     >
+                        <span
+                            style={{ left: "-20%", width: "200px" }}
+                            class="tooltiptext"
+                        >
+                            Initiation of a veto is limited to CoA members and
+                            must occur before the proposal cooldown period
+                            expires.
+                        </span>
                         Veto
-                    </button>
+                    </VetoButton>
                 ),
                 content: (
                     <div
@@ -72,7 +94,8 @@ return (
                                     dev: props.dev,
                                     registry,
                                     isHookCall: true,
-                                    proposalID: proposal.id
+                                    proposalID: proposal.id,
+                                    description: description
                                 }}
                             />
                         ) : (
@@ -84,7 +107,8 @@ return (
                                     registry,
                                     isHookCall: false,
                                     house: HoMDaoId,
-                                    proposalID: proposal.id
+                                    proposalID: proposal.id,
+                                    description: description
                                 }}
                             />
                         )}

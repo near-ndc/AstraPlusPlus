@@ -8,6 +8,7 @@ const HoMDaoId = props.dev
     : "/*__@replace:HoMDaoId__*/";
 const house = props.house;
 const proposalID = props.proposalID;
+const description = props.description;
 
 if (!accountId) {
     return "Please connect your NEAR wallet :)";
@@ -33,7 +34,7 @@ State.init({
     error: null,
     attachDeposit: 0,
     proposalQueue: null,
-    description: null
+    description: description ?? ""
 });
 
 const handleProposal = () => {
@@ -189,7 +190,7 @@ return (
                 props={{
                     onChange: (value) => onChangeDescription(value),
                     height: "270px",
-                    initialText: defaultDescription
+                    initialText: state.description ?? defaultDescription
                 }}
             />
         </div>
