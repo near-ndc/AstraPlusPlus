@@ -662,7 +662,7 @@ function renderVoteButtons({
 
     return (
         <div
-            className="d-lg-grid d-flex flex-wrap gap-2"
+            className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
             style={{
                 gridTemplateColumns: showVeto
                     ? "repeat(3,1fr) 120px"
@@ -811,7 +811,7 @@ function renderPreVoteButtons({ proposal }) {
         proposal?.submission_time + daoConfig?.pre_vote_duration < Date.now();
     return (
         <div
-            className="d-lg-grid d-flex flex-wrap gap-2"
+            className="d-lg-grid d-flex flex-wrap gap-2 align-items-end"
             style={{ gridTemplateColumns: "repeat(3,1fr)" }}
         >
             <button
