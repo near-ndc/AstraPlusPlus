@@ -68,7 +68,7 @@ const handleProposal = () => {
                             method_name: "dismiss_hook",
                             args: fc_args,
                             deposit: "100000000000000000000000",
-                            gas: "300000000000000"
+                            gas: "250000000000000"
                         }
                     ]
                 }
