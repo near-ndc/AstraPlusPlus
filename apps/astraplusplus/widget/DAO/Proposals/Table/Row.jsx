@@ -195,7 +195,7 @@ const DescriptionContainer = styled.td`
 `;
 
 const execProposal = ({ daoId, proposal_id }) =>
-    Near.call(daoId, "execute", { id: proposal_id }, 300000000000000);
+    Near.call(daoId, "execute", { id: proposal_id }, 50000000000000);
 
 return (
     <tr

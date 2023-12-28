@@ -35,7 +35,7 @@ State.init({
 });
 
 const execProposal = (proposal) =>
-    Near.call(daoId, "execute", { id: proposal.id }, 250000000000000);
+    Near.call(daoId, "execute", { id: proposal.id }, 50000000000000);
 
 const Wrapper = styled.div`
     .border-bottom {

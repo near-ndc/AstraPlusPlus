@@ -34,7 +34,7 @@ State.init({
     method_name: state.method_name,
     args: state.args || "{}",
     deposit: state.deposit || "0",
-    gas: "300000000000000",
+    gas: "50000000000000",
     error: undefined,
     receiver_id: null,
     description: null,
@@ -131,7 +131,7 @@ const handleFunctionCall = () => {
                                         method_name: state.method_name,
                                         args: fc_args,
                                         deposit: deposit,
-                                        gas: state.gas
+                                        gas: state.gas ?? "50000000000000"
                                     }
                                 ]
                             }
@@ -143,7 +143,7 @@ const handleFunctionCall = () => {
                 deposit: state.attachDeposit
                     ? Big(state.attachDeposit)
                     : 100000000000000000000000,
-                gas: 20000000000000
+                gas: 200000000000000
             }
         ]);
     } else {
@@ -190,7 +190,7 @@ const handleFunctionCall = () => {
                                         "utf-8"
                                     ).toString("base64"),
                                     deposit: deposit,
-                                    gas: "20000000000000"
+                                    gas: state.gas ?? "50000000000000"
                                 }
                             ]
                         }
@@ -240,7 +240,7 @@ const handleFunctionCall = () => {
                                         method_name: state.method_name,
                                         args: fc_args,
                                         deposit: deposit,
-                                        gas: state.gas
+                                        gas: state.gas ?? "50000000000000"
                                     }
                                 ]
                             }
@@ -255,7 +255,7 @@ const handleFunctionCall = () => {
                     methodName: "create_proposal",
                     args: args,
                     deposit: 100000000000000000000000,
-                    gas: 20000000000000
+                    gas: 200000000000000
                 }
             ]);
         } else {
@@ -274,7 +274,7 @@ const handleFunctionCall = () => {
                                             method_name: state.method_name,
                                             args: fc_args,
                                             deposit: deposit,
-                                            gas: state.gas ?? "200000000000000"
+                                            gas: state.gas ?? "50000000000000"
                                         }
                                     ]
                                 }
@@ -282,7 +282,7 @@ const handleFunctionCall = () => {
                         }
                     },
                     deposit: 100000000000000000000000,
-                    gas: state.gas ?? "200000000000000"
+                    gas: 200000000000000
                 }
             ]);
         }
