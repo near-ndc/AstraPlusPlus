@@ -188,12 +188,6 @@ function renderStatus(statusName) {
     );
 }
 
-const DescriptionContainer = styled.td`
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    -webkit-line-clamp: 3;
-`;
-
 const execProposal = ({ daoId, proposal_id }) =>
     Near.call(daoId, "execute", { id: proposal_id }, 50000000000000);
 
@@ -210,7 +204,7 @@ return (
         <th scope="row">
             <span className="id-value">#{proposal_id}</span>
         </th>
-        <td className="w-100">{formatDate(proposal.submission_time)}</td>
+        <td>{formatDate(proposal.submission_time)}</td>
         <td>
             <Widget
                 src="mob.near/widget/Profile.ShortInlineBlock"
@@ -221,13 +215,11 @@ return (
             />
         </td>
         <td className="text-center">{kindName}</td>
-        <DescriptionContainer
-            style={{
-                display: proposal.description?.length < 200 ? "" : "-webkit-box"
-            }}
-        >
-            {proposal.description}
-        </DescriptionContainer>
+        <td>
+            {proposal.description.length < 95
+                ? proposal.description
+                : `${proposal.description.slice(0, 92)}...`}
+        </td>
         <td className="text-center">
             {isVotingBodyDao
                 ? proposal.status === "PreVote"
