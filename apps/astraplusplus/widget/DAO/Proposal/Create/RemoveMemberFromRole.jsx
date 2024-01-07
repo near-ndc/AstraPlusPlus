@@ -9,7 +9,8 @@ if (!accountId) {
 State.init({
     member_id: state.member_id,
     role: state.role,
-    error: undefined
+    error: undefined,
+    rolesOptions: []
 });
 
 function isNearAddress(address) {
@@ -20,6 +21,34 @@ function isNearAddress(address) {
         address.length <= 64 &&
         ACCOUNT_ID_REGEX.test(address)
     );
+}
+
+const processPolicy = (policy) => {
+    const roles = {};
+    const options = [];
+    policy.roles.forEach((role) => {
+        if (role.kind.Group) {
+            if (!roles[role.name]) {
+                roles[role.name] = role;
+                options.push({ text: role.name, value: role.name });
+            }
+        }
+    });
+    State.update({ rolesOptions: options });
+    return roles;
+};
+
+const allowedRoles = useCache(
+    () =>
+        Near.asyncView(daoId, "get_policy").then((policy) =>
+            processPolicy(policy)
+        ),
+    daoId + "-remove-member-proposal",
+    { subscribe: false }
+);
+
+if (allowedRoles === null) {
+    return <></>;
 }
 
 const handleProposal = () => {
@@ -87,8 +116,20 @@ return (
             />
         </div>
         <div className="mb-3">
-            <h5>Role</h5>
-            <input type="text" onChange={(e) => onChangeRole(e.target.value)} />
+            <Widget
+                src={`sking.near/widget/Common.Inputs.Select`}
+                props={{
+                    label: "Role",
+                    noLabel: false,
+                    placeholder: "Select the role",
+                    options: state.rolesOptions,
+                    value: { text: state.role, value: state.role },
+                    onChange: (role) => {
+                        onChangeRole(role.value);
+                    },
+                    error: undefined
+                }}
+            />
         </div>
 
         {state.error && <div className="text-danger">{state.error}</div>}
