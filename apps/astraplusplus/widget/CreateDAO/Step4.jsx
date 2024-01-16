@@ -32,7 +32,7 @@ for (const role of initialAnswers.policy.roles) {
 const initialState = {
     roles: initialAnswers.policy.roles.length
         ? initialAnswers.policy.roles.map((r) => r.name)
-        : ["all", "council"],
+        : ["council"],
     members: initialMembers.length
         ? initialMembers
         : [{ role: "council", name: accountId }]
@@ -137,15 +137,6 @@ const finalState = {
         roles: state.answers.roles
             .filter((role, i) => role !== null && role !== "")
             .map((role, i) => {
-                if (role === "all")
-                    return {
-                        name: role,
-                        permissions:
-                            formState.policy.roles[i]?.permissions || [],
-                        kind: "Everyone",
-                        vote_policy:
-                            formState.policy.roles[i]?.vote_policy || {}
-                    };
                 return {
                     name: role,
                     kind: {
@@ -219,8 +210,8 @@ return (
                             props={{
                                 placeholder: "Group 1",
                                 size: "lg",
-                                disabled: i < 2,
-                                value: i < 2 ? r : undefined,
+                                disabled: i < 1,
+                                value: i < 1 ? r : undefined,
                                 onChange: (v) => onSetRoleName(i, v),
                                 useTimeout: true,
                                 error: errors.policy.roles[
@@ -322,12 +313,7 @@ return (
                                     placeholder: "Role",
                                     size: "lg",
                                     options: state.answers.roles
-                                        .filter(
-                                            (r) =>
-                                                r !== null &&
-                                                r !== "" &&
-                                                r !== "all"
-                                        )
+                                        .filter((r) => r !== null && r !== "")
                                         .map((r) => ({
                                             title: r,
                                             value: r
