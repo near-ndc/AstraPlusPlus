@@ -111,13 +111,15 @@ return (
         {Object.keys(votes).length === 0 && (
             <span className="text-muted text-center">No votes yet</span>
         )}
-        {votersCount > Object.keys(votes).length && (
-            <div>
-                Note: Indexer is currently running behind schedule, and the
-                expected results may take longer to appear. We appreciate your
-                patience and apologize for any inconvenience.
-            </div>
-        )}
+        {isCongressDaoID &&
+            isVotingBodyDao &&
+            votersCount > Object.keys(votes).length && (
+                <div>
+                    Note: Indexer is currently running behind schedule, and the
+                    expected results may take longer to appear. We appreciate
+                    your patience and apologize for any inconvenience.
+                </div>
+            )}
         {Object.keys(votes).map((voterId) => {
             const vote =
                 isCongressDaoID || isVotingBodyDao

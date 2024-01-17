@@ -367,6 +367,7 @@ const expensiveWork = () => {
     };
 
     Object.keys(my_proposal.vote_counts).forEach((key) => {
+        if (key === "all") return;
         totalVotes.yes += my_proposal.vote_counts[key][0];
         totalVotes.no += my_proposal.vote_counts[key][1];
         totalVotes.spam += my_proposal.vote_counts[key][2];
