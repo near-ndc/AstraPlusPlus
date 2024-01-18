@@ -43,7 +43,7 @@ return (
       <Widget
         src="nearui.near/widget/Input.ExperimentalText"
         props={{
-          label: "Define Period",
+          label: "Define Period (in days)",
           placeholder: "Enter days",
           size: "lg",
           inputProps: {

@@ -7,15 +7,44 @@ const Wrapper = styled.div`
   .text-subdued {
     color: rgba(130, 134, 136, 1);
   }
+
+  .no-card-div {
+    .ndc-card {
+      all: unset;
+    }
+  }
 `;
+const accountId = context.accountId;
+const policy = Near.view(daoId, "get_policy");
+const config = Near.view(daoId, "get_config");
+
+if (policy === null || config === null) {
+  return <Widget src="nearui.near/widget/Feedback.Spinner" />;
+}
+
+const metadata = JSON.parse(atob(config.metadata ?? ""));
 
 State.init({
   tab: "Links and Socials",
-  answers: initialAnswers
+  answers: initialAnswers,
+  form: {
+    ...config,
+    policy: policy,
+    ...metadata
+  }
 });
 
-const policy = Near.view(daoId, "get_config");
-console.log(policy);
+const currentUserRoles = []; // can have mutliple roles
+
+state.form?.policy?.roles?.map((role) => {
+  if (
+    Array.isArray(role?.kind?.Group) &&
+    role?.kind?.Group?.includes(accountId)
+  ) {
+    currentUserRoles.push(role.name);
+  }
+});
+
 const constructURL = (paramObj, base) => {
   paramObj = { ...paramObj, page: "dao" };
   const baseURL = base ?? `#/${widgetOwner}/widget/home`;
@@ -30,25 +59,50 @@ const constructURL = (paramObj, base) => {
   return `${baseURL}?${params}`;
 };
 
-const hasPermission = (role, proposalKind, permissionType) => {
-  const roleObj = state.answers.policy.roles.find((r) => r.name === role);
+// checks if user has permission to make edits to the screen
+const hasPermission = (proposalKind) => {
+  const permissions = currentUserRoles.map((role) => {
+    const roleObj = state.form.policy.roles.find((r) => r.name === role);
+    if (roleObj) {
+      return (
+        roleObj.permissions.includes(`${proposalKind}:*`) ||
+        roleObj.permissions.includes("*:*")
+      );
+    } else {
+      return false;
+    }
+  });
+  return permissions.some((element) => element === true);
+};
 
-  if (roleObj) {
-    const permission = `${proposalKind}:${permissionType}`;
-    return roleObj.permissions.some(
-      (p) =>
-        p === permission ||
-        p === "*:*" ||
-        p === `${proposalKind}:*` ||
-        p === `*:${permissionType}`
-    );
-  } else {
-    return false;
-  }
+const isUserAllowedToEdit = hasPermission("ChangeConfig");
+
+const handleProposal = () => {
+  const gas = 200000000000000;
+  const deposit = 100000000000000000000000;
+  Near.call([
+    {
+      contractName: daoId,
+      methodName: "add_proposal",
+      args: {
+        proposal: {
+          description: "Change policy proposal",
+          kind: {
+            ChangeConfig: {
+              name: "",
+              purpose: "",
+              metadata: ""
+            }
+          }
+        }
+      },
+      gas: gas,
+      deposit: deposit
+    }
+  ]);
 };
 
 const Footer = () => {
-  const isBtnDisabled = true;
   return (
     <div className="d-flex justify-content-end mt-4">
       <Widget
@@ -59,9 +113,9 @@ const Footer = () => {
               <i class="bi bi-check-lg"></i> Propose changes
             </>
           ),
-          variant: "info " + (isBtnDisabled && "disabled"),
+          variant: "info " + (!isUserAllowedToEdit && "disabled"),
           size: "lg",
-          onClick: () => {},
+          onClick: handleProposal,
           buttonProps: {
             type: "submit"
           }
@@ -86,39 +140,11 @@ const tabs = {
       />
     )
   },
-  "Cool Down Period": {
-    name: "Cool Down Period",
-    component: (
-      <Widget
-        src={`/*__@appAccount__*//widget/CreateDAO.Step3`}
-        props={{
-          formState: state.form,
-          onComplete: handleStepComplete,
-          errors: state.errors,
-          renderFooter: (stepState, otherProps) => <Footer />
-        }}
-      />
-    )
-  },
   "Proposal and Voting Permissions": {
     name: "Proposal and Voting Permissions",
     component: (
       <Widget
         src={`/*__@appAccount__*//widget/CreateDAO.Step5`}
-        props={{
-          formState: state.form,
-          onComplete: handleStepComplete,
-          errors: state.errors,
-          renderFooter: (stepState, otherProps) => <Footer />
-        }}
-      />
-    )
-  },
-  "Bond & Deadlines": {
-    name: "Bond & Deadlines",
-    component: (
-      <Widget
-        src={`/*__@appAccount__*//widget/CreateDAO.Step6`}
         props={{
           formState: state.form,
           onComplete: handleStepComplete,
@@ -137,7 +163,8 @@ const tabs = {
           formState: state.form,
           onComplete: handleStepComplete,
           errors: state.errors,
-          renderFooter: (stepState, otherProps) => <Footer />
+          renderFooter: (stepState, otherProps) => <Footer />,
+          isConfigScreen: true
         }}
       />
     )
@@ -223,22 +250,22 @@ return (
       <div className="ndc-card d-flex flex-column gap-2 p-4">
         <h5>DAO Name and Purpose</h5>
         <h6 className="text-subdued">DAO Name</h6>
-        <p>ksjdnf</p>
+        <p>{state.form.displayName}</p>
         <h6 className="text-subdued ">DAO Purpose</h6>
-        <p>dkhbfdsj</p>
+        <p>{state.form.purpose}</p>
       </div>
       <div className="ndc-card d-flex flex-column gap-2 p-4">
-        <h5>Legal Status and Doc</h5>
+        <h5>Legal Status and Document</h5>
         <h6 className="text-subdued">Legal Status</h6>
-        <p></p>
+        <p>{state.form.legal.legalStatus ?? "-"}</p>
         <h6 className="text-subdued ">Documents</h6>
-        <p></p>
+        <p>{state.form.legal.legalLink ?? "-"}</p>
       </div>
     </div>
     <div className="mt-4">
       <div className="ndc-card d-flex flex-column gap-2 p-4">
         <h5>More DAO settings</h5>
-        <div className="w-100">
+        <div className="w-100 no-card-div">
           <Widget
             src={`${widgetOwner}/widget/DAO.Layout.Tabs`}
             props={{
@@ -248,7 +275,7 @@ return (
               allowHref: false
             }}
           />
-          {tabContent}
+          <div style={{ marginTop: "-25px" }}>{tabContent}</div>
         </div>
       </div>
     </div>

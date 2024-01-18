@@ -2,8 +2,8 @@ const { formState, errors, renderFooter, showSteps, showCreateNewDAOInfo } =
   props;
 
 const initialAnswers = {
-  profileImage: formState.profileImage,
-  coverImage: formState.coverImage
+  profileImage: formState.flagLogo ?? formState.profileImage,
+  coverImage: formState.flagCover ?? formState.coverImage
 };
 
 State.init({

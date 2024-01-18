@@ -231,7 +231,8 @@ return (
           />
         ),
         showSteps: true,
-        showCreateNewDAOInfo: true
+        showCreateNewDAOInfo: true,
+        isConfigScreen: false
       }}
     />
   </>

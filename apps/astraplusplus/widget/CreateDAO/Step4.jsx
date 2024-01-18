@@ -1,4 +1,4 @@
-const { formState, errors, renderFooter, showSteps } = props;
+const { formState, errors, renderFooter, showSteps, isConfigScreen } = props;
 const { accountId } = context;
 
 const initialAnswers = {
@@ -59,7 +59,7 @@ const onRemoveRole = (index) => {
   State.update({
     answers: {
       ...state.answers,
-      roles: state.answers.roles.map((role, i) => (i === index ? null : role))
+      roles: state.answers.roles.filter((role, i) => i !== index)
     }
   });
 };
@@ -90,9 +90,7 @@ const onRemoveMember = (index) => {
   State.update({
     answers: {
       ...state.answers,
-      members: state.answers.members.map((member, i) =>
-        i === index ? null : member
-      )
+      members: state.answers.members.filter((member, i) => i !== index)
     }
   });
 };
@@ -203,19 +201,17 @@ return (
               props={{
                 placeholder: "Group 1",
                 size: "lg",
-                disabled: i < 1,
-                value: i < 1 ? r : undefined,
+                disabled: !isConfigScreen && i < 1,
+                value: r,
                 onChange: (v) => onSetRoleName(i, v),
-                useTimeout: true,
                 error:
                   errors.policy.roles[
                     finalState.policy.roles.findIndex((role) => role.name === r)
                   ].name,
-
                 inputProps: { defaultValue: r }
               }}
             />
-            {i > 1 && (
+            {(isConfigScreen ? state.answers.roles.length > 1 : i >= 1) && (
               <Widget
                 src="nearui.near/widget/Input.Button"
                 props={{
@@ -287,10 +283,10 @@ return (
                 props={{
                   placeholder: "user.near",
                   size: "lg",
-                  useTimeout: true,
+                  value: member.name,
                   inputProps: { defaultValue: member.name },
                   onChange: (v) => onSetMemberName(i, v),
-                  disabled: i === 0,
+                  disabled: !isConfigScreen && i === 0,
                   error:
                     state.error[i] ||
                     (trueMemberIndex !== null &&
@@ -312,10 +308,10 @@ return (
                     })),
                   value: member.role,
                   onChange: (v) => onSetMemberRole(i, v),
-                  disabled: i === 0
+                  disabled: !isConfigScreen && i === 0
                 }}
               />
-              {i > 0 && (
+              {(isConfigScreen ? state.answers.members.length > 1 : i >= 1) && (
                 <Widget
                   src="nearui.near/widget/Input.Button"
                   props={{
