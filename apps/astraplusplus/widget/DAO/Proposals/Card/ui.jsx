@@ -494,6 +494,7 @@ function renderVoteButtons({
     isAllowedToVote,
     handleVote
 }) {
+    const finished = statusName !== "In Progress";
     const VoteButton = styled.button`
     width: 100%;
     border-radius: 15px;
@@ -518,8 +519,8 @@ function renderVoteButtons({
       color: #000;
       transition: all 0.4s ease-in-out;
     }
-    ${({ finsihed, percentage, disabled }) => {
-        if (finsihed) {
+    ${({ finished, percentage, disabled }) => {
+        if (finished) {
             if (percentage > 80) {
                 return `
         &.no > div:last-child {
@@ -573,8 +574,8 @@ function renderVoteButtons({
       min-width: ${({ percentage }) =>
           percentage && percentage > 5 ? `${percentage}%` : "5px"};
 
-      ${({ finsihed, wins }) =>
-          finsihed &&
+      ${({ finished, wins }) =>
+          finished &&
           wins &&
           `
         display: none;
@@ -632,8 +633,6 @@ function renderVoteButtons({
         abstain: statusName === "Failed"
     };
 
-    const finsihed = statusName !== "In Progress";
-
     const voted = {
         yes: checkVotesForCongressDao("Approve"),
         no: checkVotesForCongressDao("Reject"),
@@ -676,11 +675,11 @@ function renderVoteButtons({
                 <VoteButton
                     className="yes"
                     percentage={percentages.yes}
-                    finsihed={finsihed}
+                    finished={finished}
                     wins={wins.yes}
                     myVote={voted.yes}
                     onClick={() => handleVote("VoteApprove")}
-                    disabled={alreadyVoted || finsihed || !isAllowedToVote[0]}
+                    disabled={alreadyVoted || finished || !isAllowedToVote[0]}
                 >
                     <div>
                         {wins.yes && (
@@ -698,11 +697,11 @@ function renderVoteButtons({
                 <VoteButton
                     className="no"
                     percentage={percentages.no}
-                    finsihed={finsihed}
+                    finished={finished}
                     wins={wins.no}
                     myVote={voted.no}
                     onClick={() => handleVote("VoteReject")}
-                    disabled={alreadyVoted || finsihed || !isAllowedToVote[1]}
+                    disabled={alreadyVoted || finished || !isAllowedToVote[1]}
                 >
                     <div className="d-flex gap-2 align-items-center">
                         {wins.no && (
@@ -722,12 +721,12 @@ function renderVoteButtons({
                     <VoteButton
                         className="abstain"
                         percentage={percentages.abstain}
-                        finsihed={finsihed}
+                        finished={finished}
                         wins={wins.abstain}
                         myVote={voted.abstain}
                         onClick={() => handleVote("VoteAbstain")}
                         disabled={
-                            alreadyVoted || finsihed || !isAllowedToVote[2]
+                            alreadyVoted || finished || !isAllowedToVote[2]
                         }
                     >
                         <div className="d-flex gap-2 align-items-center">
@@ -744,7 +743,7 @@ function renderVoteButtons({
                     <VoteButton
                         className="spam"
                         percentage={percentages.spam}
-                        finsihed={finsihed}
+                        finished={finished}
                         wins={wins.spam}
                         myVote={voted.spam}
                         onClick={() =>
@@ -753,7 +752,7 @@ function renderVoteButtons({
                             )
                         }
                         disabled={
-                            alreadyVoted || finsihed || !isAllowedToVote[2]
+                            alreadyVoted || finished || !isAllowedToVote[2]
                         }
                     >
                         <div className="d-flex gap-2 align-items-center">
