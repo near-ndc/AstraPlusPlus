@@ -335,9 +335,12 @@ const expensiveWork = () => {
                     : 0;
 
                 // Apply the threshold
-                const votesNeeded = Math.ceil(
-                    (threshold[0] / threshold[1]) * eligibleVoters
-                );
+                if (eligibleVoters === 0) {
+                    return;
+                }
+                const votesNeeded =
+                    Math.floor((threshold[0] / threshold[1]) * eligibleVoters) +
+                    1;
 
                 totalVotesNeeded += votesNeeded;
             }
