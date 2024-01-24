@@ -77,15 +77,6 @@ const tabs = {
             dev: props.dev ?? false
         })
     },
-    projects: {
-        name: "Projects",
-        widget: "DAO.Projects",
-        href: constructURL({
-            tab: "projects",
-            daoId: state.daoId,
-            dev: props.dev ?? false
-        })
-    },
     followers: {
         name: "Followers",
         widget: "DAO.Followers.index",
@@ -108,7 +99,6 @@ const tabs = {
 
 if (isCongressDaoID || props.daoId === VotingBodyDaoId) {
     delete tabs["funds"];
-    delete tabs["projects"];
     delete tabs["bounties"];
 }
 // not showing members page in v1
