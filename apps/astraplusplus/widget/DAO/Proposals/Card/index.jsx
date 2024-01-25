@@ -335,9 +335,12 @@ const expensiveWork = () => {
                     : 0;
 
                 // Apply the threshold
-                const votesNeeded = Math.ceil(
-                    (threshold[0] / threshold[1]) * eligibleVoters
-                );
+                if (eligibleVoters === 0) {
+                    return;
+                }
+                const votesNeeded =
+                    Math.floor((threshold[0] / threshold[1]) * eligibleVoters) +
+                    1;
 
                 totalVotesNeeded += votesNeeded;
             }
@@ -367,6 +370,7 @@ const expensiveWork = () => {
     };
 
     Object.keys(my_proposal.vote_counts).forEach((key) => {
+        if (key === "all") return;
         totalVotes.yes += my_proposal.vote_counts[key][0];
         totalVotes.no += my_proposal.vote_counts[key][1];
         totalVotes.spam += my_proposal.vote_counts[key][2];
