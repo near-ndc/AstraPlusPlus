@@ -1,11 +1,18 @@
-const { formState, errors, renderFooter, showSteps, isConfigScreen } = props;
+const {
+  formState,
+  errors,
+  renderFooter,
+  showSteps,
+  isConfigScreen,
+  updateParentState
+} = props;
 const { accountId } = context;
+
+updateParentState || (updateParentState = () => {});
 
 const initialAnswers = {
   policy: formState.policy
 };
-
-console.log("hereee", initialAnswers);
 
 function isNearAddress(address) {
   const ACCOUNT_ID_REGEX =
@@ -149,6 +156,26 @@ const finalState = {
       })
   }
 };
+
+useEffect(() => {
+  let timeoutId;
+
+  // Debounced function to update parent state
+  const debouncedUpdate = (value) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      updateParentState(value);
+    }, 300); // Adjust the debounce delay as needed
+  };
+
+  // Call the debounced function when local value changes
+  debouncedUpdate(finalState);
+
+  return () => {
+    // Cleanup on unmount
+    clearTimeout(timeoutId);
+  };
+}, [state.answers]);
 
 return (
   <div className="mt-4 ndc-card p-4">

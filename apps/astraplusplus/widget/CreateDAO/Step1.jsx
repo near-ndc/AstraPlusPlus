@@ -1,4 +1,13 @@
-const { formState, errors, renderFooter, showSteps } = props;
+const {
+  formState,
+  errors,
+  renderFooter,
+  showSteps,
+  isConfigScreen,
+  updateParentState
+} = props;
+
+updateParentState || (updateParentState = () => {});
 
 const initialAnswers = {
   name: formState.name,
@@ -21,6 +30,26 @@ const onValueChange = (key, value) => {
     }
   });
 };
+
+useEffect(() => {
+  let timeoutId;
+
+  // Debounced function to update parent state
+  const debouncedUpdate = (value) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      updateParentState(value);
+    }, 300); // Adjust the debounce delay as needed
+  };
+
+  // Call the debounced function when local value changes
+  debouncedUpdate({ ...formState, ...state.answers });
+
+  return () => {
+    // Cleanup on unmount
+    clearTimeout(timeoutId);
+  };
+}, [state.answers]);
 
 return (
   <div className="mt-4 ndc-card p-4">
@@ -64,49 +93,57 @@ return (
           error: errors["name"]
         }}
       />
-      <Widget
-        src="nearui.near/widget/Input.ExperimentalText"
-        props={{
-          label: (
-            <>
-              DAO Address{" "}
-              <span className="text-black-50 fw-light small">
-                (auto-filled)
-              </span>
-            </>
-          ),
-          placeholder: "sample-dao-name.sputnik-dao.near",
-          value:
-            state.answers.address === "" ? undefined : state.answers.address,
-          size: "md",
-          disabled: true,
-          onChange: (v) => onValueChange("address", v),
-          inputProps: {
-            name: "address",
-            defaultValue: state.answers.address
-          },
-          error: errors["address"]
-        }}
-      />
-      <Widget
-        src="nearui.near/widget/Input.ExperimentalText"
-        props={{
-          label: (
-            <>
-              Soul Bound Token Issuer{" "}
-              <span className="text-black-50 fw-light small">(optional)</span>
-            </>
-          ),
-          placeholder: "The address of the token issuer",
-          size: "md",
-          onChange: (v) => onValueChange("soulBoundTokenIssuer", v),
-          error: errors["soulBoundTokenIssuer"],
-          inputProps: {
-            name: "soulBoundTokenIssuer",
-            defaultValue: state.answers.soulBoundTokenIssuer
-          }
-        }}
-      />
+      {!isConfigScreen && (
+        <div className="d-flex flex-column gap-4">
+          <Widget
+            src="nearui.near/widget/Input.ExperimentalText"
+            props={{
+              label: (
+                <>
+                  DAO Address{" "}
+                  <span className="text-black-50 fw-light small">
+                    (auto-filled)
+                  </span>
+                </>
+              ),
+              placeholder: "sample-dao-name.sputnik-dao.near",
+              value:
+                state.answers.address === ""
+                  ? undefined
+                  : state.answers.address,
+              size: "md",
+              disabled: true,
+              onChange: (v) => onValueChange("address", v),
+              inputProps: {
+                name: "address",
+                defaultValue: state.answers.address
+              },
+              error: errors["address"]
+            }}
+          />
+          <Widget
+            src="nearui.near/widget/Input.ExperimentalText"
+            props={{
+              label: (
+                <>
+                  Soul Bound Token Issuer{" "}
+                  <span className="text-black-50 fw-light small">
+                    (optional)
+                  </span>
+                </>
+              ),
+              placeholder: "The address of the token issuer",
+              size: "md",
+              onChange: (v) => onValueChange("soulBoundTokenIssuer", v),
+              error: errors["soulBoundTokenIssuer"],
+              inputProps: {
+                name: "soulBoundTokenIssuer",
+                defaultValue: state.answers.soulBoundTokenIssuer
+              }
+            }}
+          />
+        </div>
+      )}
       <Widget
         src="nearui.near/widget/Input.ExperimentalText"
         props={{
@@ -145,25 +182,27 @@ return (
           }
         }}
       />
-      <Widget
-        src="nearui.near/widget/Input.ExperimentalText"
-        props={{
-          label: (
-            <>
-              Please provide a link to your DAO&apos;s Legal Document{" "}
-              <span className="text-black-50 fw-light small">(if any)</span>
-            </>
-          ),
-          placeholder: "https://Legal_Document",
-          size: "md",
-          onChange: (v) => onValueChange("legalDocument", v),
-          error: errors["legalDocument"],
-          inputProps: {
-            name: "legalDocument",
-            defaultValue: state.answers.legalDocument
-          }
-        }}
-      />
+      {!isConfigScreen && (
+        <Widget
+          src="nearui.near/widget/Input.ExperimentalText"
+          props={{
+            label: (
+              <>
+                Please provide a link to your DAO&apos;s Legal Document{" "}
+                <span className="text-black-50 fw-light small">(if any)</span>
+              </>
+            ),
+            placeholder: "https://Legal_Document",
+            size: "md",
+            onChange: (v) => onValueChange("legalDocument", v),
+            error: errors["legalDocument"],
+            inputProps: {
+              name: "legalDocument",
+              defaultValue: state.answers.legalDocument
+            }
+          }}
+        />
+      )}
     </div>
 
     {renderFooter(state.answers)}

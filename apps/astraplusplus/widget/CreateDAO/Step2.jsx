@@ -1,4 +1,13 @@
-const { formState, errors, renderFooter, showSteps } = props;
+const {
+  formState,
+  errors,
+  renderFooter,
+  showSteps,
+  isConfigScreen,
+  updateParentState
+} = props;
+
+updateParentState || (updateParentState = () => {});
 
 const initialAnswers = {
   links: formState.links.length > 0 ? formState.links : [""]
@@ -46,13 +55,36 @@ const Error = styled.span`
   }
 `;
 
+useEffect(() => {
+  let timeoutId;
+
+  // Debounced function to update parent state
+  const debouncedUpdate = (value) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      updateParentState(value);
+    }, 300); // Adjust the debounce delay as needed
+  };
+
+  // Call the debounced function when local value changes
+  debouncedUpdate({
+    ...formState,
+    links: state.answers.links.filter((l) => l !== null && l !== "")
+  });
+
+  return () => {
+    // Cleanup on unmount
+    clearTimeout(timeoutId);
+  };
+}, [state.answers]);
+
 return (
   <div className="mt-4 ndc-card p-4">
     <div className="d-flex flex-column gap-2">
       <div>
         <div className="d-flex gap-2 justify-content-between">
-          <div>
-            {showSteps && (
+          {showSteps && (
+            <div>
               <h2 className="h5 fw-bold">
                 <span
                   className="rounded-circle d-inline-flex align-items-center justify-content-center fw-bolder h5 me-2"
@@ -67,18 +99,26 @@ return (
                 Links and socials{" "}
                 <span className="text-black-50 fw-light small">(optional)</span>
               </h2>
-            )}
-            <p className="text-black-50 fw-light small">
-              Looking to grow the DAO members? Add links to allow people to
-              learn more about your DAO. You can only add 10 links.
-            </p>
-          </div>
+              <p className="text-black-50 fw-light small">
+                Looking to grow the DAO members? Add links to allow people to
+                learn more about your DAO. You can only add 10 links.
+              </p>
+            </div>
+          )}
+          {isConfigScreen && (
+            <div>
+              Links and socials
+              <span className="text-black-50 fw-light small">
+                (You can only add 10 links)
+              </span>
+            </div>
+          )}
           <Widget
             src="nearui.near/widget/Input.Button"
             props={{
               children: <i className="bi bi-plus-lg" />,
               variant: "icon info outline",
-              size: "lg",
+              size: isConfigScreen ? "sm" : "lg",
               onClick: onAddLink
             }}
           />
@@ -109,7 +149,7 @@ return (
             props={{
               children: <i className="bi bi-trash" />,
               variant: "icon danger outline",
-              size: "lg",
+              size: isConfigScreen ? "sm" : "lg",
               onClick: () => onRemoveLink(i)
             }}
           />

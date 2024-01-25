@@ -1,5 +1,7 @@
-const { formState, errors, renderFooter, showSteps } = props;
+const { formState, errors, renderFooter, showSteps, updateParentState } = props;
 const { accountId } = context;
+
+updateParentState || (updateParentState = () => {});
 
 const initialAnswers = {
   policy: formState.policy
@@ -354,6 +356,26 @@ const Table = styled.ul`
     }
   }
 `;
+
+useEffect(() => {
+  let timeoutId;
+
+  // Debounced function to update parent state
+  const debouncedUpdate = (value) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      updateParentState(value);
+    }, 300); // Adjust the debounce delay as needed
+  };
+
+  // Call the debounced function when local value changes
+  debouncedUpdate(state.answers);
+
+  return () => {
+    // Cleanup on unmount
+    clearTimeout(timeoutId);
+  };
+}, [state.answers]);
 
 const renderTable = (roles, rows, action) => {
   return (

@@ -1,9 +1,18 @@
-const { formState, errors, renderFooter, showSteps, showCreateNewDAOInfo } =
-  props;
+const {
+  formState,
+  errors,
+  renderFooter,
+  showSteps,
+  showCreateNewDAOInfo,
+  isConfigScreen,
+  updateParentState
+} = props;
+
+updateParentState || (updateParentState = () => {});
 
 const initialAnswers = {
-  profileImage: formState.flagLogo ?? formState.profileImage,
-  coverImage: formState.flagCover ?? formState.coverImage
+  profileImage: formState.profileImage ?? formState.flagLogo,
+  coverImage: formState.coverImage ?? formState.flagCover
 };
 
 State.init({
@@ -144,6 +153,26 @@ ${JSON.stringify({ ...formState, ...state.answers }, null, 2)}
 \`\`\`
 `;
 
+useEffect(() => {
+  let timeoutId;
+
+  // Debounced function to update parent state
+  const debouncedUpdate = (value) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      updateParentState(value);
+    }, 300); // Adjust the debounce delay as needed
+  };
+
+  // Call the debounced function when local value changes
+  debouncedUpdate({ ...formState, ...state.answers });
+
+  return () => {
+    // Cleanup on unmount
+    clearTimeout(timeoutId);
+  };
+}, [state.answers]);
+
 return (
   <div className="mt-4 ndc-card p-4">
     <div className="d-flex flex-column gap-2">
@@ -163,30 +192,32 @@ return (
             Create DAO Assets
           </h2>
         )}
-        <Widget
-          src="/*__@appAccount__*//widget/Layout.Modal"
-          props={{
-            content: (
-              <div className="ndc-card p-4">
-                <h3 className="h6 fw-bold">DAO Preview</h3>
-                <Markdown text={daoPreviewState} />
-                {renderFooter(state.answers, {
-                  hasPrevious: false
-                })}
-              </div>
-            ),
-            toggle: (
-              <Widget
-                src="nearui.near/widget/Input.Button"
-                props={{
-                  children: "Preview DAO",
-                  variant: "outline info",
-                  size: "lg"
-                }}
-              />
-            )
-          }}
-        />
+        {!isConfigScreen && (
+          <Widget
+            src="/*__@appAccount__*//widget/Layout.Modal"
+            props={{
+              content: (
+                <div className="ndc-card p-4">
+                  <h3 className="h6 fw-bold">DAO Preview</h3>
+                  <Markdown text={daoPreviewState} />
+                  {renderFooter(state.answers, {
+                    hasPrevious: false
+                  })}
+                </div>
+              ),
+              toggle: (
+                <Widget
+                  src="nearui.near/widget/Input.Button"
+                  props={{
+                    children: "Preview DAO",
+                    variant: "outline info",
+                    size: "lg"
+                  }}
+                />
+              )
+            }}
+          />
+        )}
       </div>
       <div className="d-flex gap-2 justify-content-between align-items-center">
         <div>
