@@ -236,7 +236,7 @@ const daoImageMapping = {
     logo: "https://ipfs.near.social/ipfs/bafkreia7zwjqzd4htab7be6nx3ys26q5pd3l7hww3jw6jlnbszmk74w6si"
   }
 };
-console.log("prrro", profile);
+
 return (
   <Root>
     <BG
