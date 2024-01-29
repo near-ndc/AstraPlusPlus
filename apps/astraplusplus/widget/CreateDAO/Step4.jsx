@@ -14,6 +14,9 @@ const initialAnswers = {
   policy: formState.policy
 };
 
+const [showAccountAutocompleteIndex, setShowAccountAutocompleteIndex] =
+  useState(null);
+
 function isNearAddress(address) {
   const ACCOUNT_ID_REGEX =
     /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
@@ -82,6 +85,7 @@ const onSetRoleName = (index, name) => {
 
 // -- members
 const onAddEmptyMember = () => {
+  setShowAccountAutocompleteIndex(null);
   State.update({
     answers: {
       ...state.answers,
@@ -94,6 +98,7 @@ const onAddEmptyMember = () => {
 };
 
 const onRemoveMember = (index) => {
+  setShowAccountAutocompleteIndex(null);
   State.update({
     answers: {
       ...state.answers,
@@ -177,8 +182,14 @@ useEffect(() => {
   };
 }, [state.answers]);
 
+const Container = styled.div`
+  .flex-1 {
+    flex: 1;
+  }
+`;
+
 return (
-  <div className="mt-4 ndc-card p-4">
+  <Container className="mt-4 ndc-card p-4">
     <div className="d-flex flex-column gap-2">
       {showSteps && (
         <h2 className="h5 fw-bold">
@@ -300,44 +311,65 @@ return (
           return (
             <div
               className={[
-                "d-flex align-items-center gap-2 mt-2",
+                "d-flex gap-2 mt-2",
                 member === null ? "d-none" : ""
               ].join(" ")}
               key={i}
             >
-              <Widget
-                src="nearui.near/widget/Input.ExperimentalText"
-                props={{
-                  placeholder: "user.near",
-                  size: "lg",
-                  value: member.name,
-                  inputProps: { defaultValue: member.name },
-                  onChange: (v) => onSetMemberName(i, v),
-                  disabled: !isConfigScreen && i === 0,
-                  error:
-                    state.error[i] ||
-                    (trueMemberIndex !== null &&
-                      errors.policy.roles[trueRoleIndex].kind.Group[
-                        trueMemberIndex
-                      ])
-                }}
-              />
-              <Widget
-                src="nearui.near/widget/Input.Select"
-                props={{
-                  placeholder: "Role",
-                  size: "lg",
-                  options: state.answers.roles
-                    .filter((r) => r !== null && r !== "")
-                    .map((r) => ({
-                      title: r,
-                      value: r
-                    })),
-                  value: member.role,
-                  onChange: (v) => onSetMemberRole(i, v),
-                  disabled: !isConfigScreen && i === 0
-                }}
-              />
+              <div className="d-flex flex-column gap-2 flex-1">
+                <Widget
+                  src="nearui.near/widget/Input.ExperimentalText"
+                  props={{
+                    placeholder: "user.near",
+                    size: "lg",
+                    value: member.name,
+                    onChange: (v) => {
+                      if (showAccountAutocompleteIndex !== i) {
+                        setShowAccountAutocompleteIndex(i);
+                      }
+                      onSetMemberName(i, v);
+                    },
+                    disabled: !isConfigScreen && i === 0,
+                    error:
+                      state.error[i] ||
+                      (trueMemberIndex !== null &&
+                        errors.policy.roles[trueRoleIndex].kind.Group[
+                          trueMemberIndex
+                        ])
+                  }}
+                />
+                {showAccountAutocompleteIndex === i && (
+                  <Widget
+                    src="devhub.near/widget/devhub.components.molecule.AccountAutocomplete"
+                    props={{
+                      term: member.name,
+                      onSelect: (v) => {
+                        onSetMemberName(i, v);
+                        setShowAccountAutocompleteIndex(null);
+                      },
+                      onClose: () => setShowAccountAutocompleteIndex(null)
+                    }}
+                  />
+                )}
+              </div>
+              <div className="flex-1">
+                <Widget
+                  src="nearui.near/widget/Input.Select"
+                  props={{
+                    placeholder: "Role",
+                    size: "lg",
+                    options: state.answers.roles
+                      .filter((r) => r !== null && r !== "")
+                      .map((r) => ({
+                        title: r,
+                        value: r
+                      })),
+                    value: member.role,
+                    onChange: (v) => onSetMemberRole(i, v),
+                    disabled: !isConfigScreen && i === 0
+                  }}
+                />
+              </div>
               {(isConfigScreen ? state.answers.members.length > 1 : i >= 1) && (
                 <Widget
                   src="nearui.near/widget/Input.Button"
@@ -356,5 +388,5 @@ return (
     </div>
 
     {renderFooter(finalState)}
-  </div>
+  </Container>
 );
