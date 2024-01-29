@@ -128,9 +128,6 @@ function handleFormComplete(value) {
       })
     ).toString("base64")
   };
-
-  console.log(finalSputnikFactoryArgs);
-  console.log(sputnikFactoryArgs);
   Near.call([
     {
       contractName: "sputnik-dao.near",
@@ -180,8 +177,6 @@ const steps = [
     className: state.step > 5 ? "active-outline" : undefined
   }
 ];
-
-console.log(state.formState);
 
 return (
   <>
