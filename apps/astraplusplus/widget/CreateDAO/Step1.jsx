@@ -1,4 +1,13 @@
-const { formState, errors, renderFooter } = props;
+const {
+  formState,
+  errors,
+  renderFooter,
+  showSteps,
+  isConfigScreen,
+  updateParentState
+} = props;
+
+updateParentState || (updateParentState = () => {});
 
 const initialAnswers = {
   name: formState.name,
@@ -6,38 +15,60 @@ const initialAnswers = {
   soulBoundTokenIssuer: formState.soulBoundTokenIssuer,
   purpose: formState.purpose,
   legalStatus: formState.legalStatus,
-  legalDocument: formState.legalDocument,
+  legalDocument: formState.legalDocument
 };
 
 State.init({
-  answers: initialAnswers,
+  answers: initialAnswers
 });
 
 const onValueChange = (key, value) => {
   State.update({
     answers: {
       ...state.answers,
-      [key]: value,
-    },
+      [key]: value
+    }
   });
 };
+
+useEffect(() => {
+  let timeoutId;
+
+  // Debounced function to update parent state
+  const debouncedUpdate = (value) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      updateParentState(value);
+    }, 300); // Adjust the debounce delay as needed
+  };
+
+  // Call the debounced function when local value changes
+  debouncedUpdate({ ...formState, ...state.answers });
+
+  return () => {
+    // Cleanup on unmount
+    clearTimeout(timeoutId);
+  };
+}, [state.answers]);
 
 return (
   <div className="mt-4 ndc-card p-4">
     <div className="d-flex flex-column gap-4">
-      <h2 className="h5 fw-bold">
-        <span
-          className="rounded-circle d-inline-flex align-items-center justify-content-center fw-bolder h5 me-2"
-          style={{
-            width: "48px",
-            height: "48px",
-            border: "1px solid #82E299",
-          }}
-        >
-          1
-        </span>
-        DAO Info & KYC
-      </h2>
+      {showSteps && (
+        <h2 className="h5 fw-bold">
+          <span
+            className="rounded-circle d-inline-flex align-items-center justify-content-center fw-bolder h5 me-2"
+            style={{
+              width: "48px",
+              height: "48px",
+              border: "1px solid #82E299"
+            }}
+          >
+            1
+          </span>
+          DAO Info & KYC
+        </h2>
+      )}
       <Widget
         src="nearui.near/widget/Input.ExperimentalText"
         props={{
@@ -52,59 +83,67 @@ return (
               `${v
                 .toLowerCase()
                 .replace(/\s/g, "-")
-                .replace(/[^a-zA-Z0-9-]/g, "")}.sputnik-dao.near`,
+                .replace(/[^a-zA-Z0-9-]/g, "")}.sputnik-dao.near`
             );
           },
           inputProps: {
             name: "name",
-            defaultValue: state.answers.name,
+            defaultValue: state.answers.name
           },
-          error: errors["name"],
+          error: errors["name"]
         }}
       />
-      <Widget
-        src="nearui.near/widget/Input.ExperimentalText"
-        props={{
-          label: (
-            <>
-              DAO Address{" "}
-              <span className="text-black-50 fw-light small">
-                (auto-filled)
-              </span>
-            </>
-          ),
-          placeholder: "sample-dao-name.sputnik-dao.near",
-          value:
-            state.answers.address === "" ? undefined : state.answers.address,
-          size: "md",
-          disabled: true,
-          onChange: (v) => onValueChange("address", v),
-          inputProps: {
-            name: "address",
-            defaultValue: state.answers.address,
-          },
-          error: errors["address"],
-        }}
-      />
-      <Widget
-        src="nearui.near/widget/Input.ExperimentalText"
-        props={{
-          label: (
-            <>
-              Soul Bound Token Issuer{" "}
-              <span className="text-black-50 fw-light small">(optional)</span>
-            </>
-          ),
-          placeholder: "The address of the token issuer",
-          size: "md",
-          onChange: (v) => onValueChange("soulBoundTokenIssuer", v),
-          error: errors["soulBoundTokenIssuer"],
-          inputProps: {
-            name: "soulBoundTokenIssuer",
-            defaultValue: state.answers.soulBoundTokenIssuer,
-          },
-        }}
-      />
+      {!isConfigScreen && (
+        <div className="d-flex flex-column gap-4">
+          <Widget
+            src="nearui.near/widget/Input.ExperimentalText"
+            props={{
+              label: (
+                <>
+                  DAO Address{" "}
+                  <span className="text-black-50 fw-light small">
+                    (auto-filled)
+                  </span>
+                </>
+              ),
+              placeholder: "sample-dao-name.sputnik-dao.near",
+              value:
+                state.answers.address === ""
+                  ? undefined
+                  : state.answers.address,
+              size: "md",
+              disabled: true,
+              onChange: (v) => onValueChange("address", v),
+              inputProps: {
+                name: "address",
+                defaultValue: state.answers.address
+              },
+              error: errors["address"]
+            }}
+          />
+          <Widget
+            src="nearui.near/widget/Input.ExperimentalText"
+            props={{
+              label: (
+                <>
+                  Soul Bound Token Issuer{" "}
+                  <span className="text-black-50 fw-light small">
+                    (optional)
+                  </span>
+                </>
+              ),
+              placeholder: "The address of the token issuer",
+              size: "md",
+              onChange: (v) => onValueChange("soulBoundTokenIssuer", v),
+              error: errors["soulBoundTokenIssuer"],
+              inputProps: {
+                name: "soulBoundTokenIssuer",
+                defaultValue: state.answers.soulBoundTokenIssuer
+              }
+            }}
+          />
+        </div>
+      )}
       <Widget
         src="nearui.near/widget/Input.ExperimentalText"
         props={{
@@ -115,10 +154,10 @@ return (
           inputProps: {
             rows: 5,
             name: "purpose",
-            defaultValue: state.answers.purpose,
+            defaultValue: state.answers.purpose
           },
           onChange: (v) => onValueChange("purpose", v),
-          error: errors["purpose"],
+          error: errors["purpose"]
         }}
       />
       <h3 className="h5 fw-bold">
@@ -139,29 +178,31 @@ return (
           error: errors["legalStatus"],
           inputProps: {
             name: "legalStatus",
-            defaultValue: state.answers.legalStatus,
-          },
+            defaultValue: state.answers.legalStatus
+          }
         }}
       />
-      <Widget
-        src="nearui.near/widget/Input.ExperimentalText"
-        props={{
-          label: (
-            <>
-              Please provide a link to your DAO&apos;s Legal Document{" "}
-              <span className="text-black-50 fw-light small">(if any)</span>
-            </>
-          ),
-          placeholder: "https://Legal_Document",
-          size: "md",
-          onChange: (v) => onValueChange("legalDocument", v),
-          error: errors["legalDocument"],
-          inputProps: {
-            name: "legalDocument",
-            defaultValue: state.answers.legalDocument,
-          },
-        }}
-      />
+      {!isConfigScreen && (
+        <Widget
+          src="nearui.near/widget/Input.ExperimentalText"
+          props={{
+            label: (
+              <>
+                Please provide a link to your DAO&apos;s Legal Document{" "}
+                <span className="text-black-50 fw-light small">(if any)</span>
+              </>
+            ),
+            placeholder: "https://Legal_Document",
+            size: "md",
+            onChange: (v) => onValueChange("legalDocument", v),
+            error: errors["legalDocument"],
+            inputProps: {
+              name: "legalDocument",
+              defaultValue: state.answers.legalDocument
+            }
+          }}
+        />
+      )}
     </div>
 
     {renderFooter(state.answers)}

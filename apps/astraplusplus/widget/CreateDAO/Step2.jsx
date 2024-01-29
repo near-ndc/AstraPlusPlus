@@ -1,19 +1,28 @@
-const { formState, errors, renderFooter } = props;
+const {
+  formState,
+  errors,
+  renderFooter,
+  showSteps,
+  isConfigScreen,
+  updateParentState
+} = props;
+
+updateParentState || (updateParentState = () => {});
 
 const initialAnswers = {
-  links: formState.links.length > 0 ? formState.links : [""],
+  links: formState.links.length > 0 ? formState.links : [""]
 };
 
 State.init({
-  answers: initialAnswers,
+  answers: initialAnswers
 });
 
 const update = (key, value) =>
   State.update({
     answers: {
       ...state.answers,
-      [key]: value,
-    },
+      [key]: value
+    }
   });
 
 const onAddLink = () => update("links", [...state.answers.links, ""]);
@@ -46,46 +55,81 @@ const Error = styled.span`
   }
 `;
 
+useEffect(() => {
+  let timeoutId;
+
+  // Debounced function to update parent state
+  const debouncedUpdate = (value) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      updateParentState(value);
+    }, 300); // Adjust the debounce delay as needed
+  };
+
+  // Call the debounced function when local value changes
+  debouncedUpdate({
+    ...formState,
+    links: state.answers.links.filter((l) => l !== null && l !== "")
+  });
+
+  return () => {
+    // Cleanup on unmount
+    clearTimeout(timeoutId);
+  };
+}, [state.answers]);
+
 return (
   <div className="mt-4 ndc-card p-4">
-    <div className="d-flex flex-column gap-4">
+    <div className="d-flex flex-column gap-2">
       <div>
         <div className="d-flex gap-2 justify-content-between">
-          <h2 className="h5 fw-bold">
-            <span
-              className="rounded-circle d-inline-flex align-items-center justify-content-center fw-bolder h5 me-2"
-              style={{
-                width: "48px",
-                height: "48px",
-                border: "1px solid #82E299",
-              }}
-            >
-              2
-            </span>
-            Links and socials{" "}
-            <span className="text-black-50 fw-light small">(optional)</span>
-          </h2>
+          {showSteps && (
+            <div>
+              <h2 className="h5 fw-bold">
+                <span
+                  className="rounded-circle d-inline-flex align-items-center justify-content-center fw-bolder h5 me-2"
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    border: "1px solid #82E299"
+                  }}
+                >
+                  2
+                </span>
+                Links and socials{" "}
+                <span className="text-black-50 fw-light small">(optional)</span>
+              </h2>
+              <p className="text-black-50 fw-light small">
+                Looking to grow the DAO members? Add links to allow people to
+                learn more about your DAO. You can only add 10 links.
+              </p>
+            </div>
+          )}
+          {isConfigScreen && (
+            <div>
+              Links and socials
+              <span className="text-black-50 fw-light small">
+                (You can only add 10 links)
+              </span>
+            </div>
+          )}
           <Widget
             src="nearui.near/widget/Input.Button"
             props={{
               children: <i className="bi bi-plus-lg" />,
               variant: "icon info outline",
-              size: "lg",
-              onClick: onAddLink,
+              size: isConfigScreen ? "sm" : "lg",
+              onClick: onAddLink
             }}
           />
         </div>
-        <p className="text-black-50 fw-light small">
-          Looking to grow the DAO members? Add links to allow people to learn
-          more about your DAO. You can only add 10 links.
-        </p>
       </div>
 
       {state.answers.links.map((l, i) => (
         <div
           className={[
             "d-flex align-items-center gap-2",
-            l === null && "d-none",
+            l === null && "d-none"
           ].join(" ")}
         >
           <Widget
@@ -96,8 +140,8 @@ return (
               onChange: (v) => onLinkChange(i, v),
               inputProps: {
                 name: `link-${i}`,
-                defaultValue: l,
-              },
+                defaultValue: l
+              }
             }}
           />
           <Widget
@@ -105,8 +149,8 @@ return (
             props={{
               children: <i className="bi bi-trash" />,
               variant: "icon danger outline",
-              size: "lg",
-              onClick: () => onRemoveLink(i),
+              size: isConfigScreen ? "sm" : "lg",
+              onClick: () => onRemoveLink(i)
             }}
           />
         </div>
@@ -119,7 +163,7 @@ return (
     </div>
 
     {renderFooter({
-      links: state.answers.links.filter((l) => l !== null && l !== ""),
+      links: state.answers.links.filter((l) => l !== null && l !== "")
     })}
   </div>
 );

@@ -94,12 +94,22 @@ const tabs = {
             daoId: state.daoId,
             dev: props.dev ?? false
         })
+    },
+    settings: {
+        name: "Settings",
+        widget: "DAO.Settings.index",
+        href: constructURL({
+            tab: "settings",
+            daoId: state.daoId,
+            dev: props.dev ?? false
+        })
     }
 };
 
 if (isCongressDaoID || props.daoId === VotingBodyDaoId) {
     delete tabs["funds"];
     delete tabs["bounties"];
+    delete tabs["settings"];
 }
 // not showing members page in v1
 if (props.daoId === VotingBodyDaoId) {

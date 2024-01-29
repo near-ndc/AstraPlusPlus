@@ -1,12 +1,14 @@
-const { formState, errors, renderFooter } = props;
+const { formState, errors, renderFooter, showSteps, updateParentState } = props;
 const { accountId } = context;
 
+updateParentState || (updateParentState = () => {});
+
 const initialAnswers = {
-  policy: formState.policy,
+  policy: formState.policy
 };
 
 State.init({
-  answers: initialAnswers,
+  answers: initialAnswers
 });
 
 // -- roles
@@ -15,78 +17,78 @@ const rolesArray = [...state.answers.policy.roles.map((role) => role.name)];
 const proposalKinds = {
   ChangeDAOConfig: {
     title: "Change DAO Config",
-    key: "config",
+    key: "config"
   },
   ChangeDAOPolicy: {
     title: "Change DAO Policy",
-    key: "policy",
+    key: "policy"
   },
   Bounty: {
     title: "Bounty",
-    key: "add_bounty",
+    key: "add_bounty"
   },
   BountyDone: {
     title: "Bounty Done",
-    key: "bounty_done",
+    key: "bounty_done"
   },
   Transfer: {
     title: "Transfer",
-    key: "transfer",
+    key: "transfer"
   },
   Polls: {
     title: "Polls",
-    key: "vote",
+    key: "vote"
   },
   RemoveMembers: {
     title: "Remove Members",
-    key: "remove_member_from_role",
+    key: "remove_member_from_role"
   },
   AddMembers: {
     title: "Add Members",
-    key: "add_member_to_role",
+    key: "add_member_to_role"
   },
   FunctionCall: {
     title: "Function Call",
-    key: "call",
+    key: "call"
   },
   UpgradeSelf: {
     title: "Upgrade Self",
-    key: "upgrade_self",
+    key: "upgrade_self"
   },
   UpgradeRemote: {
     title: "Upgrade Remote",
-    key: "upgrade_remote",
+    key: "upgrade_remote"
   },
   SetVoteToken: {
     title: "Set Vote Token",
-    key: "set_vote_token",
-  },
+    key: "set_vote_token"
+  }
 };
 
 const proposalActions = {
   AddProposal: {
     title: "Add Proposal",
-    key: "AddProposal",
+    key: "AddProposal"
   },
   VoteApprove: {
     title: "Vote Approve",
-    key: "VoteApprove",
+    key: "VoteApprove"
   },
   VoteReject: {
     title: "Vote Reject",
-    key: "VoteReject",
+    key: "VoteReject"
   },
   VoteRemove: {
     title: "Vote Remove",
-    key: "VoteRemove",
-  },
+    key: "VoteRemove"
+  }
 };
 
 const allActionArray = Object.keys(proposalActions).map(
-  (key) => proposalActions[key].key,
+  (key) => proposalActions[key].key
 );
 const allProposalKindArray = Object.keys(proposalKinds).map(
-  (key) => proposalKinds[key].key,
+  (key) => proposalKinds[key].key
 );
 
 const hasPermission = (role, proposalKind, permissionType) => {
@@ -99,7 +101,7 @@ const hasPermission = (role, proposalKind, permissionType) => {
         p === permission ||
         p === "*:*" ||
         p === `${proposalKind}:*` ||
-        p === `*:${permissionType}`,
+        p === `*:${permissionType}`
     );
   } else {
     return false;
@@ -114,7 +116,7 @@ const cleanPermissions = (permissions) => {
   allActionArray.forEach((action) => {
     if (permissions.some((p) => p === `*:${action}`)) {
       permissions = permissions.filter(
-        (p) => !p.endsWith(`:${action}`) || p === `*:${action}`,
+        (p) => !p.endsWith(`:${action}`) || p === `*:${action}`
       );
     }
   });
@@ -123,7 +125,7 @@ const cleanPermissions = (permissions) => {
   allProposalKindArray.forEach((kind) => {
     if (permissions.some((p) => p === `${kind}:*`)) {
       permissions = permissions.filter(
-        (p) => !p.startsWith(`${kind}:`) || p === `${kind}:*`,
+        (p) => !p.startsWith(`${kind}:`) || p === `${kind}:*`
       );
     }
   });
@@ -132,11 +134,11 @@ const cleanPermissions = (permissions) => {
   allProposalKindArray.forEach((kind) => {
     if (
       allActionArray.every((action) =>
-        permissions.includes(`${kind}:${action}`),
+        permissions.includes(`${kind}:${action}`)
       )
     ) {
       permissions = permissions.filter(
-        (p) => !p.startsWith(`${kind}:`) || p === `${kind}:*`,
+        (p) => !p.startsWith(`${kind}:`) || p === `${kind}:*`
       );
       permissions.push(`${kind}:*`);
     }
@@ -146,11 +148,11 @@ const cleanPermissions = (permissions) => {
   allActionArray.forEach((action) => {
     if (
       allProposalKindArray.every((kind) =>
-        permissions.includes(`${kind}:${action}`),
+        permissions.includes(`${kind}:${action}`)
       )
     ) {
       permissions = permissions.filter(
-        (p) => !p.endsWith(`:${action}`) || p === `*:${action}`,
+        (p) => !p.endsWith(`:${action}`) || p === `*:${action}`
       );
       permissions.push(`*:${action}`);
     }
@@ -173,7 +175,7 @@ const popActionWildCard = (permissions) => {
     const [proposalKind, action] = permission.split(":");
     if (action === "*") {
       expandedPermissions.push(
-        ...allActionArray.map((a) => `${proposalKind}:${a}`),
+        ...allActionArray.map((a) => `${proposalKind}:${a}`)
       );
     } else {
       expandedPermissions.push(permission);
@@ -188,7 +190,7 @@ const popProposalKindWildCard = (permissions) => {
     const [proposalKind, action] = permission.split(":");
     if (proposalKind === "*") {
       expandedPermissions.push(
-        ...allProposalKindArray.map((k) => `${k}:${action}`),
+        ...allProposalKindArray.map((k) => `${k}:${action}`)
       );
     } else {
       expandedPermissions.push(permission);
@@ -241,7 +243,7 @@ const setCreatePermission = (roleName, proposalKind, value) => {
   const newRole = setPermission(role, proposalKind, "AddProposal", value);
 
   const newRoles = state.answers.policy.roles.map((r) =>
-    r.name === roleName ? newRole : r,
+    r.name === roleName ? newRole : r
   );
 
   State.update({
@@ -249,9 +251,9 @@ const setCreatePermission = (roleName, proposalKind, value) => {
       ...state.answers,
       policy: {
         ...state.answers.policy,
-        roles: newRoles,
-      },
-    },
+        roles: newRoles
+      }
+    }
   });
 };
 
@@ -263,7 +265,7 @@ const setVotePermission = (roleName, proposalKind, value) => {
   newRole = setPermission(newRole, proposalKind, "VoteRemove", value);
 
   const newRoles = state.answers.policy.roles.map((r) =>
-    r.name === roleName ? newRole : r,
+    r.name === roleName ? newRole : r
   );
 
   State.update({
@@ -271,9 +273,9 @@ const setVotePermission = (roleName, proposalKind, value) => {
       ...state.answers,
       policy: {
         ...state.answers.policy,
-        roles: newRoles,
-      },
-    },
+        roles: newRoles
+      }
+    }
   });
 };
 
@@ -355,6 +357,26 @@ const Table = styled.ul`
   }
 `;
 
+useEffect(() => {
+  let timeoutId;
+
+  // Debounced function to update parent state
+  const debouncedUpdate = (value) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      updateParentState(value);
+    }, 300); // Adjust the debounce delay as needed
+  };
+
+  // Call the debounced function when local value changes
+  debouncedUpdate(state.answers);
+
+  return () => {
+    // Cleanup on unmount
+    clearTimeout(timeoutId);
+  };
+}, [state.answers]);
+
 const renderTable = (roles, rows, action) => {
   return (
     <Table>
@@ -384,7 +406,7 @@ const renderTable = (roles, rows, action) => {
                     ? hasPermission(role, rows[key].key, "VoteApprove") ||
                       hasPermission(role, rows[key].key, "VoteReject") ||
                       hasPermission(role, rows[key].key, "VoteRemove")
-                    : hasPermission(role, rows[key].key, action),
+                    : hasPermission(role, rows[key].key, action)
               }}
             />
           ))}
@@ -396,21 +418,22 @@ const renderTable = (roles, rows, action) => {
 
 return (
   <div className="mt-4 ndc-card p-4">
-    <div className="d-flex flex-column gap-4">
-      <h2 className="h5 fw-bold mb-2">
-        <span
-          className="rounded-circle d-inline-flex align-items-center justify-content-center fw-bolder h5 me-2"
-          style={{
-            width: "48px",
-            height: "48px",
-            border: "1px solid #82E299",
-          }}
-        >
-          5
-        </span>
-        Proposal and permissions
-      </h2>
-
+    <div className="d-flex flex-column gap-2">
+      {showSteps && (
+        <h2 className="h5 fw-bold mb-2">
+          <span
+            className="rounded-circle d-inline-flex align-items-center justify-content-center fw-bolder h5 me-2"
+            style={{
+              width: "48px",
+              height: "48px",
+              border: "1px solid #82E299"
+            }}
+          >
+            5
+          </span>
+          Proposal and Voting permissions
+        </h2>
+      )}
       <div>
         <h3 className="h6 fw-bold mb-0">Proposal creation</h3>
         <p className="text-black-50 fw-light small">
