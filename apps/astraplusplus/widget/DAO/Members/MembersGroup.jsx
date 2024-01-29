@@ -907,7 +907,7 @@ return (
                     {paginatedMembers?.map((item) => {
                       return (
                         <div className="ndc-card p-4 d-flex flex-column gap-2">
-                          <div className="d-flex justify-content-between align-items-center">
+                          <div className="d-flex justify-content-between align-items-center text-truncate">
                             <Widget
                               src="mob.near/widget/Profile.ShortInlineBlock"
                               props={{
