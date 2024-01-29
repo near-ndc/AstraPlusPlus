@@ -152,10 +152,11 @@ const finalState = {
               .filter((m) => m.role === role && m !== null && m.name !== "")
               .map((m) => m.name)
           },
-          permissions:
-            formState.policy.roles[i]?.permissions || role === "council"
-              ? ["*:*"]
-              : [],
+          permissions: isConfigScreen
+            ? formState.policy.roles[i].permissions
+            : formState.policy.roles[i]?.permissions || role === "council"
+            ? ["*:*"]
+            : [],
           vote_policy: formState.policy.roles[i]?.vote_policy || {}
         };
       })
