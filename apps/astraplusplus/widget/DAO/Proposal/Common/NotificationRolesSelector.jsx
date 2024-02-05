@@ -108,9 +108,7 @@ const createNotificationsData = () => {
     contractName: "social.near",
     methodName: "set",
     args: { data: notification },
-    deposit: Big(JSON.stringify(notification).length * 16)
-      .mul(Big(10).pow(20))
-      .toFixed()
+    deposit: 100000000000000000000000
   };
   return call;
 };

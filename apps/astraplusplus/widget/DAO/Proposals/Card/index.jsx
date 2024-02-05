@@ -426,7 +426,13 @@ if (!state || state.proposal.id !== proposal.id) {
   );
 }
 
-const handleVote = ({ action, proposalId, daoId, proposer }) => {
+const handleVote = ({
+  action,
+  proposalId,
+  daoId,
+  proposer,
+  showNotification
+}) => {
   let args = {};
   if (isVotingBodyDao) {
     args["prop_id"] = parseInt(proposalId);
@@ -482,22 +488,25 @@ const handleVote = ({ action, proposalId, daoId, proposer }) => {
     } else {
       args["action"] = action;
     }
-    Near.call([
+    const calls = [
       {
         contractName: daoId,
         methodName: isCongressDaoID ? "vote" : "act_proposal",
         args: args,
         gas: 200000000000000
-      },
-      {
+      }
+    ];
+    if (showNotification) {
+      calls.push({
         contractName: "social.near",
         methodName: "set",
         args: { data: notification },
         deposit: Big(JSON.stringify(notification).length * 16)
           .mul(Big(10).pow(20))
           .toFixed()
-      }
-    ]);
+      });
+    }
+    Near.call(calls);
   }
 };
 

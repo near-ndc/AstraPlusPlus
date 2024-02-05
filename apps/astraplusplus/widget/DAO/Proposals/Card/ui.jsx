@@ -29,6 +29,8 @@ const {
   registry
 } = props;
 const accountId = context.accountId;
+const [showNotificationModal, setNotificationModal] = useState(false);
+const [voteDetails, setVoteDetails] = useState(null);
 
 function checkVotesForCongressDao(value) {
   if (isCongressDaoID) {
@@ -990,8 +992,65 @@ if (multiSelectMode && !canVote) {
   );
 }
 
+const NotificationModal = () => {
+  return (
+    <Widget
+      src="/*__@appAccount__*//widget/Layout.Modal"
+      props={{
+        content: (
+          <div className="ndc-card d-flex flex-column gap-3 p-4">
+            Do you want to notify proposer: {proposer} about the vote?
+            <div className="d-flex gap-3 justify-content-end">
+              <Widget
+                src="nearui.near/widget/Input.Button"
+                props={{
+                  children: <>No</>,
+                  size: "sm",
+                  variant: "danger outline",
+                  onClick: () => {
+                    handleVote({
+                      action: voteDetails,
+                      daoId,
+                      proposalId: proposal.id,
+                      proposer,
+                      showNotification: false
+                    });
+                    setNotificationModal(false);
+                  }
+                }}
+              />
+              <Widget
+                src="nearui.near/widget/Input.Button"
+                props={{
+                  children: <>Yes</>,
+                  variant: "info outline",
+                  size: "sm",
+                  onClick: () => {
+                    handleVote({
+                      action: voteDetails,
+                      daoId,
+                      proposalId: proposal.id,
+                      proposer,
+                      showNotification: true
+                    });
+                    setNotificationModal(false);
+                  }
+                }}
+              />
+            </div>
+          </div>
+        ),
+        toggle: <></>,
+        open: showNotificationModal,
+        onOpenChange: () => setNotificationModal(!showNotificationModal)
+      }}
+    />
+  );
+};
+
 return (
   <Wrapper className="ndc-card" status={statusName}>
+    <NotificationModal />
     {renderPermission({ isAllowedToVote: isAllowedToVote.every((v) => v) })}
     {renderHeader({ typeName, id, daoId, statusName })}
     {renderData({
@@ -1017,12 +1076,17 @@ return (
         accountId,
         isAllowedToVote,
         handleVote: (action) => {
-          return handleVote({
-            action,
-            daoId,
-            proposalId: proposal.id,
-            proposer
-          });
+          if (isVotingBodyDao) {
+            return handleVote({
+              action,
+              daoId,
+              proposalId: proposal.id,
+              proposer
+            });
+          } else {
+            setNotificationModal(true);
+            setVoteDetails(action);
+          }
         }
       })}
 
