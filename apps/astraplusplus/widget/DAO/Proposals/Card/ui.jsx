@@ -896,7 +896,11 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
     }
   ];
 
-  if (proposal.typeName !== "Text" && proposal.typeName !== "TextSuper") {
+  if (
+    proposal.typeName !== "Text" &&
+    proposal.typeName !== "Vote" &&
+    proposal.typeName !== "TextSuper"
+  ) {
     items.push({
       title: "More details",
       icon: "bi bi-three-dots",

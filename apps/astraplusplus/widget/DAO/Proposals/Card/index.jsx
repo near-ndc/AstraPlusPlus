@@ -153,9 +153,11 @@ if (!proposalString && proposalId && daoId) {
       return "Proposal not found, check console for details.";
     }
     new_proposal = new_proposal.body[0].proposal;
-    new_proposal.kind = {
-      [new_proposal.kind.typeEnum]: new_proposal.kind
-    };
+    if (typeof new_proposal.kind !== "string") {
+      new_proposal.kind = {
+        [new_proposal.kind.typeEnum]: new_proposal.kind
+      };
+    }
   }
 } else if (!proposalString) {
   return "Please provide a daoId and a proposal or proposalId.";
