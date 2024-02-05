@@ -20,7 +20,8 @@ State.init({
   description: state.description,
   error: state.error,
   attachDeposit: 0,
-  proposalQueue: null
+  proposalQueue: null,
+  notificationsData: {}
 });
 
 const handleProposal = () => {
@@ -73,7 +74,7 @@ const handleProposal = () => {
       }
     ]);
   } else {
-    Near.call([
+    const calls = [
       {
         contractName: daoId,
         methodName:
@@ -84,7 +85,12 @@ const handleProposal = () => {
         gas: gas,
         deposit: policy?.proposal_bond || 100000000000000000000000
       }
-    ]);
+    ];
+    if (state.notificationsData) {
+      calls.push(state.notificationsData);
+    }
+
+    Near.call(calls);
   }
 };
 
@@ -139,6 +145,17 @@ return (
         }}
       />
     </div>
+    <Widget
+      src="/*__@appAccount__*//widget/DAO.Proposal.Common.NotificationRolesSelector"
+      props={{
+        daoId: daoId,
+        dev: props.dev,
+        onUpdate: (v) => {
+          State.update({ notificationsData: v });
+        },
+        proposalType: "Text"
+      }}
+    />
     {state.error && <div className="text-danger">{state.error}</div>}
     <div className="ms-auto">
       <Widget

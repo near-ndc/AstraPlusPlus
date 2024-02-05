@@ -47,7 +47,8 @@ State.init({
   showReceiverAsOptions: false,
   disableReceiverField: false,
   attachDeposit: 0,
-  proposalQueue: null
+  proposalQueue: null,
+  notificationsData: {}
 });
 
 const fc_args = Buffer.from(state.args, "utf-8").toString("base64");
@@ -148,6 +149,7 @@ const handleFunctionCall = () => {
       }
     ]);
   } else {
+    const calls = [];
     if (isCongressDaoID) {
       if (isEmpty(state.description)) {
         State.update({
@@ -247,43 +249,44 @@ const handleFunctionCall = () => {
           };
         }
       }
-      Near.call([
-        {
-          contractName: daoId,
-          methodName: "create_proposal",
-          args: args,
-          deposit: 100000000000000000000000,
-          gas: 200000000000000
-        }
-      ]);
+      calls.push({
+        contractName: daoId,
+        methodName: "create_proposal",
+        args: args,
+        deposit: 100000000000000000000000,
+        gas: 200000000000000
+      });
     } else {
-      Near.call([
-        {
-          contractName: daoId,
-          methodName: "add_proposal",
-          args: {
-            proposal: {
-              description: state.description,
-              kind: {
-                FunctionCall: {
-                  receiver_id: state.contractId,
-                  actions: [
-                    {
-                      method_name: state.method_name,
-                      args: fc_args,
-                      deposit: deposit,
-                      gas: state.gas ?? "50000000000000"
-                    }
-                  ]
-                }
+      calls.push({
+        contractName: daoId,
+        methodName: "add_proposal",
+        args: {
+          proposal: {
+            description: state.description,
+            kind: {
+              FunctionCall: {
+                receiver_id: state.contractId,
+                actions: [
+                  {
+                    method_name: state.method_name,
+                    args: fc_args,
+                    deposit: deposit,
+                    gas: state.gas ?? "50000000000000"
+                  }
+                ]
               }
             }
-          },
-          deposit: policy?.proposal_bond || 100000000000000000000000,
-          gas: 200000000000000
-        }
-      ]);
+          }
+        },
+        deposit: policy?.proposal_bond || 100000000000000000000000,
+        gas: 200000000000000
+      });
     }
+    if (state.notificationsData) {
+      calls.push(state.notificationsData);
+    }
+
+    Near.call(calls);
   }
 };
 
@@ -535,6 +538,17 @@ return (
         }}
       />
     </div>
+    <Widget
+      src="/*__@appAccount__*//widget/DAO.Proposal.Common.NotificationRolesSelector"
+      props={{
+        daoId: daoId,
+        dev: props.dev,
+        onUpdate: (v) => {
+          State.update({ notificationsData: v });
+        },
+        proposalType: "Function call"
+      }}
+    />
     {state.error && <div className="text-danger">{state.error}</div>}
     <div className="ms-auto">
       <Widget
