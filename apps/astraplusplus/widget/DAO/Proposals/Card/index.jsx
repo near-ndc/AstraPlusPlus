@@ -500,10 +500,8 @@ const handleVote = ({
       calls.push({
         contractName: "social.near",
         methodName: "set",
-        args: { data: notification },
-        deposit: Big(JSON.stringify(notification).length * 16)
-          .mul(Big(10).pow(20))
-          .toFixed()
+        args: { data: notification, options: { refund_unused_deposit: true } },
+        deposit: 100000000000000000000000
       });
     }
     Near.call(calls);

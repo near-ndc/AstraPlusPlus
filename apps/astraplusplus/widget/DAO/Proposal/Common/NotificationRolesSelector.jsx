@@ -107,7 +107,7 @@ const createNotificationsData = () => {
   const call = {
     contractName: "social.near",
     methodName: "set",
-    args: { data: notification },
+    args: { data: notification, options: { refund_unused_deposit: true } },
     deposit: 100000000000000000000000
   };
   return call;
