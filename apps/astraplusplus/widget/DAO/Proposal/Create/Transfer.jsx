@@ -12,7 +12,8 @@ State.init({
   amount: state.amount,
   tokenAddress: state.tokenAddress || "",
   error: state.error,
-  description: state.description
+  description: state.description,
+  notificationsData: {}
 });
 
 function isNearAddress(address) {
@@ -64,7 +65,7 @@ const handleProposal = () => {
     .mul(Big(10).pow(ftMetadata.decimals))
     .toFixed();
 
-  Near.call([
+  const calls = [
     {
       contractName: daoId,
       methodName: "add_proposal",
@@ -83,7 +84,12 @@ const handleProposal = () => {
       gas: gas,
       deposit: deposit
     }
-  ]);
+  ];
+  if (state.notificationsData) {
+    calls.push(state.notificationsData);
+  }
+
+  Near.call(calls);
 };
 
 const onChangeRecipient = (receiver_id) => {
@@ -233,7 +239,17 @@ return (
         }}
       />
     </div>
-
+    <Widget
+      src="/*__@appAccount__*//widget/DAO.Proposal.Common.NotificationRolesSelector"
+      props={{
+        daoId: daoId,
+        dev: props.dev,
+        onUpdate: (v) => {
+          State.update({ notificationsData: v });
+        },
+        proposalType: "Transfer"
+      }}
+    />
     {state.error && <div className="text-danger">{state.error}</div>}
     <div className="ms-auto">
       <Widget
