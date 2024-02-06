@@ -145,6 +145,15 @@ const finalState = {
     roles: state.answers.roles
       .filter((role, i) => role !== null && role !== "")
       .map((role, i) => {
+        if (role === "all")
+          return {
+            name: role,
+            permissions: isConfigScreen
+              ? formState.policy.roles[i].permissions
+              : formState.policy.roles[i]?.permissions || [],
+            kind: "Everyone",
+            vote_policy: formState.policy.roles[i]?.vote_policy || {}
+          };
         return {
           name: role,
           kind: {
