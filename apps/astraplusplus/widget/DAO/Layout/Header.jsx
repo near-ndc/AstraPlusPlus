@@ -114,8 +114,10 @@ const Avatar = styled.div`
   background-color: #eee;
   background-size: cover;
   background-position: center;
-  height: 140px;
-  width: 140px;
+  min-height: 140px;
+  min-width: 140px;
+  max-height: 140px;
+  max-width: 140px;
 `;
 
 const Root = styled.div`
