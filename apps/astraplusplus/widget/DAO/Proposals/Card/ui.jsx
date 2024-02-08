@@ -35,9 +35,11 @@ const expirationTime =
   isCongressDaoID || isVotingBodyDao
     ? submission_time +
       (daoConfig?.vote_duration ?? daoConfig?.voting_duration ?? 0)
-    : parseInt(
+    : policy?.proposal_period
+    ? parseInt(
         Big(submission_time).add(Big(policy.proposal_period)).div(1000000)
-      );
+      )
+    : null;
 function checkVotesForCongressDao(value) {
   if (isCongressDaoID) {
     return votes[accountId]?.vote === value;
@@ -439,17 +441,17 @@ function renderData({
             </div>
           </div>
         )}
-
-        <div className="info_section">
-          <b>Expired at</b>
-          <div>
-            <small className="text-muted">
-              {new Date(expirationTime).toLocaleString()}
-            </small>
+        {expirationTime && (
+          <div className="info_section">
+            <b>Expired at</b>
+            <div>
+              <small className="text-muted">
+                {new Date(expirationTime).toLocaleString()}
+              </small>
+            </div>
           </div>
-        </div>
-
-        {totalVotesNeeded && (
+        )}
+        {totalVotesNeeded > 0 && (
           <div className="info_section no-border">
             <b>Required Votes</b>
             <div>
