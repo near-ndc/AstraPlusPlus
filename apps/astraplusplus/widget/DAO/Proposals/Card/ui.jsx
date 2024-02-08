@@ -31,7 +31,13 @@ const {
 const accountId = context.accountId;
 const [showNotificationModal, setNotificationModal] = useState(false);
 const [voteDetails, setVoteDetails] = useState(null);
-
+const expirationTime =
+  isCongressDaoID || isVotingBodyDao
+    ? submission_time +
+      (daoConfig?.vote_duration ?? daoConfig?.voting_duration ?? 0)
+    : parseInt(
+        Big(submission_time).add(Big(policy.proposal_period)).div(1000000)
+      );
 function checkVotesForCongressDao(value) {
   if (isCongressDaoID) {
     return votes[accountId]?.vote === value;
@@ -257,9 +263,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
           <div className="d-flex align-items-center gap-2">
             {(isCongressDaoID || isVotingBodyDao) &&
               statusName === "Approved" &&
-              proposal?.submission_time +
-                (daoConfig?.vote_duration ?? daoConfig?.voting_duration) +
-                (daoConfig?.cooldown ?? 0) < // cooldown is not available in vb
+              expirationTime + (daoConfig?.cooldown ?? 0) < // cooldown is not available in vb
                 Date.now() && (
                 <Widget
                   src="nearui.near/widget/Input.Button"
@@ -329,39 +333,29 @@ function renderHeader({ typeName, id, daoId, statusName }) {
             }}
           />
 
-          {(isCongressDaoID || isVotingBodyDao) &&
-            statusName === "In Progress" &&
-            proposal?.submission_time +
-              (daoConfig?.vote_duration ?? daoConfig?.voting_duration) >
-              Date.now() && (
-              <Widget
-                src="/*__@replace:nui__*//widget/Element.Badge"
-                props={{
-                  children: (
-                    <div className="counter-text">
-                      <Widget
-                        src="/*__@appAccount__*//widget/Common.Layout.Countdown"
-                        props={{
-                          timeToCheck:
-                            proposal?.submission_time +
-                            (daoConfig?.vote_duration ??
-                              daoConfig?.voting_duration)
-                        }}
-                      />
-                    </div>
-                  ),
-                  variant: `info round`,
-                  size: "lg"
-                }}
-              />
-            )}
+          {statusName === "In Progress" && expirationTime > Date.now() && (
+            <Widget
+              src="/*__@replace:nui__*//widget/Element.Badge"
+              props={{
+                children: (
+                  <div className="counter-text">
+                    <Widget
+                      src="/*__@appAccount__*//widget/Common.Layout.Countdown"
+                      props={{
+                        timeToCheck: expirationTime
+                      }}
+                    />
+                  </div>
+                ),
+                variant: `info round`,
+                size: "lg"
+              }}
+            />
+          )}
           {isCongressDaoID &&
             daoConfig?.cooldown !== 0 &&
             statusName !== "In Progress" &&
-            proposal?.submission_time +
-              (daoConfig?.vote_duration ?? daoConfig?.voting_duration) +
-              daoConfig?.cooldown >
-              Date.now() && (
+            expirationTime + daoConfig?.cooldown > Date.now() && (
               <Widget
                 src="/*__@replace:nui__*//widget/Element.Badge"
                 props={{
@@ -371,11 +365,7 @@ function renderHeader({ typeName, id, daoId, statusName }) {
                       <Widget
                         src="/*__@appAccount__*//widget/Common.Layout.Countdown"
                         props={{
-                          timeToCheck:
-                            proposal?.submission_time +
-                            (daoConfig?.vote_duration ??
-                              daoConfig?.voting_duration) +
-                            daoConfig?.cooldown
+                          timeToCheck: expirationTime + daoConfig?.cooldown
                         }}
                       />
                     </div>
@@ -449,21 +439,16 @@ function renderData({
             </div>
           </div>
         )}
-        {(isCongressDaoID || isVotingBodyDao) && (
-          <div className="info_section">
-            <b>Expired at</b>
-            <div>
-              <small className="text-muted">
-                {new Date(
-                  submission_time +
-                    (daoConfig?.vote_duration ??
-                      daoConfig?.voting_duration ??
-                      0)
-                ).toLocaleString()}
-              </small>
-            </div>
+
+        <div className="info_section">
+          <b>Expired at</b>
+          <div>
+            <small className="text-muted">
+              {new Date(expirationTime).toLocaleString()}
+            </small>
           </div>
-        )}
+        </div>
+
         {totalVotesNeeded && (
           <div className="info_section no-border">
             <b>Required Votes</b>
