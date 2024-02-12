@@ -148,7 +148,7 @@ const finalState = {
         if (role === "all")
           return {
             name: role,
-            permissions: formState.policy.roles[i]?.permissions || [],
+            permissions: formState.policy.roles[i]?.permissions ?? [],
             kind: "Everyone",
             vote_policy: formState.policy.roles[i]?.vote_policy || {}
           };
@@ -160,7 +160,7 @@ const finalState = {
               .map((m) => m.name)
           },
           permissions: isConfigScreen
-            ? formState.policy.roles[i].permissions
+            ? formState.policy.roles[i].permissions ?? []
             : formState.policy.roles[i]?.permissions || role === "council"
             ? ["*:*"]
             : [],
