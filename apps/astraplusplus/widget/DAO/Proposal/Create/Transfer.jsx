@@ -13,7 +13,9 @@ State.init({
   tokenAddress: state.tokenAddress || "",
   error: state.error,
   description: state.description,
-  notificationsData: {}
+  notificationsData: {},
+  ftMetadata: null,
+  storage: undefined
 });
 
 function isNearAddress(address) {
@@ -57,8 +59,7 @@ const handleProposal = () => {
     decimals: 24
   };
   if (state.tokenAddress !== "") {
-    ftMetadata = Near.view(state.tokenAddress, "ft_metadata", {});
-    if (ftMetadata === null) return null;
+    ftMetadata = state.ftMetadata;
   }
 
   const amountInYocto = Big(state.amount)
@@ -85,12 +86,47 @@ const handleProposal = () => {
       deposit: deposit
     }
   ];
+  if (state.storage === null && state.tokenAddress) {
+    const depositInYocto = Big(0.0125)
+      .mul(Big(10).pow(ftMetadata.decimals))
+      .toFixed();
+    calls.push({
+      contractName: state.tokenAddress,
+      methodName: "storage_deposit",
+      args: {
+        account_id: state.receiver_id
+      },
+      gas: gas,
+      deposit: depositInYocto
+    });
+  }
   if (state.notificationsData) {
     calls.push(state.notificationsData);
   }
 
   Near.call(calls);
 };
+
+useEffect(() => {
+  if (
+    state.tokenAddress &&
+    state.receiver_id &&
+    isNearAddress(state.receiver_id)
+  ) {
+    Near.asyncView(state.tokenAddress, "ft_metadata", {}).then((ftMetadata) => {
+      State.update({
+        ftMetadata
+      });
+    });
+    Near.asyncView(state.tokenAddress, "storage_balance_of", {
+      account_id: state.receiver_id
+    }).then((storage) => {
+      State.update({
+        storage
+      });
+    });
+  }
+}, [state.receiver_id, state.tokenAddress]);
 
 const onChangeRecipient = (receiver_id) => {
   State.update({
