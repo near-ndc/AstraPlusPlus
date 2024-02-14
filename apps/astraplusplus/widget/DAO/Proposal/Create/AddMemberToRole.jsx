@@ -12,6 +12,7 @@ State.init({
   role: state.role,
   error: undefined,
   rolesOptions: [],
+  description: null,
   notificationsData: {}
 });
 
@@ -44,9 +45,19 @@ const processPolicy = (policy) => {
   return roles;
 };
 
+function isEmpty(value) {
+  return !value || value === "";
+}
+
 const allowedRoles = processPolicy(policy);
 
 const handleProposal = () => {
+  if (isEmpty(state.description)) {
+    State.update({
+      error: "Please enter a description"
+    });
+    return;
+  }
   if (
     !state.member_id ||
     state.member_id === "" ||
@@ -72,7 +83,7 @@ const handleProposal = () => {
       methodName: "add_proposal",
       args: {
         proposal: {
-          description: "Potential member",
+          description: state.description,
           kind: {
             AddMemberToRole: {
               member_id: state.member_id ?? accountId,
@@ -106,6 +117,15 @@ const onChangeRole = (role) => {
   });
 };
 
+const onChangeDescription = (description) => {
+  State.update({
+    description,
+    error: undefined
+  });
+};
+
+const defaultDescription = "Potential member";
+
 if (allowedRoles === null) {
   return <> </>;
 }
@@ -129,6 +149,17 @@ return (
             onChangeRole(role.value);
           },
           error: undefined
+        }}
+      />
+    </div>
+    <div className="mb-3">
+      <h5>Proposal Description</h5>
+      <Widget
+        src="sking.near/widget/Common.Inputs.Markdown"
+        props={{
+          onChange: (value) => onChangeDescription(value),
+          height: "270px",
+          initialText: defaultDescription
         }}
       />
     </div>

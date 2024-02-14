@@ -12,6 +12,7 @@ State.init({
   role: state.role,
   error: undefined,
   rolesOptions: [],
+  description: null,
   notificationsData: {}
 });
 
@@ -23,6 +24,10 @@ function isNearAddress(address) {
     address.length <= 64 &&
     ACCOUNT_ID_REGEX.test(address)
   );
+}
+
+function isEmpty(value) {
+  return !value || value === "";
 }
 
 if (policy === null) {
@@ -47,6 +52,12 @@ const processPolicy = (policy) => {
 const allowedRoles = processPolicy(policy);
 
 const handleProposal = () => {
+  if (isEmpty(state.description)) {
+    State.update({
+      error: "Please enter a description"
+    });
+    return;
+  }
   if (
     !state.member_id ||
     state.member_id === "" ||
@@ -72,7 +83,7 @@ const handleProposal = () => {
       methodName: "add_proposal",
       args: {
         proposal: {
-          description: "Remove member",
+          description: state.description,
           kind: {
             RemoveMemberFromRole: {
               member_id: state.member_id ?? accountId,
@@ -106,6 +117,15 @@ const onChangeRole = (role) => {
   });
 };
 
+const onChangeDescription = (description) => {
+  State.update({
+    description,
+    error: undefined
+  });
+};
+
+const defaultDescription = "Remove member";
+
 return (
   <>
     <div className="mb-3">
@@ -125,6 +145,17 @@ return (
             onChangeRole(role.value);
           },
           error: undefined
+        }}
+      />
+    </div>
+    <div className="mb-3">
+      <h5>Proposal Description</h5>
+      <Widget
+        src="sking.near/widget/Common.Inputs.Markdown"
+        props={{
+          onChange: (value) => onChangeDescription(value),
+          height: "270px",
+          initialText: defaultDescription
         }}
       />
     </div>
