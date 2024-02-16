@@ -35,7 +35,7 @@ State.init({
   method_name: state.method_name,
   args: state.args || "{}",
   deposit: state.deposit || "0",
-  gas: "50000000000000",
+  gas: "270",
   error: undefined,
   receiver_id: null,
   description: null,
@@ -107,9 +107,16 @@ const handleFunctionCall = () => {
       });
       return;
     }
+    if (state.gas > 300) {
+      State.update({
+        error: "Maximum gas allowed is 300Tgas"
+      });
+      return;
+    }
   }
 
   const deposit = Big(state.deposit).mul(Big(10).pow(24)).toFixed();
+  const gas = Big(state.gas).mul(Big(10).pow(12)).toFixed();
   if (isVotingBodyDao) {
     if (isEmpty(state.description)) {
       State.update({
@@ -133,7 +140,7 @@ const handleFunctionCall = () => {
                     method_name: state.method_name,
                     args: fc_args,
                     deposit: deposit,
-                    gas: state.gas ?? "50000000000000"
+                    gas: gas
                   }
                 ]
               }
@@ -193,7 +200,7 @@ const handleFunctionCall = () => {
                     "utf-8"
                   ).toString("base64"),
                   deposit: deposit,
-                  gas: state.gas ?? "50000000000000"
+                  gas: gas
                 }
               ]
             }
@@ -240,7 +247,7 @@ const handleFunctionCall = () => {
                     method_name: state.method_name,
                     args: fc_args,
                     deposit: deposit,
-                    gas: state.gas ?? "50000000000000"
+                    gas: gas
                   }
                 ]
               }
@@ -271,7 +278,7 @@ const handleFunctionCall = () => {
                     method_name: state.method_name,
                     args: fc_args,
                     deposit: deposit,
-                    gas: state.gas ?? "50000000000000"
+                    gas: gas
                   }
                 ]
               }
@@ -504,19 +511,19 @@ return (
             )}
             {!isCongressDaoID && !isVotingBodyDao && (
               <div className="mb-3">
-                <h5>Gas</h5>
+                <h5>Gas (Tgas)</h5>
                 <input
                   type="number"
                   value={state.gas}
                   onChange={(e) => onChangeGas(e.target.value)}
-                  defaultValue="300000000000000"
+                  defaultValue="270"
                 />
               </div>
             )}
           </>
         )}
         <div className="mb-3">
-          <h5>Deposit {(isCongressDaoID || isVotingBodyDao) && "(NEAR)"}</h5>
+          <h5>Deposit (NEAR)</h5>
           <input
             type="number"
             value={state.deposit}
