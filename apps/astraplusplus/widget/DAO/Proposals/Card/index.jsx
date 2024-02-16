@@ -493,7 +493,7 @@ const handleVote = ({
         contractName: daoId,
         methodName: isCongressDaoID ? "vote" : "act_proposal",
         args: args,
-        gas: 200000000000000
+        gas: 270000000000000
       }
     ];
     if (showNotification) {
