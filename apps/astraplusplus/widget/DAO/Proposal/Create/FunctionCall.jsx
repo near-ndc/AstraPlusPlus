@@ -107,9 +107,9 @@ const handleFunctionCall = () => {
       });
       return;
     }
-    if (state.gas > 300) {
+    if (state.gas > 270) {
       State.update({
-        error: "Maximum gas allowed is 300Tgas"
+        error: "Maximum gas allowed is 270Tgas"
       });
       return;
     }

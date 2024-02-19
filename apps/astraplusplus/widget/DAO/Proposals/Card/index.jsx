@@ -291,19 +291,6 @@ const expensiveWork = () => {
           : isAllowedTo(proposalKinds[kindName], actions.VoteRemove)
       ];
 
-  // --- end check user permissions
-  // --- Votes required:
-  // TODO: Needs to be reviewed
-
-  // Fixes pikespeak API for single proposal
-  Object.keys(my_proposal.vote_counts).forEach((k) => {
-    if (typeof my_proposal.vote_counts[k] !== "string") return;
-    my_proposal.vote_counts[k] = my_proposal.vote_counts[k]
-      .match(/.{1,2}/g)
-      .slice(0, 3)
-      .map((a) => parseInt(a));
-  });
-
   let totalVotesNeeded = 0;
 
   if (policy?.roles) {
@@ -357,11 +344,14 @@ const expensiveWork = () => {
     total: 0
   };
 
-  Object.keys(my_proposal.vote_counts).forEach((key) => {
-    if (key === "all") return;
-    totalVotes.yes += my_proposal.vote_counts[key][0];
-    totalVotes.no += my_proposal.vote_counts[key][1];
-    totalVotes.spam += my_proposal.vote_counts[key][2];
+  Object.values(my_proposal.votes).forEach((vote) => {
+    if (vote === "Approve") {
+      totalVotes.yes++;
+    } else if (vote === "Reject") {
+      totalVotes.no++;
+    } else if (vote === "Remove") {
+      totalVotes.spam++;
+    }
   });
 
   if (isVotingBodyDao) {
@@ -493,7 +483,7 @@ const handleVote = ({
         contractName: daoId,
         methodName: isCongressDaoID ? "vote" : "act_proposal",
         args: args,
-        gas: 270000000000000
+        gas: 300000000000000
       }
     ];
     if (showNotification) {

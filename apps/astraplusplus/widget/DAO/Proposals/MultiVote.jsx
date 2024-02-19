@@ -73,7 +73,7 @@ if (view === "submit") {
           contractName: daoId,
           methodName: isCongressDaoID ? "vote" : "act_proposal",
           args: args,
-          gas: 270000000000000
+          gas: 300000000000000
         });
       }
     });
