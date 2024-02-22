@@ -159,36 +159,38 @@ return (
         </thead>
         <tbody>
           {proposals !== null &&
-            proposals.map(({ proposal, proposal_type, proposal_id }, i) => {
-              if (!isCongressDaoID && !isVotingBodyDao) {
-                proposal.kind = {
-                  [proposal_type]: {
-                    ...proposal.kind
-                  }
-                };
+            proposals.map(
+              ({ proposal, proposal_type, proposal_id, dao_id }, i) => {
+                if (!isCongressDaoID && !isVotingBodyDao) {
+                  proposal.kind = {
+                    [proposal_type]: {
+                      ...proposal.kind
+                    }
+                  };
+                }
+                proposal.id = proposal_id;
+                if (proposal.status === "Removed") return <></>;
+                return (
+                  <Widget
+                    src="/*__@appAccount__*//widget/DAO.Proposals.Table.Row"
+                    props={{
+                      proposal,
+                      proposal_type,
+                      proposal_id,
+                      i,
+                      daoId: daoId ?? dao_id,
+                      multiSelectMode,
+                      isAllowedTo,
+                      isCongressDaoID,
+                      isVotingBodyDao,
+                      daoConfig,
+                      isHuman,
+                      dev: props.dev
+                    }}
+                  />
+                );
               }
-              proposal.id = proposal_id;
-              if (proposal.status === "Removed") return <></>;
-              return (
-                <Widget
-                  src="/*__@appAccount__*//widget/DAO.Proposals.Table.Row"
-                  props={{
-                    proposal,
-                    proposal_type,
-                    proposal_id,
-                    i,
-                    daoId,
-                    multiSelectMode,
-                    isAllowedTo,
-                    isCongressDaoID,
-                    isVotingBodyDao,
-                    daoConfig,
-                    isHuman,
-                    dev: props.dev
-                  }}
-                />
-              );
-            })}
+            )}
         </tbody>
       </table>
     )}
