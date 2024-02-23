@@ -327,7 +327,10 @@ const expensiveWork = () => {
   }
 
   if (isVotingBodyDao) {
-    if (my_proposal.typeName === "Dissolve") {
+    if (
+      my_proposal.typeName === "Dissolve" ||
+      my_proposal.typeName === "Text Super"
+    ) {
       totalVotesNeeded = daoConfig?.super_consent?.quorum;
     } else if (my_proposal.typeName === "Pre Vote") {
       totalVotesNeeded = daoConfig?.pre_vote_support;
