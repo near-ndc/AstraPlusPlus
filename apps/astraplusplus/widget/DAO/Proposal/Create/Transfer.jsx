@@ -223,7 +223,7 @@ const res = useCache(
 );
 
 if (!res) {
-  return <></>;
+  return <Widget src="nearui.near/widget/Feedback.Spinner" />;
 }
 
 return (
