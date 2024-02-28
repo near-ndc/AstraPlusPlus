@@ -1,43 +1,27 @@
-/*__@import:daoHelpers/getFollowedDAOs__*/
+const [followingAccounts, setFollowingAccounts] = useState([]);
 
-const following = getFollowedDAOs(props.accountId ?? context.accountId ?? "");
+const graph = context.accountId
+  ? Social.keys(`${context.accountId}/graph/follow/*`, "final")
+  : {};
 
-if (following === null) {
-  return "";
-}
-
-const feeds = [
-  {
-    name: "daos followed",
-    data: {
-      sources: [
-        {
-          domain: "post",
-          key: "main",
-        },
-      ],
-      typeWhitelist: ["md"],
-      accountWhitelist: following,
-    },
-  },
-];
+useEffect(() => {
+  if (graph !== null) {
+    const accounts = Object.keys(graph[context.accountId].graph.follow || {});
+    setFollowingAccounts(accounts);
+  }
+}, [graph, context.accountId]);
 
 const renderHeader = () => (
   <div>
-    <h2 className="h2">Social Feed</h2>
-    <p className="text-muted">Social posts from the DAOs you follow</p>
-
+    <h2 className="h2 mb-2">Social Feed</h2>
     <div>
-      {following.length < 1 ? (
-        <div className="text-muted mt-4">You are not following any DAOs</div>
-      ) : (
-        <Widget
-          src="efiz.near/widget/every.post"
-          props={{
-            ...feeds[0].data,
-          }}
-        />
-      )}
+      <Widget
+        key="reg-feed"
+        src="near/widget/v1.Posts.Feed"
+        props={{
+          accounts: followingAccounts.length > 0 ? followingAccounts : undefined
+        }}
+      />
     </div>
   </div>
 );
