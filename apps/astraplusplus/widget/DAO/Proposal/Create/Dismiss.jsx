@@ -68,7 +68,8 @@ const handleProposal = () => {
             {
               method_name: "dismiss_hook",
               args: fc_args,
-              gas: "50000000000000"
+              gas: "50000000000000",
+              deposit: "100000000000000000000000"
             }
           ]
         }
@@ -157,7 +158,8 @@ return (
         daoId: daoId,
         label: "House",
         placeholder: "Select house account",
-        onUpdate: onChangeDao
+        onUpdate: onChangeDao,
+        dev: props.dev
       }}
     />
     <div className="mb-3">
