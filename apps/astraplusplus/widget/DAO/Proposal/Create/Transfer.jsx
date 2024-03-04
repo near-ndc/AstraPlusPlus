@@ -92,7 +92,8 @@ const handleProposal = () => {
       contractName: state.tokenAddress,
       methodName: "storage_deposit",
       args: {
-        account_id: state.receiver_id
+        account_id: state.receiver_id,
+        registration_only: true
       },
       gas: gas,
       deposit: depositInYocto
