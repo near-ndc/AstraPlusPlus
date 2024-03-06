@@ -1,3 +1,5 @@
+const { router } = props;
+
 const sortList = [
   {
     label: "Newest",
@@ -91,7 +93,27 @@ const Wrapper = styled.div`
     background-color: #4498e0 !important;
     color: white !important;
   }
+
+  .pointer-cursor {
+    cursor: pointer;
+  }
+
+  .data-row {
+    border-bottom: 1px solid lightgray;
+    display: table-row;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .data-row:hover {
+    background-color: #f5f5f5;
+  }
 `;
+
+const actionLink = ({ id }) => {
+  return `#//*__@appAccount__*//widget/home?page=action&id=${id}`;
+};
+
 return (
   <Wrapper className="d-flex flex-column gap-1">
     <h2>Actions Library</h2>
@@ -169,7 +191,18 @@ return (
             {res.body.data.map((item) => {
               const address = item.config.smartContractAddress;
               return (
-                <tr>
+                <a
+                  key={item.id}
+                  className="pointer-cursor data-row"
+                  href={actionLink({ id: item.id })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.navigate({
+                      page: "action",
+                      id: address
+                    });
+                  }}
+                >
                   <td>
                     <div style={{ maxWidth: 500 }}>
                       <h6 className="font-weight-bold mb-0">{item.name}</h6>
@@ -194,11 +227,15 @@ return (
                       props={{
                         children: "Use in DAO",
                         variant: "info",
-                        size: "md"
+                        size: "md",
+                        onClick: (e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }
                       }}
                     />
                   </td>
-                </tr>
+                </a>
               );
             })}
           </tbody>
