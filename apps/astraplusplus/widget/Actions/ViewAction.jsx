@@ -113,16 +113,8 @@ return (
               </a>
             ))}
             <Widget
-              src="nearui.near/widget/Input.Button"
-              props={{
-                children: "Use in DAO",
-                variant: "info",
-                size: "lg",
-                onClick: (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }}
+              src="/*__@appAccount__*//widget/Actions.UseInDao"
+              props={{}}
             />
           </div>
         </div>
