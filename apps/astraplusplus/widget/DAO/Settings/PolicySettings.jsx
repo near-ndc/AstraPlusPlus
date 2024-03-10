@@ -106,6 +106,7 @@ const Wrapper = styled.div`
     border-style: solid;
     font-size: 14px;
     cursor: pointer;
+    min-width: fit-content;
   }
 
   .selected {
@@ -118,7 +119,10 @@ const tabContent = tabs[selectedTab].component;
 
 return (
   <Wrapper style={{ marginTop: 30 }}>
-    <div className="d-flex gap-3 align-items-center">
+    <div
+      className="d-flex gap-3 align-items-center h-100"
+      style={{ overflow: "scroll" }}
+    >
       {Object.keys(tabs).map((i) => (
         <div
           onClick={() => setSelectedTab(i)}

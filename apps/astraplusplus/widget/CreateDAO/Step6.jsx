@@ -167,8 +167,11 @@ return (
         Quorum
       </h2>
     )}
-    <div className="d-flex">
-      <div className="p-4 right-shadow border-right flex-1">
+    <div className="d-flex flex-wrap">
+      <div
+        className="p-4 right-shadow border-right flex-1"
+        style={{ minWidth: "250px" }}
+      >
         <div className="d-flex flex-column gap-3">
           <div className="d-flex gap-3 align-items-center">
             <i class="bi bi-people-fill"></i>
@@ -197,7 +200,10 @@ return (
           </div>
         </div>
       </div>
-      <div className="d-flex flex-column gap-3 p-4 border-right flex-2">
+      <div
+        className="d-flex flex-column gap-3 p-4 border-right flex-2"
+        style={{ minWidth: "250px" }}
+      >
         <div className="d-flex gap-3 align-items-center">
           <i class="bi bi-people-fill"></i>
           <div className="text-md">Members</div>
@@ -216,7 +222,10 @@ return (
             ))
           : state.members}
       </div>
-      <div className="d-flex flex-column gap-2 p-4 flex-1">
+      <div
+        className="d-flex flex-column gap-2 p-4 flex-1"
+        style={{ minWidth: "250px" }}
+      >
         <div className="d-flex gap-3 align-items-center">
           <img
             src="https://ipfs.near.social/ipfs/bafkreid6uui42li7elyzxyogbm2lutj3arc3p6gmefc5qqsyerejjph4qa"

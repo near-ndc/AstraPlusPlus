@@ -109,13 +109,14 @@ return (
   <Wrapper>
     <div className="mt-4">
       <div className="ndc-card p-4">
-        <div className="d-flex align-items-center justify-content-between">
+        <div className="d-flex align-items-center justify-content-between flex-wrap">
           <h3
             className="pb-2 fw-bold"
             style={{
               flex: 1,
               borderBottom: "1px solid rgb(236, 238, 240)",
-              marginBottom: "18px"
+              marginBottom: "18px",
+              minWidth: "200px"
             }}
           >
             DAO settings
