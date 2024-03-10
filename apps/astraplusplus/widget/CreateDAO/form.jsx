@@ -42,7 +42,7 @@ const handleStepComplete = (value) => {
 
   if (!stepValid) return;
 
-  if (state.step === 5) {
+  if (state.step === 6) {
     const finalAnswers = {
       ...state.form,
       ...value

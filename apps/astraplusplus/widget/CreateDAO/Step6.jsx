@@ -32,13 +32,85 @@ function onGroupChange(name) {
   });
 }
 
+const proposalKinds = {
+  ChangeDAOConfig: {
+    title: "Change DAO Config",
+    key: "config"
+  },
+  ChangeDAOPolicy: {
+    title: "Change DAO Policy",
+    key: "policy"
+  },
+  Bounty: {
+    title: "Bounty",
+    key: "add_bounty"
+  },
+  BountyDone: {
+    title: "Bounty Done",
+    key: "bounty_done"
+  },
+  Transfer: {
+    title: "Transfer",
+    key: "transfer"
+  },
+  Polls: {
+    title: "Polls",
+    key: "vote"
+  },
+  RemoveMembers: {
+    title: "Remove Members",
+    key: "remove_member_from_role"
+  },
+  AddMembers: {
+    title: "Add Members",
+    key: "add_member_to_role"
+  },
+  FunctionCall: {
+    title: "Function Call",
+    key: "call"
+  },
+  UpgradeSelf: {
+    title: "Upgrade Self",
+    key: "upgrade_self"
+  },
+  UpgradeRemote: {
+    title: "Upgrade Remote",
+    key: "upgrade_remote"
+  },
+  SetVoteToken: {
+    title: "Set Vote Token",
+    key: "set_vote_token"
+  }
+};
+
 if (!state.selectedGroup) {
   onGroupChange(groups[0]);
 }
 
-// quorum: "0";
-// threshold: (2)[(1, 2)];
-// weight_kind: "RoleWeight";
+function onVoteWeightChange(weight) {
+  const value = {
+    quorum: "0",
+    threshold: [parseInt(weight), 100],
+    weight_kind: "RoleWeight"
+  };
+  const votePolicy = {};
+  Object.values(proposalKinds).map((i) => (votePolicy[i.key] = value));
+  if (Array.isArray(initialAnswers?.policy?.roles)) {
+    const updatedState = initialAnswers.policy.roles.map((i) => {
+      if (i.name === state.selectedGroup) {
+        return { ...i, vote_policy: votePolicy };
+      } else return i;
+    });
+    const updatedPolicy = {
+      policy: { ...initialAnswers.policy, roles: updatedState }
+    };
+    updateParentState(updatedPolicy);
+    State.update({
+      voteWeight: weight,
+      answers: updatedPolicy
+    });
+  }
+}
 
 const Wrapper = styled.div`
   max-height: 70vh;
@@ -174,14 +246,10 @@ return (
               max={100}
               value={state.voteWeight}
               onPointerUp={(e) => {
-                State.update({
-                  voteWeight: e.target.value
-                });
+                onVoteWeightChange(e.target.value);
               }}
               onChange={(e) => {
-                State.update({
-                  voteWeight: e.target.value
-                });
+                onVoteWeightChange(e.target.value);
               }}
               className="form-range"
             />
