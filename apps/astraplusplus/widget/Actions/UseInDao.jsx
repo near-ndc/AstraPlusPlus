@@ -51,13 +51,16 @@ const Select = styled.select`
 `;
 
 function onSave() {
+  const publicKey = "";
+  const signature = "";
   if (selectedDao && templateId) {
+    const buff = Buffer.from(`${accountId}|${publicKey}|${signature}`);
     asyncFetch(
       `https://api.app.astrodao.com/api/v1/proposals/templates/${templateId}/clone/${selectedDao}`,
       {
         method: "POST",
         headers: {
-          Authorization: ""
+          Authorization: `Bearer ${buff.toString("base64")}`
         },
         body: JSON.stringify({
           templateId: templateId,
