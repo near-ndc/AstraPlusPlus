@@ -7,18 +7,21 @@ const res = fetch(
 const url = `https://near.org//*__@appAccount__*//widget/home?page=dao&tab=action&id=${id}`;
 
 const twitterURL = new URL("https://twitter.com/intent/tweet");
-twitterURL.searchParams.append("text", "here");
+twitterURL.searchParams.append("text", "Sharing a DAO template from Astra++");
 twitterURL.searchParams.append("url", url);
 
 const telegramURL = new URL("https://t.me/share/url");
 telegramURL.searchParams.append("url", url);
-telegramURL.searchParams.append("text", "here");
+telegramURL.searchParams.append("text", "Sharing a DAO template from Astra++");
 const [isExpanded, setIsExpanded] = useState(false);
+const [copied, setCopied] = useState(false);
+
 const socialMedia = [
   {
     name: "Share",
-    link: twitterURL.toString(),
-    icon: "bi bi-share"
+    link: url.toString(),
+    icon: "bi bi-share",
+    copyLink: true
   },
   {
     name: "Twitter",
@@ -74,10 +77,36 @@ const Wrapper = styled.div`
   }
 `;
 
+useEffect(() => {
+  let timeoutId;
+
+  if (copied) {
+    timeoutId = setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  }
+
+  return () => {
+    clearTimeout(timeoutId);
+  };
+}, [copied]);
+
+const copyToClipboard = (link) => {
+  clipboard.writeText(link);
+  setCopied(true);
+};
+
 const data = res?.body?.data?.[0];
 
 return (
   <Wrapper className="d-flex flex-column gap-4">
+    <Widget
+      src="near/widget/DIG.Toast"
+      props={{
+        title: "Copied",
+        open: copied
+      }}
+    />
     <a
       className="text-muted mb-3"
       href={actionLink}
@@ -100,21 +129,32 @@ return (
             <div className="text-muted text-sm">{data?.createdBy}</div>
           </div>
           <div className="d-flex gap-2 align-items-center">
-            {socialMedia.map((item, index) => (
-              <a
-                key={index}
-                href={item.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={`Share to ${item.name}`}
-                className="social_button"
-              >
-                <i className={item.icon}></i>
-              </a>
-            ))}
+            {socialMedia.map((item, index) =>
+              item.copyLink ? (
+                <div
+                  className="social_button"
+                  onClick={() => copyToClipboard(item.link)}
+                >
+                  <i className={item.icon}></i>
+                </div>
+              ) : (
+                <a
+                  key={index}
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`Share to ${item.name}`}
+                  className="social_button"
+                >
+                  <i className={item.icon}></i>
+                </a>
+              )
+            )}
             <Widget
               src="/*__@appAccount__*//widget/Actions.UseInDao"
-              props={{}}
+              props={{
+                templateId: id
+              }}
             />
           </div>
         </div>

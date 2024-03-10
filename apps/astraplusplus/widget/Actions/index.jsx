@@ -230,7 +230,9 @@ return (
                     >
                       <Widget
                         src="/*__@appAccount__*//widget/Actions.UseInDao"
-                        props={{}}
+                        props={{
+                          templateId: address
+                        }}
                       />
                     </div>
                   </td>
