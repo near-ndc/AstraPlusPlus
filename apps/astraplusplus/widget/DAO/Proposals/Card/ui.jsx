@@ -201,7 +201,7 @@ function renderPermission({ isAllowedToVote }) {
 }
 
 const execProposal = ({ daoId, id }) =>
-  Near.call(daoId, "execute", { id }, 50000000000000);
+  Near.call(daoId, "execute", { id }, 150000000000000);
 
 const slashPreVoteProposal = ({ id }) =>
   Near.call(daoId, "slash_prevote_proposal", { id }, 300000000000000);
