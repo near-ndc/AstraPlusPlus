@@ -24,7 +24,7 @@ State.init({
 
 function onGroupChange(name) {
   const item = initialAnswers.policy.roles.find((i) => i.name === name);
-  const voteWeight = item?.vote_policy.threshold ?? [1, 2];
+  const voteWeight = item?.vote_policy?.add_bounty?.threshold ?? [1, 2];
   State.update({
     selectedGroup: name,
     voteWeight: parseInt((voteWeight?.[0] / voteWeight?.[1]) * 100),

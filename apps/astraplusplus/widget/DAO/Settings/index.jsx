@@ -52,7 +52,8 @@ const hasPermission = (proposalKind) => {
     if (roleObj) {
       return (
         roleObj.permissions.includes(`${proposalKind}:*`) ||
-        roleObj.permissions.includes("*:*")
+        roleObj.permissions.includes("*:*") ||
+        roleObj.permissions.includes(`${proposalKind}:AddProposal`)
       );
     } else {
       return false;
