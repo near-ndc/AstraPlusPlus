@@ -63,7 +63,7 @@ const tabs = {
       />
     )
   },
-  Permissions: {
+  "Proposal and Voting Permissions": {
     name: "Proposal and Voting Permissions",
     component: (
       <Widget
@@ -75,23 +75,64 @@ const tabs = {
         }}
       />
     )
+  },
+  Quorum: {
+    name: "Quorum",
+    component: (
+      <Widget
+        src={`/*__@appAccount__*//widget/CreateDAO.Step6`}
+        props={{
+          formState: policyState,
+          updateParentState: (data) => setPolicyState(data),
+          renderFooter: (data) => <></>,
+          isConfigScreen: true
+        }}
+      />
+    )
   }
 };
+
+const Wrapper = styled.div`
+  .custom-tag {
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
+    padding-inline: 1rem;
+    padding-block: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    border-width: 1px;
+    border-style: solid;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: fit-content;
+  }
+
+  .selected {
+    background-color: black;
+    color: white;
+  }
+`;
 
 const tabContent = tabs[selectedTab].component;
 
 return (
-  <div style={{ marginTop: 30 }}>
-    <Widget
-      src={`/*__@appAccount__*//widget/DAO.Layout.Tabs`}
-      props={{
-        tabs: tabs,
-        tab: selectedTab,
-        update: (state) => setSelectedTab(state.tab),
-        allowHref: false
-      }}
-    />
-    <div style={{ marginTop: "-25px" }}>{tabContent}</div>
+  <Wrapper style={{ marginTop: 30 }}>
+    <div
+      className="d-flex gap-3 align-items-center h-100"
+      style={{ overflow: "scroll" }}
+    >
+      {Object.keys(tabs).map((i) => (
+        <div
+          onClick={() => setSelectedTab(i)}
+          className={"custom-tag " + (i === selectedTab ? "selected" : "")}
+        >
+          {i}
+        </div>
+      ))}
+    </div>
+    <div>{tabContent}</div>
     <Footer />
-  </div>
+  </Wrapper>
 );

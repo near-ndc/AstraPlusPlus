@@ -42,7 +42,7 @@ const handleStepComplete = (value) => {
 
   if (!stepValid) return;
 
-  if (state.step === 5) {
+  if (state.step === 6) {
     const finalAnswers = {
       ...state.form,
       ...value
@@ -171,10 +171,16 @@ const steps = [
     className: state.step > 4 ? "active-outline" : undefined
   },
   {
-    title: "DAO Assets",
+    title: "Quorum",
     active: state.step === 5,
     icon: state.step > 5 ? <i className="bi bi-check2"></i> : undefined,
     className: state.step > 5 ? "active-outline" : undefined
+  },
+  {
+    title: "DAO Assets",
+    active: state.step === 6,
+    icon: state.step > 6 ? <i className="bi bi-check2"></i> : undefined,
+    className: state.step > 6 ? "active-outline" : undefined
   }
 ];
 

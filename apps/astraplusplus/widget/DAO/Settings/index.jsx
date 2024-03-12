@@ -52,7 +52,8 @@ const hasPermission = (proposalKind) => {
     if (roleObj) {
       return (
         roleObj.permissions.includes(`${proposalKind}:*`) ||
-        roleObj.permissions.includes("*:*")
+        roleObj.permissions.includes("*:*") ||
+        roleObj.permissions.includes(`${proposalKind}:AddProposal`)
       );
     } else {
       return false;
@@ -108,20 +109,32 @@ const tabContent = tabs[state.tab].component;
 return (
   <Wrapper>
     <div className="mt-4">
-      <div className="ndc-card d-flex flex-column gap-2 p-4">
-        <h3>DAO settings</h3>
-        <div className="w-100 no-card-div">
-          <Widget
-            src={`${widgetOwner}/widget/DAO.Layout.Tabs`}
-            props={{
-              tabs: tabs,
-              tab: state.tab,
-              update: (state) => State.update(state),
-              allowHref: false
+      <div className="ndc-card p-4">
+        <div className="d-flex align-items-center justify-content-between flex-wrap">
+          <h3
+            className="pb-2 fw-bold"
+            style={{
+              flex: 1,
+              borderBottom: "1px solid rgb(236, 238, 240)",
+              marginBottom: "18px",
+              minWidth: "200px"
             }}
-          />
-          <div style={{ marginTop: "-25px" }}>{tabContent}</div>
+          >
+            DAO settings
+          </h3>
+          <div className="no-card-div">
+            <Widget
+              src={`${widgetOwner}/widget/DAO.Layout.Tabs`}
+              props={{
+                tabs: tabs,
+                tab: state.tab,
+                update: (state) => State.update(state),
+                allowHref: false
+              }}
+            />
+          </div>
         </div>
+        <div style={{ marginTop: "-30px" }}>{tabContent}</div>
       </div>
     </div>
   </Wrapper>

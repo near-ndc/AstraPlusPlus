@@ -144,8 +144,8 @@ const NearSvg = (
 
 return (
   <div>
-    <div className="d-flex p-4" style={{ gap: 70 }}>
-      <div className="d-flex flex-column gap-2">
+    <div className="d-flex p-2 p-sm-4 flex-wrap" style={{ gap: 70 }}>
+      <div className="d-flex flex-column gap-2" style={{ minWidth: "300px" }}>
         <h3>Bounties</h3>
         <div>
           <p className="fw-light">Bond to claim a bounty</p>
@@ -183,7 +183,10 @@ return (
           </div>
         </div>
       </div>
-      <div className="d-flex flex-column gap-2 ml-4">
+      <div
+        className="d-flex flex-column gap-2 ml-4"
+        style={{ minWidth: "300px" }}
+      >
         <h3>Proposals</h3>
         <div>
           <p className="fw-light">Bond to create a proposal</p>

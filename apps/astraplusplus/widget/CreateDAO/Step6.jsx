@@ -3,284 +3,269 @@ const {
   errors,
   renderFooter,
   showSteps,
-  showCreateNewDAOInfo,
-  isConfigScreen,
-  updateParentState
+  updateParentState,
+  isConfigScreen
 } = props;
+const { accountId } = context;
 
 updateParentState || (updateParentState = () => {});
 
 const initialAnswers = {
-  profileImage: formState.profileImage ?? formState.flagLogo,
-  coverImage: formState.coverImage ?? formState.flagCover
+  policy: formState.policy
 };
+const groups = [...initialAnswers.policy.roles.map((role) => role.name)];
 
 State.init({
-  answers: initialAnswers
+  answers: initialAnswers,
+  selectedGroup: null,
+  voteWeight: 50,
+  members: []
 });
 
-const onValueChange = (key, value) => {
+function onGroupChange(name) {
+  const item = initialAnswers.policy.roles.find((i) => i.name === name);
+  const voteWeight = item?.vote_policy?.add_bounty?.threshold ?? [1, 2];
   State.update({
-    answers: {
-      ...state.answers,
-      [key]: value
-    }
+    selectedGroup: name,
+    voteWeight: parseInt((voteWeight?.[0] / voteWeight?.[1]) * 100),
+    members: item.kind
   });
+}
+
+const proposalKinds = {
+  ChangeDAOConfig: {
+    title: "Change DAO Config",
+    key: "config"
+  },
+  ChangeDAOPolicy: {
+    title: "Change DAO Policy",
+    key: "policy"
+  },
+  Bounty: {
+    title: "Bounty",
+    key: "add_bounty"
+  },
+  BountyDone: {
+    title: "Bounty Done",
+    key: "bounty_done"
+  },
+  Transfer: {
+    title: "Transfer",
+    key: "transfer"
+  },
+  Polls: {
+    title: "Polls",
+    key: "vote"
+  },
+  RemoveMembers: {
+    title: "Remove Members",
+    key: "remove_member_from_role"
+  },
+  AddMembers: {
+    title: "Add Members",
+    key: "add_member_to_role"
+  },
+  FunctionCall: {
+    title: "Function Call",
+    key: "call"
+  },
+  UpgradeSelf: {
+    title: "Upgrade Self",
+    key: "upgrade_self"
+  },
+  UpgradeRemote: {
+    title: "Upgrade Remote",
+    key: "upgrade_remote"
+  },
+  SetVoteToken: {
+    title: "Set Vote Token",
+    key: "set_vote_token"
+  }
 };
 
-const Profile = styled.div`
-  .avatar {
-    width: 15%;
-    max-width: 180px;
-    min-width: 100px;
-    margin-left: 50px;
-    transform: translateY(-50%);
-    background-color: #eee;
-    background-size: cover;
-    background-position: center;
+if (!state.selectedGroup) {
+  onGroupChange(groups[0]);
+}
+
+function onVoteWeightChange(weight) {
+  const value = {
+    quorum: "0",
+    threshold: [parseInt(weight), 100],
+    weight_kind: "RoleWeight"
+  };
+  const votePolicy = {};
+  Object.values(proposalKinds).map((i) => (votePolicy[i.key] = value));
+  if (Array.isArray(initialAnswers?.policy?.roles)) {
+    const updatedState = initialAnswers.policy.roles.map((i) => {
+      if (i.name === state.selectedGroup) {
+        return { ...i, vote_policy: votePolicy };
+      } else return i;
+    });
+    const updatedPolicy = {
+      policy: { ...initialAnswers.policy, roles: updatedState }
+    };
+    updateParentState(updatedPolicy);
+    State.update({
+      voteWeight: weight,
+      answers: updatedPolicy
+    });
+  }
+}
+
+const Wrapper = styled.div`
+  max-height: 70vh;
+  overflow-y: scroll;
+  .selected-group {
+    background-color: #eaf3fb;
+    border-left: 3px solid #4498e0;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }
+
+  .text-md {
+    font-size: 20px;
+  }
+
+  .border-right {
+    border-right: 1px solid #f0efe7;
+    overflow: auto;
+  }
+
+  .right-shadow {
+    box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-sm {
+    font-size: 13px;
+  }
+
+  .flex-1 {
+    flex: 1;
+  }
+
+  .flex-2 {
+    flex: 1.5;
   }
 `;
 
-const BG = styled.div`
-  --bs-aspect-ratio: 16%;
-  background-color: #eee;
-  background-size: cover;
-  background-position: center;
-  min-height: 120px;
-`;
-
-const renderUploadButton = ({ onChange, value }) => {
-  return (
-    <Widget
-      src="nearui.near/widget/Social.ImageUpload"
-      props={{
-        onChange: onChange,
-        value: value,
-        uploadButton: (otherProps) => (
-          <Widget
-            src="nearui.near/widget/Input.Button"
-            props={{
-              children: <i className="bi bi-pen" />,
-              variant: "icon  info",
-              size: "md",
-              className: "position-absolute bottom-0 end-0 m-3",
-              ...otherProps
-            }}
-          />
-        ),
-        deleteButton: (otherProps) => (
-          <Widget
-            src="nearui.near/widget/Input.Button"
-            props={{
-              children: <i className="bi bi-trash" />,
-              variant: "icon  danger",
-              size: "md",
-              className: "position-absolute bottom-0 end-0 m-3",
-              ...otherProps
-            }}
-          />
-        ),
-        loadingButton: (otherProps) => (
-          <Widget
-            src="nearui.near/widget/Input.Button"
-            props={{
-              children: (
-                <div
-                  class="spinner-border text-light"
-                  style={{
-                    width: "1.1rem",
-                    height: "1.1rem",
-                    borderWidth: "0.15em"
-                  }}
-                  role="status"
-                ></div>
-              ),
-              variant: "icon info",
-              size: "md",
-              className: "position-absolute bottom-0 end-0 m-3",
-              ...otherProps
-            }}
-          />
-        )
-      }}
-    />
-  );
-};
-
-const renderAssetsEditor = (hideEditButtons) => {
-  return (
-    <Profile
-      className="overflow-hidden w-100"
-      style={{
-        marginBottom: "-40px"
-      }}
-    >
-      <BG
-        className="ratio rounded-4"
-        style={{
-          backgroundImage: `url(${state.answers.coverImage})`
-        }}
-      >
-        <div>
-          {!hideEditButtons &&
-            renderUploadButton({
-              onChange: (v) => onValueChange("coverImage", v),
-              value: state.answers.coverImage
-            })}
-        </div>
-      </BG>
-      <div
-        className="avatar rounded-4 border border-2 border-white ratio ratio-1x1 position-relative z-1"
-        style={{
-          backgroundImage: `url(${state.answers.profileImage})`
-        }}
-      >
-        <div>
-          {!hideEditButtons &&
-            renderUploadButton({
-              onChange: (v) => onValueChange("profileImage", v),
-              value: state.answers.profileImage
-            })}
-        </div>
-      </div>
-    </Profile>
-  );
-};
-
-const daoPreviewState = `
-\`\`\`json
-${JSON.stringify({ ...formState, ...state.answers }, null, 2)}
-\`\`\`
-`;
-
-useEffect(() => {
-  let timeoutId;
-
-  // Debounced function to update parent state
-  const debouncedUpdate = (value) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      updateParentState(value);
-    }, 300); // Adjust the debounce delay as needed
-  };
-
-  // Call the debounced function when local value changes
-  debouncedUpdate({ ...formState, ...state.answers });
-
-  return () => {
-    // Cleanup on unmount
-    clearTimeout(timeoutId);
-  };
-}, [state.answers]);
-
 return (
-  <div className="mt-4 ndc-card p-4">
-    <div className="d-flex flex-column gap-2">
-      <div className="d-flex gap-2 justify-content-between align-items-center">
-        {showSteps && (
-          <h2 className="h5 fw-bold">
-            <span
-              className="rounded-circle d-inline-flex align-items-center justify-content-center fw-bolder h5 me-2 mb-0"
-              style={{
-                width: "48px",
-                height: "48px",
-                border: "1px solid #82E299"
-              }}
-            >
-              6
-            </span>
-            Create DAO Assets
-          </h2>
-        )}
-        {!isConfigScreen && (
-          <Widget
-            src="/*__@appAccount__*//widget/Layout.Modal"
-            props={{
-              content: (
-                <div className="ndc-card p-4">
-                  <h3 className="h6 fw-bold">DAO Preview</h3>
-                  <Markdown text={daoPreviewState} />
-                  {renderFooter(state.answers, {
-                    hasPrevious: false
-                  })}
-                </div>
-              ),
-              toggle: (
-                <Widget
-                  src="nearui.near/widget/Input.Button"
-                  props={{
-                    children: "Preview DAO",
-                    variant: "outline info",
-                    size: "lg"
-                  }}
-                />
-              )
-            }}
-          />
-        )}
-      </div>
-      <div className="d-flex gap-2 justify-content-between align-items-center">
-        <div>
-          <h3 className="h6 fw-bold">Set profile image and background image</h3>
-          <p className="text-black-50 fw-light small">
-            Update the DAO profile image and background images below
-          </p>
-        </div>
-        <Widget
-          src="/*__@appAccount__*//widget/Layout.Modal"
-          props={{
-            content: (
-              <div className="ndc-card p-4">
-                <h3 className="h5 fw-bold mb-4">Preview DAO Assets</h3>
-                <h4 className="h6 fw-bold mb-2">Profile & Background Image</h4>
-                {renderAssetsEditor(true)}
-                <h4 className="h6 fw-bold mb-2">DAO Name</h4>
-                <h5 className="h5 fw-bold">{formState.name}</h5>
-              </div>
-            ),
-            toggle: (
-              <Widget
-                src="nearui.near/widget/Input.Button"
-                props={{
-                  children: (
-                    <>
-                      Preview DAO Assets <i className="bi bi-eye" />
-                    </>
-                  ),
-                  variant: "outline info",
-                  size: "lg"
-                }}
-              />
-            )
-          }}
-        />
-      </div>
-      {renderAssetsEditor()}
-      {showCreateNewDAOInfo && (
-        <div
-          className="d-flex gap-2 flex-column p-3 rounded-4"
+  <Wrapper className={"mt-4 ndc-card" + (isConfigScreen ? " " : " p-4")}>
+    {showSteps && (
+      <h2 className="h5 fw-bold">
+        <span
+          className="rounded-circle d-inline-flex align-items-center justify-content-center fw-bolder h5 me-2"
           style={{
-            border: "1px solid #4498e0"
+            width: "48px",
+            height: "48px",
+            border: "1px solid #82E299"
           }}
         >
-          <h3 className="h6 fw-bold d-flex align-items-center">
-            <i
-              className="bi bi-info-circle me-2"
-              style={{
-                color: "#4498e0",
-                fontSize: "22px"
+          6
+        </span>
+        Quorum
+      </h2>
+    )}
+    <div className="d-flex flex-wrap">
+      <div
+        className="p-4 right-shadow border-right flex-1"
+        style={{ minWidth: "250px" }}
+      >
+        <div className="d-flex flex-column gap-3">
+          <div className="d-flex gap-3 align-items-center">
+            <i class="bi bi-people-fill"></i>
+            <div className="text-md">Groups</div>
+            <Widget
+              src="/*__@replace:nui__*//widget/Element.Badge"
+              props={{
+                children: initialAnswers?.policy?.roles?.length ?? 1,
+                variant: `disabled round`,
+                size: "md"
               }}
             />
-            Create a new DAO costs 6 NEAR.
-          </h3>
-          <p className="mb-0">
-            The 6 NEAR will be used to pay for the contract deployment and
-            storage.
-          </p>
+          </div>
+          <div className="d-flex flex-column gap-2">
+            {groups.map((i) => (
+              <div
+                onClick={() => onGroupChange(i)}
+                className={
+                  "p-2 rounded-2 pointer " +
+                  (state.selectedGroup === i ? "selected-group" : "")
+                }
+              >
+                {i}
+              </div>
+            ))}
+          </div>
         </div>
-      )}
+      </div>
+      <div
+        className="d-flex flex-column gap-3 p-4 border-right flex-2"
+        style={{ minWidth: "250px" }}
+      >
+        <div className="d-flex gap-3 align-items-center">
+          <i class="bi bi-people-fill"></i>
+          <div className="text-md">Members</div>
+          <Widget
+            src="/*__@replace:nui__*//widget/Element.Badge"
+            props={{
+              children: state.members?.Group?.length ?? 1,
+              variant: `disabled round`,
+              size: "md"
+            }}
+          />
+        </div>
+        {state.members.Group && Array.isArray(state.members.Group)
+          ? state.members.Group.map((i) => (
+              <div className="border-bottom p-2">{i}</div>
+            ))
+          : state.members}
+      </div>
+      <div
+        className="d-flex flex-column gap-2 p-4 flex-1"
+        style={{ minWidth: "250px" }}
+      >
+        <div className="d-flex gap-3 align-items-center">
+          <img
+            src="https://ipfs.near.social/ipfs/bafkreid6uui42li7elyzxyogbm2lutj3arc3p6gmefc5qqsyerejjph4qa"
+            height={20}
+          />
+          <div className="text-md">Voting Policy</div>
+        </div>
+        <div className="text-muted text-sm">
+          What is the quorum required for the decision of this group
+        </div>
+        <div>
+          <div className="d-flex justify-content-between">
+            <label>Group quorum %</label>
+            <Widget
+              src="/*__@replace:nui__*//widget/Element.Badge"
+              props={{
+                children: state.voteWeight,
+                variant: `info round`,
+                size: "md"
+              }}
+            />
+          </div>
+          <div>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={state.voteWeight}
+              onPointerUp={(e) => {
+                onVoteWeightChange(e.target.value);
+              }}
+              onChange={(e) => {
+                onVoteWeightChange(e.target.value);
+              }}
+              className="form-range"
+            />
+          </div>
+        </div>
+      </div>
     </div>
-
     {renderFooter(state.answers)}
-  </div>
+  </Wrapper>
 );
