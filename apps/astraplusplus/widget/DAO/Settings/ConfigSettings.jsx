@@ -18,7 +18,7 @@ const handleProposal = () => {
         : undefined,
     links: Array.isArray(configState.links) ? configState.links : [],
     flagCover:
-      configState.coverImage === "string" ? configState.coverImage : "",
+      typeof configState.coverImage === "string" ? configState.coverImage : "",
     flagLogo:
       typeof configState.profileImage === "string"
         ? configState.profileImage
