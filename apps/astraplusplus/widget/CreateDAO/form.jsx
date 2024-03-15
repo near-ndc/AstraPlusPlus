@@ -52,7 +52,7 @@ const handleStepComplete = (value) => {
       step: state.step,
       form: finalAnswers
     });
-    handleFormComplete(finalAnswers);
+    setShowNote(true);
     return;
   }
   State.update({
@@ -62,6 +62,87 @@ const handleStepComplete = (value) => {
       ...value
     }
   });
+};
+const [showNoteModal, setShowNote] = useState(false);
+const [copied, setCopied] = useState(false);
+
+useEffect(() => {
+  let timeoutId;
+
+  if (copied) {
+    timeoutId = setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  }
+
+  return () => {
+    clearTimeout(timeoutId);
+  };
+}, [copied]);
+
+const NoteContainer = styled.div`
+  a {
+    color: #4498e0;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+`;
+
+const NoteModal = () => {
+  const url = `https://near.org/astraplusplus.ndctools.near/widget/home?tab=proposals&daoId=${state.form.address}&page=dao`;
+  return (
+    <Widget
+      src="/*__@appAccount__*//widget/Layout.Modal"
+      props={{
+        open: showNoteModal,
+        onOpenChange: (open) => {
+          setShowNote(open);
+        },
+        toggle: <></>,
+        content: (
+          <NoteContainer className="ndc-card p-4 d-flex flex-column gap-2">
+            <h6 className="mb-0">
+              Please note that upon confirming the transaction, your DAO will
+              appear within the next hour in both the "My DAOs" and "All DAOs"
+              sections.
+              <br />
+              <br /> To access it beforehand, please copy the following{" "}
+              <a target="_blank" rel="noopener noreferrer" href={url}>
+                link.
+              </a>
+            </h6>
+            <div className="d-flex gap-2 justify-content-end">
+              <Widget
+                src="nearui.near/widget/Input.Button"
+                props={{
+                  children: "Cancel",
+                  variant: "danger outline",
+                  onClick: () => setShowNote(false)
+                }}
+              />
+              <Widget
+                src="nearui.near/widget/Input.Button"
+                props={{
+                  children: "Copy link",
+                  variant: "info",
+                  onClick: () => {
+                    clipboard.writeText(url).then(() => {
+                      setCopied(true);
+                      handleFormComplete(state.form);
+                      setShowNote(false);
+                    });
+                  }
+                }}
+              />
+            </div>
+          </NoteContainer>
+        )
+      }}
+    />
+  );
 };
 
 function handleFormComplete(value) {
@@ -187,6 +268,7 @@ const steps = [
 return (
   <>
     <h1 className="h3 fw-bold mb-4">Create a new DAO</h1>
+    <NoteModal />
     <Widget
       src={`nearui.near/widget/Navigation.Steps`}
       props={{
@@ -197,6 +279,13 @@ return (
             step: i
           });
         }
+      }}
+    />
+    <Widget
+      src="near/widget/DIG.Toast"
+      props={{
+        title: "Copied",
+        open: copied
       }}
     />
     <Widget
