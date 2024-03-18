@@ -536,12 +536,13 @@ return (
     <div className="mb-3">
       <h5>Description</h5>
       <Widget
-        src="sking.near/widget/Common.Inputs.Markdown"
+        src={"devhub.near/widget/devhub.components.molecule.Compose"}
         props={{
-          value: state.description,
-          onChange: (value) => onChangeDescription(value),
-          height: "270px",
-          initialText: defaultDescription
+          data: state.description,
+          onChange: onChangeDescription,
+          autocompleteEnabled: true,
+          autoFocus: false,
+          placeholder: defaultDescription
         }}
       />
     </div>

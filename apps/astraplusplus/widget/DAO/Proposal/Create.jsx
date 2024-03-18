@@ -195,7 +195,6 @@ const Wrapper = styled.div`
     line-height: 1.4;
     font-weight: 400;
     font-size: 15px;
-    color: #868682;
     margin: 0;
   }
 

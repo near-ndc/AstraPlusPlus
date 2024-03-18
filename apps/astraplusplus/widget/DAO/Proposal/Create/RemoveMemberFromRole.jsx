@@ -130,7 +130,16 @@ return (
   <>
     <div className="mb-3">
       <h5>Account ID</h5>
-      <input type="text" onChange={(e) => onChangeMember(e.target.value)} />
+      <Widget
+        src={
+          "/*__@appAccount__*//widget/DAO.Proposal.Common.AccountAutoComplete"
+        }
+        props={{
+          placeholder: "Specify member account",
+          accountId: state.member_id,
+          onChange: onChangeMember
+        }}
+      />
     </div>
     <div className="mb-3">
       <Widget
@@ -151,11 +160,13 @@ return (
     <div className="mb-3">
       <h5>Proposal Description</h5>
       <Widget
-        src="sking.near/widget/Common.Inputs.Markdown"
+        src={"devhub.near/widget/devhub.components.molecule.Compose"}
         props={{
-          onChange: (value) => onChangeDescription(value),
-          height: "270px",
-          initialText: defaultDescription
+          data: state.description,
+          onChange: onChangeDescription,
+          autocompleteEnabled: true,
+          autoFocus: false,
+          placeholder: defaultDescription
         }}
       />
     </div>
