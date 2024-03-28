@@ -986,14 +986,16 @@ const NotificationModal = () => {
       props={{
         content: (
           <div className="ndc-card p-4">
-            {/* proposal is expired */}
-            {new Date().getTime() > new Date(expirationTime).getTime() && (
-              <div className="alert alert-info">
-                Please note: This proposal has expired. Your vote will only mark
-                the proposal as 'Expired' and won't affect the decision-making
-                process.
-              </div>
-            )}
+            {/* sputnik dao proposal is expired */}
+            {!isCongressDaoID &&
+              !isVotingBodyDao &&
+              new Date().getTime() > new Date(expirationTime).getTime() && (
+                <div className="alert alert-info">
+                  Please note: This proposal has expired. Your vote will only
+                  mark the proposal as 'Expired' and won't affect the
+                  decision-making process.
+                </div>
+              )}
             <div className="d-flex flex-column gap-3">
               Do you want to notify proposer: {proposer} about the vote?
               <div className="d-flex gap-3 justify-content-end">
