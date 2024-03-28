@@ -49,8 +49,8 @@ const tabs = {
     })
   },
   home: {
-    name: "Discussion",
-    widget: "DAO.Discussion",
+    name: "Feed",
+    widget: "DAO.Feed",
     href: constructURL({
       tab: "home",
       daoId: props.daoId,
