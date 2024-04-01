@@ -32,7 +32,8 @@ const isVotingBodyDao = daoId === VotingBodyDaoId;
 const proposalsCount = Near.view(daoId, "number_of_proposals");
 
 if (proposalsCount === null) return;
-
+const STORAGE_FILTERS_KEY = daoId + "_filters";
+const storageFiltersData = Storage.privateGet(STORAGE_FILTERS_KEY);
 State.init({
   daoId,
   page: 0,
@@ -49,6 +50,15 @@ State.init({
   daoConfig: null,
   tab: "active"
 });
+
+if (
+  storageFiltersData &&
+  JSON.stringify(state.filters) !== storageFiltersData
+) {
+  State.update({
+    filters: JSON.parse(storageFiltersData)
+  });
+}
 
 function getPreVoteVotes(supported) {
   const votes = {};
@@ -335,12 +345,17 @@ return (
               props={{
                 filters: state.filters,
                 cancel: () => {
+                  Storage.privateSet(STORAGE_FILTERS_KEY, null);
                   State.update({
                     ...state,
                     filtersOpen: false
                   });
                 },
                 applyFilters: (filters) => {
+                  Storage.privateSet(
+                    STORAGE_FILTERS_KEY,
+                    JSON.stringify(filters)
+                  );
                   State.update({
                     ...state,
                     filters,
