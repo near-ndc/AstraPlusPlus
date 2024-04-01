@@ -77,7 +77,7 @@ function addProposal(content) {
     methodName: "add_proposal",
     args: {
       proposal: {
-        description: "Social Feed post",
+        description: `Social Feed post created by ${context.accountId}`,
         kind: {
           FunctionCall: {
             receiver_id: "social.near",
