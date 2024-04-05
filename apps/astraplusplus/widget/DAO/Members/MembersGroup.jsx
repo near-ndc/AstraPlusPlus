@@ -1,7 +1,7 @@
 const data = props.data;
 const policy = props.policy;
 const currentPage = props.page ?? 1;
-const resPerPage = props.resPerPage ?? 20;
+const resPerPage = props.resPerPage ?? 21;
 const isCongressDaoID = props.isCongressDaoID ?? false;
 const isVotingBodyDao = props.isVotingBodyDao ?? false;
 const accountId = props.accountId ?? context.accountId;
@@ -375,10 +375,10 @@ const Table = ({ title, tableData, showExpand }) => {
                   Spam Votes
                   <i class="bi bi-arrow-down"></i>
                 </th>
-                <th>
+                {/* <th>
                   Proposals <br />
                   Accepted/ Created
-                </th>
+                </th> */}
               </tr>
             </thead>
             <tbody style={{ position: "relative" }}>
@@ -389,14 +389,16 @@ const Table = ({ title, tableData, showExpand }) => {
               {tableData?.map((item) => {
                 return (
                   <tr className={isCongressDaoID && "opacity-low"}>
-                    <td>
-                      <Widget
-                        src="mob.near/widget/Profile.ShortInlineBlock"
-                        props={{
-                          accountId: item.account,
-                          tooltip: true
-                        }}
-                      />
+                    <td style={{ maxWidth: "300px" }}>
+                      <div className="text-truncate w-100">
+                        <Widget
+                          src="mob.near/widget/Profile.ShortInlineBlock"
+                          props={{
+                            accountId: item.account,
+                            tooltip: true
+                          }}
+                        />
+                      </div>
                     </td>
                     {state.selectedView === viewTypes.LIST && (
                       <td className="role-tag-td">
@@ -407,33 +409,13 @@ const Table = ({ title, tableData, showExpand }) => {
                     <td> {item.approve}</td>
                     <td> {item.rejected}</td>
                     <td>{item.spamVotes ?? 0}</td>
-                    <td>
+                    {/* <td>
                       {item.acceptedProposals} / {item.totalProposals}
-                    </td>
+                    </td> */}
                     <td className="d-flex gap-2 align-items-center">
-                      <Widget
-                        src="nearui.near/widget/Input.Button"
-                        props={{
-                          children: (
-                            <a
-                              href={`#//*__@appAccount__*//widget/home?page=votinghistory`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{
-                                color: "rgb(68, 152, 224)"
-                              }}
-                            >
-                              <i class="bi bi-clock-history"></i>
-                            </a>
-                          ),
-                          size: "sm",
-                          variant: "icon info outline"
-                        }}
-                      />
                       {/* we don't show propose to mint and remove for congress dao */}
                       {!isCongressDaoID && !isVotingBodyDao && (
                         <div className="d-flex gap-2 align-items-center">
-                          <ProposeToMintSBT itemDetails={item} />
                           <ProposeToRemove user={item.account} />
                         </div>
                       )}
@@ -928,35 +910,11 @@ return (
                             }}
                           ></div>
                           {!isCongressDaoID && !isVotingBodyDao && (
-                            <div className="d-flex justify-content-between">
-                              <ProposeToMintSBT itemDetails={item} />
+                            <div className="d-flex justify-content-center">
+                              {/* <ProposeToMintSBT itemDetails={item} /> */}
                               <ProposeToRemove user={item.account} />
                             </div>
                           )}
-                          <Widget
-                            src="nearui.near/widget/Input.Button"
-                            props={{
-                              buttonProps: {
-                                style: {
-                                  width: "inherit"
-                                }
-                              },
-                              children: (
-                                <a
-                                  href={`#//*__@appAccount__*//widget/home?page=votinghistory`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  style={{
-                                    color: "rgb(68, 152, 224)"
-                                  }}
-                                >
-                                  View Voting History
-                                </a>
-                              ),
-                              variant: "info outline",
-                              size: "sm"
-                            }}
-                          />
                         </div>
                       );
                     })}

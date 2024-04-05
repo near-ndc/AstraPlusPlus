@@ -44,7 +44,7 @@ for (const role of initialAnswers.policy.roles) {
 const initialState = {
   roles: initialAnswers.policy.roles.length
     ? initialAnswers.policy.roles.map((r) => r.name)
-    : ["council"],
+    : ["council", "all"],
   members: initialMembers.length
     ? initialMembers
     : [{ role: "council", name: accountId }]
@@ -219,9 +219,10 @@ return (
           <div>
             <h3 className="h6 fw-bold">Add Groups</h3>
             <p className="text-black-50 fw-light small">
-              Adding groups to DAO during creation is not supported using web
-              based wallets. Anyway, you can add more groups later in DAO
-              settings
+              You can add members and assign them various roles, with
+              permissions customizable in the next step. The 'All' group
+              includes everyone; you can remove it if you wish to limit
+              interactions to selected individuals within your DAO.
             </p>
           </div>
           <Widget
@@ -367,7 +368,7 @@ return (
                     placeholder: "Role",
                     size: "lg",
                     options: state.answers.roles
-                      .filter((r) => r !== null && r !== "")
+                      .filter((r) => r !== null && r !== "" && r !== "all")
                       .map((r) => ({
                         title: r,
                         value: r
