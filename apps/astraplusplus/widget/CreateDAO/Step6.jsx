@@ -216,11 +216,13 @@ return (
             }}
           />
         </div>
-        {state.members.Group && Array.isArray(state.members.Group)
-          ? state.members.Group.map((i) => (
-              <div className="border-bottom p-2">{i}</div>
-            ))
-          : state.members}
+        <div className="text-truncate w-100">
+          {state.members.Group && Array.isArray(state.members.Group)
+            ? state.members.Group.map((i) => (
+                <div className="border-bottom p-2">{i}</div>
+              ))
+            : state.members}
+        </div>
       </div>
       <div
         className="d-flex flex-column gap-2 p-4 flex-1"
