@@ -59,7 +59,7 @@ const pages = [
       active: page === "home",
       href: currentLink + "?page=home",
       onClick: () => router.navigate({ page: "home" }),
-      widgetName: "Feed.index",
+      widgetName: "ProposalsFeed.index",
       defaultProps: {}
     },
     {
