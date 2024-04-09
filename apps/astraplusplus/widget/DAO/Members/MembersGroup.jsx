@@ -23,7 +23,7 @@ const RolesColor = rolesArray.map((item, i) => {
 const onRemoveUserProposal = (memberId, roleId) => {
   Near.call([
     {
-      contractName: daoId,
+      contractName: props.daoId,
       methodName: "add_proposal",
       args: {
         proposal: {
