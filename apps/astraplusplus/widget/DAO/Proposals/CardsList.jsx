@@ -5,7 +5,8 @@ const {
   update,
   isCongressDaoID,
   daoConfig,
-  isVotingBodyDao
+  isVotingBodyDao,
+  showNavButton
 } = props;
 
 return (
@@ -40,7 +41,8 @@ return (
               isCongressDaoID,
               isVotingBodyDao,
               daoConfig,
-              dev: props.dev
+              dev: props.dev,
+              showNavButton
             }}
           />
         );

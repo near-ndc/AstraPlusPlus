@@ -1,5 +1,5 @@
 const multiSelectMode = props.multiSelectMode ?? false;
-let { proposalString, proposalId, daoId, daoConfig } = props;
+let { proposalString, proposalId, daoId, daoConfig, showNavButton } = props;
 const accountId = context.accountId;
 
 const CoADaoId = props.dev
@@ -579,7 +579,8 @@ return (
       dev: props.dev,
       HoMDaoId,
       CoADaoId,
-      registry
+      registry,
+      showNavButton
     }}
   />
 );

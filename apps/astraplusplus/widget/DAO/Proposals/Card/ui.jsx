@@ -26,8 +26,12 @@ const {
   currentuserCongressHouse,
   CoADaoId,
   HoMDaoId,
-  registry
+  registry,
+  showNavButton
 } = props;
+const proposalURL = `https://near.org//*__@appAccount__*//widget/home?page=dao&tab=proposals&daoId=${daoId}&proposalId=${
+  proposal.id
+}${props.dev ? "&dev=true" : ""}`;
 const accountId = context.accountId;
 const [showNotificationModal, setNotificationModal] = useState(false);
 const [voteDetails, setVoteDetails] = useState(null);
@@ -261,7 +265,16 @@ function renderHeader({ typeName, id, daoId, statusName }) {
     <div className="card__header">
       <div className="d-flex flex-column gap-2">
         <div className="d-flex align-items-center justify-content-between">
-          <h4>{typeName}</h4>
+          <div className="d-flex align-items-center gap-2">
+            <h4>{typeName}</h4>
+            {showNavButton && (
+              <a target="_blank" rel="noopener noreferrer" href={proposalURL}>
+                <h5>
+                  <i class="bi bi-box-arrow-up-right"></i>
+                </h5>
+              </a>
+            )}
+          </div>
           <div className="d-flex align-items-center gap-2">
             {(isCongressDaoID || isVotingBodyDao) &&
               statusName === "Approved" &&
@@ -877,9 +890,7 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
       icon: "bi bi-share",
       widget: "Common.Modals.Share",
       props: {
-        url: `https://near.org//*__@appAccount__*//widget/home?page=dao&tab=proposals&daoId=${daoId}&proposalId=${
-          proposal.id
-        }${props.dev ? "&dev=true" : ""}`,
+        url: proposalURL,
         text: "Explore this new proposal from our DAO! Your support and feedback are essential as we work towards a decentralized future. Review the details and join the discussion here:"
       }
     }
