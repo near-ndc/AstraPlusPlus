@@ -369,106 +369,109 @@ return (
         }}
       />
     </div>
-    {res !== null && !res.body && (
+    {res !== null && !res.body ? (
       <div className="alert alert-danger mt-2" role="alert">
-        Couldn't fetch proposals from API. Please try again later.
+        Network issue. Please try again later.
       </div>
-    )}
-    {isVotingBodyDao && (
-      <div className="w-100 mt-2">
-        <Widget
-          src={`/*__@appAccount__*//widget/DAO.Layout.Tabs`}
-          props={{
-            allowHref: false,
-            tabs: {
-              active: {
-                name: "Active"
-              },
-              draft: {
-                name: "Draft"
-              }
-            },
-            tab: state.tab,
-            update: (state) => update(state)
-          }}
-        />
-      </div>
-    )}
-    <div>
-      {state.tableView ? (
-        <Widget
-          src="/*__@appAccount__*//widget/DAO.Proposals.Table.index"
-          props={{
-            state,
-            resPerPage,
-            proposals: res === null ? null : res.body,
-            isCongressDaoID,
-            isVotingBodyDao,
-            daoConfig: state.daoConfig,
-            dev: props.dev
-          }}
-        />
-      ) : (
-        <Widget
-          src="/*__@appAccount__*//widget/DAO.Proposals.CardsList"
-          props={{
-            state,
-            resPerPage,
-            proposals: res === null ? null : res.body,
-            isCongressDaoID,
-            isVotingBodyDao,
-            daoConfig: state.daoConfig,
-            dev: props.dev
-          }}
-        />
-      )}
-
-      <div className="d-flex justify-content-center my-4">
-        <Widget
-          src="nearui.near/widget/Navigation.PrevNext"
-          props={{
-            hasPrev: state.page > 0,
-            hasNext: hasNextHandler(),
-            onPrev: () => {
-              update({
-                page: state.page - 1
-              });
-            },
-            onNext: () => {
-              update({
-                page: state.page + 1
-              });
-            },
-            nextHref: `#proposals-top`
-          }}
-        />
-      </div>
-    </div>
-    {state.multiSelectMode && (
+    ) : (
       <>
-        <div
-          style={{
-            height: 180,
-            width: "100%"
-          }}
-        ></div>
-        <Widget
-          src="/*__@appAccount__*//widget/DAO.Proposals.MultiVote"
-          props={{
-            daoId: state.daoId,
-            view: "submit",
-            onHideMultiSelect: () => {
-              State.update({
-                ...state,
-                multiSelectMode: false
-              });
-              Storage.privateSet("multiSelectMode", false);
-            },
-            isCongressDaoID,
-            isVotingBodyDao,
-            dev: props.dev
-          }}
-        />
+        {isVotingBodyDao && (
+          <div className="w-100 mt-2">
+            <Widget
+              src={`/*__@appAccount__*//widget/DAO.Layout.Tabs`}
+              props={{
+                allowHref: false,
+                tabs: {
+                  active: {
+                    name: "Active"
+                  },
+                  draft: {
+                    name: "Draft"
+                  }
+                },
+                tab: state.tab,
+                update: (state) => update(state)
+              }}
+            />
+          </div>
+        )}
+        <div>
+          {state.tableView ? (
+            <Widget
+              src="/*__@appAccount__*//widget/DAO.Proposals.Table.index"
+              props={{
+                state,
+                resPerPage,
+                proposals: res === null ? null : res.body,
+                isCongressDaoID,
+                isVotingBodyDao,
+                daoConfig: state.daoConfig,
+                dev: props.dev
+              }}
+            />
+          ) : (
+            <Widget
+              src="/*__@appAccount__*//widget/DAO.Proposals.CardsList"
+              props={{
+                state,
+                resPerPage,
+                proposals: res === null ? null : res.body,
+                isCongressDaoID,
+                isVotingBodyDao,
+                daoConfig: state.daoConfig,
+                dev: props.dev
+              }}
+            />
+          )}
+
+          <div className="d-flex justify-content-center my-4">
+            <Widget
+              src="nearui.near/widget/Navigation.PrevNext"
+              props={{
+                hasPrev: state.page > 0,
+                hasNext: hasNextHandler(),
+                onPrev: () => {
+                  update({
+                    page: state.page - 1
+                  });
+                },
+                onNext: () => {
+                  update({
+                    page: state.page + 1
+                  });
+                },
+                nextHref: `#proposals-top`
+              }}
+            />
+          </div>
+        </div>
+        {state.multiSelectMode && (
+          <>
+            <div
+              style={{
+                height: 180,
+                width: "100%"
+              }}
+            ></div>
+            <Widget
+              src="/*__@appAccount__*//widget/DAO.Proposals.MultiVote"
+              props={{
+                daoId: state.daoId,
+                view: "submit",
+                onHideMultiSelect: () => {
+                  State.update({
+                    ...state,
+                    multiSelectMode: false
+                  });
+                  Storage.privateSet("multiSelectMode", false);
+                },
+                isCongressDaoID,
+                isVotingBodyDao,
+                dev: props.dev
+              }}
+            />
+          </>
+        )}
       </>
     )}
   </>
