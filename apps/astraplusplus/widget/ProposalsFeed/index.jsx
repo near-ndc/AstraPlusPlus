@@ -10,7 +10,7 @@ State.init({
     proposal_status: [],
     time_start: "",
     time_end: "",
-    dao_type: ""
+    dao_type: "all"
   },
   filtersOpen: false
 });

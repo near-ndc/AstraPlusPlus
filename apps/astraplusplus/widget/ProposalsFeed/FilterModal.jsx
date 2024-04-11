@@ -98,7 +98,7 @@ const Wrapper = styled.div`
 
 return (
   <Wrapper className="ndc-card p-5 pb-4">
-    <h4 className="filter-title">Type</h4>
+    <h4 className="filter-title">DAOs: </h4>
     <div className="d-flex flex-wrap gap-3">
       {DaoTypes.map((item) => {
         return (
@@ -123,7 +123,7 @@ return (
         );
       })}
     </div>
-    <h4 className="filter-title mt-4">Status</h4>
+    <h4 className="filter-title mt-4">Proposal status: </h4>
     <div className="d-flex flex-wrap">
       {ProposalStatus.map((item) => {
         return (
