@@ -327,16 +327,13 @@ const expensiveWork = () => {
   }
 
   if (isVotingBodyDao) {
-    if (
-      my_proposal.typeName === "Dissolve" ||
-      my_proposal.typeName === "Text Super"
-    ) {
-      totalVotesNeeded = daoConfig?.super_consent?.quorum;
-    } else if (my_proposal.typeName === "Pre Vote") {
-      totalVotesNeeded = daoConfig?.pre_vote_support;
-    } else {
-      totalVotesNeeded = daoConfig?.simple_consent?.quorum;
+    const votesConfig = Near.view(daoId, "get_proposal_consent", {
+      id: proposal.id
+    });
+    if (votesConfig === null) {
+      return;
     }
+    totalVotesNeeded = votesConfig.quorum;
   }
 
   let totalVotes = {
