@@ -851,6 +851,8 @@ function renderPreVoteButtons({ proposal }) {
   );
 }
 
+const [footerModal, setFooterModal] = useState({});
+
 function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
   const items = [
     {
@@ -914,21 +916,30 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
   }
 
   const renderModal = (item, index) => {
+    const toggleKey = proposal.id + item.title;
+
     return (
       <Widget
         src="/*__@appAccount__*//widget/Layout.Modal"
         props={{
+          open: footerModal[toggleKey],
+          onOpenChange: () =>
+            setFooterModal((prevState) => ({
+              ...prevState,
+              [toggleKey]: !prevState[toggleKey]
+            })),
           content: (
             <Widget
               src={`/*__@appAccount__*//widget/${item.widget}`}
               props={item.props}
             />
           ),
+          avoidDefaultDomBehavior: true,
           toggle: (
             <div
               key={index}
               className={
-                "d-flex gap-2 align-items-center justify-content-center user-select-none" +
+                "d-flex gap-3 align-items-center justify-content-center user-select-none" +
                 (index !== items.length - 1 ? " border-end" : "")
               }
             >
@@ -946,7 +957,7 @@ function renderFooter({ totalVotes, votes, comments, daoId, proposal }) {
   };
 
   return (
-    <div className="d-flex gap-3 justify-content-between mt-2 border-top pt-4 flex-wrap">
+    <div className="d-flex gap-4 justify-content-between mt-2 border-top pt-4 flex-wrap">
       {items.map(renderModal)}
     </div>
   );
@@ -1058,52 +1069,60 @@ const NotificationModal = () => {
   );
 };
 
+const Content = useMemo(() => {
+  return (
+    <>
+      {renderPermission({ isAllowedToVote: isAllowedToVote.every((v) => v) })}
+      {renderHeader({ typeName, id, daoId, statusName })}
+      {renderData({
+        proposer,
+        category,
+        description,
+        submission_time,
+        totalVotesNeeded
+      })}
+      {!!showMultiVote &&
+        renderMultiVoteButtons({
+          daoId,
+          proposal,
+          canVote
+        })}
+
+      {statusName !== "Pre Vote" &&
+        !showMultiVote &&
+        renderVoteButtons({
+          totalVotes,
+          statusName,
+          votes,
+          accountId,
+          isAllowedToVote,
+          handleVote: (action) => {
+            if (isVotingBodyDao) {
+              return handleVote({
+                action,
+                daoId,
+                proposalId: proposal.id,
+                proposer
+              });
+            } else {
+              setNotificationModal(true);
+              setVoteDetails(action);
+            }
+          }
+        })}
+
+      {statusName === "Pre Vote" &&
+        renderPreVoteButtons({
+          proposal
+        })}
+    </>
+  );
+}, [proposal.id]);
+
 return (
   <Wrapper className="ndc-card" status={statusName}>
     <NotificationModal />
-    {renderPermission({ isAllowedToVote: isAllowedToVote.every((v) => v) })}
-    {renderHeader({ typeName, id, daoId, statusName })}
-    {renderData({
-      proposer,
-      category,
-      description,
-      submission_time,
-      totalVotesNeeded
-    })}
-    {!!showMultiVote &&
-      renderMultiVoteButtons({
-        daoId,
-        proposal,
-        canVote
-      })}
-
-    {statusName !== "Pre Vote" &&
-      !showMultiVote &&
-      renderVoteButtons({
-        totalVotes,
-        statusName,
-        votes,
-        accountId,
-        isAllowedToVote,
-        handleVote: (action) => {
-          if (isVotingBodyDao) {
-            return handleVote({
-              action,
-              daoId,
-              proposalId: proposal.id,
-              proposer
-            });
-          } else {
-            setNotificationModal(true);
-            setVoteDetails(action);
-          }
-        }
-      })}
-
-    {statusName === "Pre Vote" &&
-      renderPreVoteButtons({
-        proposal
-      })}
+    {Content}
     {renderFooter({
       totalVotes,
       votes,

@@ -23,23 +23,23 @@ const socialMedia = [
   {
     name: "Facebook",
     link: facebookURL.toString(),
-    icon: "bi bi-facebook",
+    icon: "bi bi-facebook"
   },
   {
     name: "Twitter",
     link: twitterURL.toString(),
-    icon: "bi bi-twitter",
+    icon: "bi bi-twitter"
   },
   {
     name: "LinkedIn",
     link: linkedinURL.toString(),
-    icon: "bi bi-linkedin",
+    icon: "bi bi-linkedin"
   },
   {
     name: "Telegram",
     link: telegramURL.toString(),
-    icon: "bi bi-telegram",
-  },
+    icon: "bi bi-telegram"
+  }
 ];
 
 const Wrapper = styled.div`
@@ -83,11 +83,11 @@ const Wrapper = styled.div`
 `;
 
 State.init({
-  copied: false,
+  copied: false
 });
 
 return (
-  <Wrapper className="ndc-card p-4">
+  <Wrapper className="p-4">
     <h3 className="mb-4">Share with friends</h3>
     <div className="d-flex gap-4 justify-content-between mb-4">
       {socialMedia.map((item, index) => (
@@ -109,11 +109,11 @@ return (
         onClick={() => {
           clipboard.writeText(url);
           State.update({
-            copied: true,
+            copied: true
           });
           setTimout(() => {
             State.update({
-              copied: false,
+              copied: false
             });
           }, 2000);
         }}

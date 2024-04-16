@@ -239,7 +239,7 @@ function getDaoConfig() {
 getDaoConfig();
 
 return (
-  <>
+  <div className="p-2 p-sm-0">
     <div
       className="d-flex align-items-center gap-2 flex-wrap-reverse justify-content-end"
       id="proposals-top"
@@ -289,30 +289,32 @@ return (
           }
         }}
       />
-      <Widget
-        src="nearui.near/widget/Input.Button"
-        props={{
-          children: (
-            <>
-              Table View
-              {state.tableView ? (
-                <i className="bi bi-x-lg"></i>
-              ) : (
-                <i className="bi bi-table"></i>
-              )}
-            </>
-          ),
-          variant: "info outline",
-          size: "md",
-          onClick: () => {
-            Storage.privateSet("tableView", !state.tableView);
-            State.update({
-              ...state,
-              tableView: !state.tableView
-            });
-          }
-        }}
-      />
+      <div className="d-none d-sm-flex">
+        <Widget
+          src="nearui.near/widget/Input.Button"
+          props={{
+            children: (
+              <>
+                Table View
+                {state.tableView ? (
+                  <i className="bi bi-x-lg"></i>
+                ) : (
+                  <i className="bi bi-table"></i>
+                )}
+              </>
+            ),
+            variant: "info outline",
+            size: "md",
+            onClick: () => {
+              Storage.privateSet("tableView", !state.tableView);
+              State.update({
+                ...state,
+                tableView: !state.tableView
+              });
+            }
+          }}
+        />
+      </div>
       <Widget
         src="/*__@appAccount__*//widget/Layout.Modal"
         props={{
@@ -395,7 +397,7 @@ return (
             />
           </div>
         )}
-        <div>
+        <div className="d-none d-sm-block">
           {state.tableView ? (
             <Widget
               src="/*__@appAccount__*//widget/DAO.Proposals.Table.index"
@@ -423,28 +425,44 @@ return (
               }}
             />
           )}
-
-          <div className="d-flex justify-content-center my-4">
-            <Widget
-              src="nearui.near/widget/Navigation.PrevNext"
-              props={{
-                hasPrev: state.page > 0,
-                hasNext: hasNextHandler(),
-                onPrev: () => {
-                  update({
-                    page: state.page - 1
-                  });
-                },
-                onNext: () => {
-                  update({
-                    page: state.page + 1
-                  });
-                },
-                nextHref: `#proposals-top`
-              }}
-            />
-          </div>
         </div>
+
+        <div className="d-block d-sm-none">
+          <Widget
+            src="/*__@appAccount__*//widget/DAO.Proposals.CardsList"
+            props={{
+              state,
+              resPerPage,
+              proposals: res === null ? null : res.body,
+              isCongressDaoID,
+              isVotingBodyDao,
+              daoConfig: state.daoConfig,
+              dev: props.dev
+            }}
+          />
+        </div>
+
+        <div className="d-flex justify-content-center my-4">
+          <Widget
+            src="nearui.near/widget/Navigation.PrevNext"
+            props={{
+              hasPrev: state.page > 0,
+              hasNext: hasNextHandler(),
+              onPrev: () => {
+                update({
+                  page: state.page - 1
+                });
+              },
+              onNext: () => {
+                update({
+                  page: state.page + 1
+                });
+              },
+              nextHref: `#proposals-top`
+            }}
+          />
+        </div>
+
         {state.multiSelectMode && (
           <>
             <div
@@ -474,5 +492,5 @@ return (
         )}
       </>
     )}
-  </>
+  </div>
 );
