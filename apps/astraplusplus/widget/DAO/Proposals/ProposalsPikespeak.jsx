@@ -241,7 +241,7 @@ getDaoConfig();
 return (
   <div className="p-2 p-sm-0">
     <div
-      className="d-flex align-items-center gap-2 flex-wrap-reverse justify-content-end"
+      className="d-flex align-items-center gap-2 flex-wrap"
       id="proposals-top"
     >
       <Widget
