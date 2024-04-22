@@ -17,11 +17,15 @@ const Overlay = styled.div`
   display: grid;
   place-items: center;
   overflow-y: auto;
-  z-index: 99999;
+  z-index: 999;
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(6px);
+
+  @media (max-width: 768px) {
+    top: 75px;
+  }
 `;
 
 const Content = styled.div`
