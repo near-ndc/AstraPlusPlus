@@ -11,6 +11,7 @@ const HoMDaoId = props.dev
   ? "/*__@replace:HoMDaoIdTesting__*/"
   : "/*__@replace:HoMDaoId__*/";
 
+const ndcTrustDaoId = "ndctrust.sputnik-dao.near";
 let { page, tab, daoId, house } = props;
 if (!page) {
   page = "social-feed";
@@ -114,6 +115,13 @@ const pages = [
       active: page === "congress" && router.params.house === "vb",
       href: currentLink + `?page=congress&house=vb`,
       onClick: () => router.navigate({ page: "congress", house: "vb" }),
+      widgetName: "DAO.index"
+    },
+    {
+      title: "NDC Trust",
+      active: page === "dao" && daoId === ndcTrustDaoId,
+      href: currentLink + `?page=dao&daoId=${ndcTrustDaoId}`,
+      onClick: () => router.navigate({ page: "dao", daoId: ndcTrustDaoId }),
       widgetName: "DAO.index"
     }
   ],
