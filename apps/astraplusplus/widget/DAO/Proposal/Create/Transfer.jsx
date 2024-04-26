@@ -227,8 +227,19 @@ if (!res) {
   return <Widget src="nearui.near/widget/Feedback.Spinner" />;
 }
 
+const Container = styled.div`
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+  }
+`;
+
 return (
-  <>
+  <Container>
     <div className="mb-3">
       <h5>Recipient</h5>
       <Widget
@@ -314,5 +325,5 @@ return (
         />
       )}
     </div>
-  </>
+  </Container>
 );
