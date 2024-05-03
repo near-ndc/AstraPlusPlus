@@ -91,7 +91,7 @@ const onAddEmptyMember = () => {
       ...state.answers,
       members: [
         ...state.answers.members,
-        { name: "", role: state.answers.roles[1] }
+        { name: "", role: state.answers.roles.filter((i) => i !== "all")[0] }
       ]
     }
   });

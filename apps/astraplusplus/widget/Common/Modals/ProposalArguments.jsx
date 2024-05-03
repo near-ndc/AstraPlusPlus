@@ -41,10 +41,10 @@ const Wrapper = styled.div`
 const MarkdownContainer = styled.div`
   position: relative;
   width: 100%;
-  padding: 24px;
+  padding: 10px;
   background-color: #f8f9fa;
   color: #1b1b18;
-  border-radius: 14px;
+  border-radius: 5px;
   max-height: 700px;
   overflow-y: auto;
   color: #333;
@@ -85,7 +85,7 @@ const MarkdownContainer = styled.div`
 
   p {
     font-size: 1em;
-    margin-bottom: 1em;
+    margin-bottom: 0px !important;
   }
 
   a {
@@ -201,7 +201,7 @@ if (proposal_type === "Transfer")
         <b>Amount</b>
         <div>
           <Widget
-            src="sking.near/widget/Common.TokenAmount"
+            src="/*__@appAccount__*//widget/Common.Components.TokenAmount"
             props={{
               amountWithoutDecimals: kind.Transfer.amount,
               address: kind.Transfer.token_id
@@ -234,7 +234,7 @@ if (
         <b>Amount</b>
         <div>
           <Widget
-            src="sking.near/widget/Common.TokenAmount"
+            src="/*__@appAccount__*//widget/Common.Components.TokenAmount"
             props={{
               amountWithoutDecimals: kind[proposal_type],
               address: kind.Transfer.token_id
@@ -252,7 +252,7 @@ if (proposal_type === "UpdateBonds")
         <b>Pre Vote Bond Amount</b>
         <div>
           <Widget
-            src="sking.near/widget/Common.TokenAmount"
+            src="/*__@appAccount__*//widget/Common.Components.TokenAmount"
             props={{
               amountWithoutDecimals: kind[proposal_type].pre_vote_bond,
               address: ""
@@ -264,7 +264,7 @@ if (proposal_type === "UpdateBonds")
         <b>Active Queue Bond Amount</b>
         <div>
           <Widget
-            src="sking.near/widget/Common.TokenAmount"
+            src="/*__@appAccount__*//widget/Common.Components.TokenAmount"
             props={{
               amountWithoutDecimals: kind[proposal_type].active_queue_bond,
               address: ""
@@ -323,7 +323,7 @@ if (proposal_type === "FunctionCall") {
                 <b>Deposit</b>
                 <div style={{ zoom: 0.7 }}>
                   <Widget
-                    src="sking.near/widget/Common.TokenAmount"
+                    src="/*__@appAccount__*//widget/Common.Components.TokenAmount"
                     props={{
                       amountWithoutDecimals: deposit,
                       address: ""
@@ -385,7 +385,7 @@ if (proposal_type === "AddBounty")
         <b>Amount</b>
         <div>
           <Widget
-            src="sking.near/widget/Common.TokenAmount"
+            src="/*__@appAccount__*//widget/Common.Components.TokenAmount"
             props={{
               amountWithoutDecimals: kind.AddBounty.bounty.amount,
               address: kind.AddBounty.bounty.token
@@ -398,8 +398,12 @@ if (proposal_type === "AddBounty")
         <p>{kind.AddBounty.bounty.times}</p>
       </div>
       <div>
-        <b>Deadline</b>
-        <p>{new Date(kind.AddBounty.bounty.max_deadline).toLocaleString()}</p>
+        <b>Deadline Duration</b>
+        <p>
+          {convertMillisecondsToDaysAndHours(
+            kind.AddBounty.bounty.max_deadline
+          )}
+        </p>
       </div>
       <div className="w-100">
         <b>Bounty Description</b>
