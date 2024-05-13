@@ -188,43 +188,43 @@ const NEAR = () => {
   );
 };
 
-const res = useCache(
-  () =>
-    asyncFetch(`https://api.pikespeak.ai/account/balance/${daoId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": "/*__@replace:pikespeakApiKey__*/"
-      }
-    }).then((res) => {
-      const data = res.body?.map((a) => {
-        const isNEAR = a.contract === "Near";
-        return {
-          text: (
-            <div style={{ gap: 10 }} className="d-flex align-items-center">
-              <div style={{ gap: 4 }} className="d-flex align-items-center">
-                {!isNEAR ? (
-                  <img width="32px" height="32px" src={a.icon} />
-                ) : (
-                  <NEAR />
-                )}
-                <p>{a.symbol}</p>
-              </div>
-              <div>{a?.amount}</div>
-            </div>
-          ),
 
-          value: isNEAR ? "" : a.contract
-        };
-      });
-      return data;
-    }),
-  daoId + "-token-info",
-  { subscribe: false }
-);
+let res = fetch(`https://api.pikespeak.ai/account/balance/${daoId}`, {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": "/*__@replace:pikespeakApiKey__*/"
+  }
+});
 
 if (!res) {
   return <Widget src="nearui.near/widget/Feedback.Spinner" />;
+}
+if (res.body && Array.isArray(res.body)) {
+  res = res.body
+    ?.map((a) => {
+      if (a.symbol === "NEAR [Storage]") {
+        return null;
+      }
+      const isNEAR = a.contract === "Near";
+      return {
+        text: (
+          <div style={{ gap: 10 }} className="d-flex align-items-center">
+            <div style={{ gap: 4 }} className="d-flex align-items-center">
+              {!isNEAR ? (
+                <img width="32px" height="32px" src={a.icon} />
+              ) : (
+                <NEAR />
+              )}
+              <div>{a.symbol}</div>
+            </div>
+            <div>{a?.amount}</div>
+          </div>
+        ),
+        value: isNEAR ? "" : a.contract
+      };
+    })
+    .filter((i) => i !== null);
 }
 
 const Container = styled.div`
