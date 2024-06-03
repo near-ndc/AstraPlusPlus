@@ -144,7 +144,7 @@ return (
                         ),
                         content: (
                             <Widget
-                                src="sking.near/widget/DAO.Proposal"
+                            src="/*__@appAccount__*//widget/DAO.Proposals.index"
                                 props={{ daoId: daoId, proposalId: proposalId }}
                             />
                         )

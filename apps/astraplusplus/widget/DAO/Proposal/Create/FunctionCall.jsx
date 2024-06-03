@@ -436,7 +436,7 @@ return (
             <div className="mb-3">
               <h5>Memo</h5>
               <Widget
-                src="sking.near/widget/Common.Inputs.Markdown"
+                src="/*__@appAccount__*//widget/Common.Components.Markdown"
                 props={{
                   value: state.memo,
                   onChange: (value) => onChangeMemo(value),
@@ -560,7 +560,7 @@ return (
     {state.error && <div className="text-danger">{state.error}</div>}
     <div className="ms-auto">
       <Widget
-        src="sking.near/widget/Common.Button"
+        src="/*__@appAccount__*//widget/Common.Components.Button"
         props={{
           children: "Propose Function Call",
           onClick: handleFunctionCall,
@@ -570,7 +570,7 @@ return (
       />
       {onClose && (
         <Widget
-          src="sking.near/widget/Common.Button"
+          src="/*__@appAccount__*//widget/Common.Components.Button"
           props={{
             children: "Close",
             onClick: onClose,

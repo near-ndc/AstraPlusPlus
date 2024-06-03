@@ -23,7 +23,7 @@ State.init({
 return (
     <div className="mb-3">
         <Widget
-            src={`sking.near/widget/Common.Inputs.Select`}
+            src={`/*__@appAccount__*//widget/Common.Components.Select`}
             props={{
                 label: label,
                 noLabel: false,

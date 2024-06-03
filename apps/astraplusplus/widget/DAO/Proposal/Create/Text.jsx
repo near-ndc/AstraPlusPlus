@@ -161,7 +161,7 @@ return (
     {state.error && <div className="text-danger">{state.error}</div>}
     <div className="ms-auto">
       <Widget
-        src="sking.near/widget/Common.Button"
+        src="/*__@appAccount__*//widget/Common.Components.Button"
         props={{
           children: "Create Proposal",
           onClick: handleProposal,
@@ -171,7 +171,7 @@ return (
       />
       {onClose && (
         <Widget
-          src="sking.near/widget/Common.Button"
+          src="/*__@appAccount__*//widget/Common.Components.Button"
           props={{
             children: "Close",
             onClick: onClose,
