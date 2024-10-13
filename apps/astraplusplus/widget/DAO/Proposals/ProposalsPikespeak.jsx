@@ -48,7 +48,8 @@ State.init({
   multiSelectMode: defaultMultiSelectMode ?? false,
   tableView: defaultTableView ?? false,
   daoConfig: null,
-  tab: "active"
+  tab: "active",
+  sputnikProposalsLastCount: null
 });
 
 if (
@@ -130,6 +131,12 @@ function fetchCongressDaoProposals() {
 
   return data;
 }
+
+useEffect(() => {
+  Near.asyncView(daoId, "get_last_proposal_id", {}).then((resp) => {
+    State.update({ sputnikProposalsLastCount: resp - 1 });
+  });
+}, [daoId]);
 
 function fetchDaoProposals() {
   const resp = fetch(
@@ -377,6 +384,16 @@ return (
       </div>
     ) : (
       <>
+        {!state.filters.proposal_types.length &&
+          !state.filters.status.length &&
+          res?.body?.[0] &&
+          res.body[0].proposal_id < state.sputnikProposalsLastCount && (
+            <div className="alert alert-danger mt-4" role="alert">
+              The Pikespeak indexer is currently delayed. New proposals have
+              been created, so please check back later for an updated proposals
+              feed.
+            </div>
+          )}
         {isVotingBodyDao && (
           <div className="w-100 mt-2">
             <Widget

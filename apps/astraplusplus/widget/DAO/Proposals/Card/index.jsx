@@ -86,8 +86,8 @@ if (isHuman === null) {
 const policy = isCongressDaoID
   ? Near.view(daoId, "get_members")
   : isVotingBodyDao
-  ? ""
-  : Near.view(daoId, "get_policy");
+    ? ""
+    : Near.view(daoId, "get_policy");
 let roles = policy;
 
 function getPreVoteVotes(supported) {
@@ -276,10 +276,10 @@ const expensiveWork = () => {
     typeof my_proposal.kind === "string"
       ? my_proposal.kind
       : isCongressDaoID || isVotingBodyDao
-      ? Object.keys(my_proposal.kind)[0]
-      : typeof my_proposal.kind.typeEnum === "string"
-      ? my_proposal.kind.typeEnum
-      : Object.keys(my_proposal.kind)[0];
+        ? Object.keys(my_proposal.kind)[0]
+        : typeof my_proposal.kind.typeEnum === "string"
+          ? my_proposal.kind.typeEnum
+          : Object.keys(my_proposal.kind)[0];
 
   const isAllowedToVote = isVotingBodyDao
     ? [isHuman, isHuman, isHuman, isHuman]
@@ -294,31 +294,30 @@ const expensiveWork = () => {
   let totalVotesNeeded = 0;
 
   if (policy?.roles) {
-    policy.roles.forEach((role) => {
-      // Determine if the role is eligible for the given proposalType
-      const isRoleAllowedToVote =
+    const groupWithPermissions = policy.roles.filter(
+      (role) =>
+        // Determine if the role is eligible for the given proposalType
         role.permissions.includes(`${proposalKinds[kindName]}:VoteApprove`) ||
         role.permissions.includes(`${proposalKinds[kindName]}:VoteReject`) ||
         role.permissions.includes(`${proposalKinds[kindName]}:*`) ||
         role.permissions.includes(`*:VoteApprove`) ||
         role.permissions.includes(`*:VoteReject`) ||
-        role.permissions.includes("*:*");
+        role.permissions.includes("*:*")
+    );
+    groupWithPermissions.map((role) => {
+      const threshold = (role.vote_policy &&
+        role.vote_policy[proposalKinds[kindName]]?.threshold) ||
+        policy["default_vote_policy"]?.threshold || [0, 0];
+      const eligibleVoters = role.kind.Group ? role.kind.Group.length : 0;
 
-      if (isRoleAllowedToVote) {
-        const threshold = (role.vote_policy &&
-          role.vote_policy[proposalKinds[kindName]]?.threshold) ||
-          policy["default_vote_policy"]?.threshold || [0, 0];
-        const eligibleVoters = role.kind.Group ? role.kind.Group.length : 0;
-
-        // Apply the threshold
-        if (eligibleVoters === 0) {
-          return;
-        }
-        const votesNeeded =
-          Math.floor((threshold[0] / threshold[1]) * eligibleVoters) + 1;
-
-        totalVotesNeeded += votesNeeded;
+      // Apply the threshold
+      if (eligibleVoters === 0) {
+        return;
       }
+      const votesNeeded =
+        Math.floor((threshold[0] / threshold[1]) * eligibleVoters) + 1;
+
+      totalVotesNeeded += votesNeeded;
     });
   }
   my_proposal.typeName = kindName.replace(/([A-Z])/g, " $1").trim(); // Add spaces between camelCase
