@@ -40,10 +40,10 @@ const expirationTime =
     ? submission_time +
       (daoConfig?.vote_duration ?? daoConfig?.voting_duration ?? 0)
     : policy?.proposal_period
-    ? parseInt(
-        Big(submission_time).add(Big(policy.proposal_period)).div(1000000)
-      )
-    : null;
+      ? parseInt(
+          Big(submission_time).add(Big(policy.proposal_period)).div(1000000)
+        )
+      : null;
 function checkVotesForCongressDao(value) {
   if (isCongressDaoID) {
     return votes[accountId]?.vote === value;
@@ -655,8 +655,8 @@ function renderVoteButtons({
         gridTemplateColumns: showVeto
           ? "repeat(3,1fr) 120px"
           : isVotingBodyDao
-          ? "repeat(4,1fr)"
-          : "repeat(3,1fr)"
+            ? "repeat(4,1fr)"
+            : "repeat(3,1fr)"
       }}
     >
       <div className="w-100">

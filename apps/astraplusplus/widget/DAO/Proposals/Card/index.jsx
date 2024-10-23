@@ -305,19 +305,28 @@ const expensiveWork = () => {
         role.permissions.includes("*:*")
     );
     groupWithPermissions.map((role) => {
-      const threshold = (role.vote_policy &&
-        role.vote_policy[proposalKinds[kindName]]?.threshold) ||
-        policy["default_vote_policy"]?.threshold || [0, 0];
-      const eligibleVoters = role.kind.Group ? role.kind.Group.length : 0;
+      if (role?.vote_policy?.[proposalKinds[kindName]]?.threshold) {
+        if (
+          Array.isArray(role.vote_policy[proposalKinds[kindName]]?.threshold)
+        ) {
+          const threshold = (role.vote_policy &&
+            role.vote_policy[proposalKinds[kindName]]?.threshold) ||
+            policy["default_vote_policy"]?.threshold || [0, 0];
+          const eligibleVoters = role.kind.Group ? role.kind.Group.length : 0;
+          // Apply the threshold
+          if (eligibleVoters === 0) {
+            return;
+          }
+          const votesNeeded =
+            Math.floor((threshold[0] / threshold[1]) * eligibleVoters) + 1;
 
-      // Apply the threshold
-      if (eligibleVoters === 0) {
-        return;
+          totalVotesNeeded += votesNeeded;
+        } else {
+          totalVotesNeeded = parseInt(
+            role.vote_policy[proposalKinds[kindName]].threshold
+          );
+        }
       }
-      const votesNeeded =
-        Math.floor((threshold[0] / threshold[1]) * eligibleVoters) + 1;
-
-      totalVotesNeeded += votesNeeded;
     });
   }
   my_proposal.typeName = kindName.replace(/([A-Z])/g, " $1").trim(); // Add spaces between camelCase

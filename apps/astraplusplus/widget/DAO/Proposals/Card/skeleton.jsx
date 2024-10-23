@@ -7,8 +7,8 @@ let layout = [
         variants: ["lg"],
         rows: 1,
         style: {
-          width: "50%",
-        },
+          width: "50%"
+        }
       },
       {
         type: "text",
@@ -16,10 +16,10 @@ let layout = [
         rows: 1,
         style: {
           width: "80px",
-          marginStart: "auto",
-        },
-      },
-    ],
+          marginStart: "auto"
+        }
+      }
+    ]
   },
   {
     type: "row",
@@ -27,21 +27,21 @@ let layout = [
     content: [
       {
         type: "avatar",
-        variants: ["md", "me-1"],
+        variants: ["md", "me-1"]
       },
       {
         type: "text",
         variants: ["md"],
         rows: 1,
         style: {
-          width: "150px",
-        },
-      },
-    ],
+          width: "150px"
+        }
+      }
+    ]
   },
   {
     type: "box",
-    variants: ["lg", "mb-5"],
+    variants: ["lg", "mb-5"]
   },
   {
     type: "row",
@@ -51,11 +51,11 @@ let layout = [
         type: "box",
         variants: ["rounded-5"],
         style: {
-          height: "46px",
+          height: "46px"
         },
-        count: 3,
-      },
-    ],
+        count: 3
+      }
+    ]
   },
   {
     type: "row",
@@ -67,11 +67,11 @@ let layout = [
         count: 2,
         style: {
           height: "38px",
-          width: "160px",
-        },
-      },
-    ],
-  },
+          width: "160px"
+        }
+      }
+    ]
+  }
 ];
 
 const Wrapper = styled.div`
